@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Huskies Athlete Hub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#1B3A6B;--navy-dark:#0F2347;--navy-mid:#2D5499;--navy-light:#EBF0F8;
+  --orange:#F4581A;--orange-dark:#C43D0F;
+  --gray-bg:#F2F3F5;--gray-border:#DDE1E9;--text:#1a1a2e;--text-soft:#5A6070;
+  --exc:#4E9E2A;--acc:#D4970A;--mon:#E07B00;--hrc:#C0392B;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--gray-bg);color:var(--text);}
+header{background:var(--navy-dark);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:500;}
+header h1{font-size:18px;}
+header .sub{font-size:12px;color:rgba(255,255,255,.6);}
+.hdr-btn{padding:8px 14px;background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+.hdr-btn:hover{background:rgba(255,255,255,.1);}
+.wrap{max-width:1000px;margin:0 auto;padding:24px;}
+.search-box{position:relative;margin-bottom:24px;}
+.search-box input{width:100%;padding:14px 16px;font-size:16px;border:1.5px solid var(--gray-border);border-radius:10px;background:#fff;}
+.search-box input:focus{outline:none;border-color:var(--navy);}
+.search-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--gray-border);border-top:none;border-radius:0 0 10px 10px;max-height:280px;overflow-y:auto;z-index:20;display:none;}
+.search-results.show{display:block;}
+.search-result-item{padding:10px 16px;cursor:pointer;font-size:14px;border-bottom:1px solid #f0f2f5;}
+.search-result-item:hover{background:var(--navy-light);}
+.search-result-item .sources{font-size:11px;color:var(--text-soft);margin-top:2px;}
+.profile-header{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.profile-header h2{font-size:22px;color:var(--navy);}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.cards{grid-template-columns:1fr;}}
+.card{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-top:4px solid var(--navy);}
+.card h3{font-size:14px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.card .empty{color:var(--text-soft);font-size:13px;padding:12px 0;}
+.metric-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid #f4f5f7;}
+.metric-row:last-child{border-bottom:none;}
+.metric-row .label{font-size:12px;color:var(--text-soft);}
+.metric-row .value{font-size:15px;font-weight:800;}
+.delta{font-size:11px;font-weight:700;margin-left:6px;}
+.delta.up{color:var(--exc);}
+.delta.down{color:var(--hrc);}
+.session-list{margin-top:10px;font-size:12px;}
+.session-list div{padding:4px 0;display:flex;justify-content:space-between;color:var(--text-soft);}
+.login-gate{position:fixed;inset:0;background:linear-gradient(135deg,#0F2347,#1B3A6B 55%,#2D5499);z-index:99999;display:flex;align-items:center;justify-content:center;}
+.login-gate.hidden{display:none;}
+.login-box{background:#fff;border-radius:16px;padding:32px 28px;width:min(360px,90vw);box-shadow:0 24px 60px rgba(0,0,0,.4);}
+.login-box h2{color:var(--navy);font-size:18px;margin-bottom:6px;}
+.login-box p{color:var(--text-soft);font-size:13px;margin-bottom:18px;}
+.login-box input{width:100%;padding:10px 12px;border:1.5px solid var(--gray-border);border-radius:8px;font-size:14px;margin-bottom:10px;}
+.login-box button{width:100%;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+.login-err{color:var(--hrc);font-size:12px;margin-top:8px;min-height:16px;}
+.app-hidden{display:none;}
+.loading-note{font-size:12px;color:var(--text-soft);text-align:center;padding:20px;}
+.tab-btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid var(--navy);background:transparent;color:var(--navy);}
+.tab-btn.active{background:var(--navy);color:#fff;}
+.flag-group{background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.flag-group h4{font-size:15px;color:var(--navy);margin-bottom:10px;}
+.flag-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f4f5f7;font-size:13px;}
+.flag-item:last-child{border-bottom:none;}
+.flag-item .name{font-weight:700;cursor:pointer;color:var(--navy);}
+.flag-item .name:hover{text-decoration:underline;}
+.flag-item .reason{font-size:12px;color:var(--text-soft);}
+.flag-tag{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;text-transform:uppercase;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="loginGate" class="login-gate">
+  <div class="login-box">
+    <h2>Coach Login</h2>
+    <p>Sign in with your district email to view athlete profiles.</p>
+    <input type="email" id="loginEmail" placeholder="you@naperville203.org" autocomplete="username"/>
+    <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div id="appRoot" class="app-hidden">
+<header>
+  <img class="hlogo" src="" id="headerLogo" alt="Naperville North Huskies" style="height:44px;width:44px;border-radius:8px;object-fit:contain;">
+  <div>
+    <div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--orange);text-transform:uppercase;">Naperville North Strength &amp; Performance</div>
+    <h1>Athlete Hub</h1>
+    <div class="sub">Combined view across Asymmetry, CMJ, Velocity &amp; Strength Board</div>
+  </div>
+  <button class="hdr-btn" onclick="sbClient.auth.signOut()">Log Out</button>
+</header>
+
+<div class="wrap">
+  <div style="display:flex;gap:8px;margin-bottom:20px;">
+    <button class="tab-btn active" id="tabSearchBtn" onclick="switchView('search')">Athlete Search</button>
+    <button class="tab-btn" id="tabTeamBtn" onclick="switchView('team')">By Team</button>
+    <button class="tab-btn" id="tabHealthBtn" onclick="switchView('health')">Team Health Check</button>
+  </div>
+  <div id="searchView">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search athlete by name..." oninput="onSearchInput()" autocomplete="off"/>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div id="profileArea"></div>
+  </div>
+  <div id="healthView" style="display:none;"></div>
+  <div id="teamView" style="display:none;"></div>
+<div class="footer-tag" style="text-align:center;padding:24px 0 10px;color:var(--orange);font-weight:800;letter-spacing:.5px;font-size:13px;">TRAIN SMART. &nbsp; LEAD STRONG. &nbsp; COMPETE WITH PURPOSE.</div>
+</div>
+</div>
+
+<script>
+const LOGO = "data:image/png;base64,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";
+const SUPABASE_URL = 'https://qyhlsoidbyiwlatpoewl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_cZE5LZny7o9pQKpf48J2cA_Xp1vGbTn';
+
+const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Ported directly from the live CMJ dashboard's own baked statistical thresholds
+// (per-athlete mean/SD/CV-based Green/Yellow/Red zones), so this reproduces the
+// exact same readiness calls as the real CMJ dashboard, not an approximation.
+
+// Ported directly from the live Velocity dashboard's velocity->%1RM lookup table.
+const VTABLE = [{"pct": 50, "v": 0.85}, {"pct": 55, "v": 0.8}, {"pct": 60, "v": 0.75}, {"pct": 65, "v": 0.7}, {"pct": 70, "v": 0.65}, {"pct": 75, "v": 0.6}, {"pct": 80, "v": 0.5}, {"pct": 85, "v": 0.45}, {"pct": 90, "v": 0.4}, {"pct": 95, "v": 0.35}, {"pct": 100, "v": 0.3}];
+function velocityToPercent1RM(v){
+  if (v >= VTABLE[0].v) return VTABLE[0].pct;
+  if (v <= VTABLE[VTABLE.length-1].v) return VTABLE[VTABLE.length-1].pct;
+  for (let i=0;i<VTABLE.length-1;i++){
+    const a=VTABLE[i], b=VTABLE[i+1];
+    if (v<=a.v && v>=b.v){ const frac=(a.v-v)/(a.v-b.v); return a.pct+frac*(b.pct-a.pct); }
+  }
+  return 75;
+}
+function est1RM(load, vel){ return load / (velocityToPercent1RM(vel)/100); }
+function analyzeVeloTrend(rows){
+  if (rows.length===0) return {status:'incomplete',label:'No data',est1RMLatest:null};
+  if (rows.length===1) return {status:'incomplete',label:'Baseline only',est1RMLatest:est1RM(rows[0].load,rows[0].vel)};
+  const withEst = rows.map(r=>({...r, est: est1RM(r.load,r.vel)}));
+  const baseline = withEst[0], latest = withEst[withEst.length-1];
+  const pctChange = (latest.est-baseline.est)/baseline.est;
+  let flagDecline = false;
+  if (withEst.length>=3){
+    const last3 = withEst.slice(-3);
+    if (last3[1].vel < last3[0].vel-0.01 && last3[2].vel < last3[1].vel-0.01) flagDecline = true;
+  }
+  let status,label;
+  if (flagDecline){ status='flag'; label='Flag — 2wk decline'; }
+  else if (pctChange>0.03){ status='up'; label='Trending Up'; }
+  else if (pctChange<-0.03){ status='flag'; label='Flag — Est.1RM down'; }
+  else { status='stable'; label='Stable'; }
+  return {status,label,est1RMLatest:latest.est,pctChange};
+}
+
+
+// ── AUTH ──────────────────────────────────────────────────────────────
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.textContent = '';
+  const {error} = await sbClient.auth.signInWithPassword({email, password: pass});
+  if(error){ errEl.textContent = error.message; return; }
+  await onLoginSuccess();
+}
+async function onLoginSuccess(){
+  document.getElementById('loginGate').classList.add('hidden');
+  document.getElementById('appRoot').classList.remove('app-hidden');
+  await loadAllData();
+}
+async function initAuth(){
+  const {data:{session}} = await sbClient.auth.getSession();
+  if(session){ await onLoginSuccess(); }
+  sbClient.auth.onAuthStateChange((event)=>{
+    if(event==='SIGNED_OUT'){
+      document.getElementById('loginGate').classList.remove('hidden');
+      document.getElementById('appRoot').classList.add('app-hidden');
+    }
+  });
+}
+
+// ── DATA LOADING ──────────────────────────────────────────────────────
+let ASYM_DATA=null, CMJ_DATA=null, VELO_DATA=null, STR_ATHLETES=[], STR_TESTS=[], STR_EXERCISES=[];
+let ROSTER=[]; // union of names across all sources, for search
+
+function normName(n){ return (n||'').trim().toLowerCase(); }
+
+async function loadAllData(){
+  document.getElementById('profileArea').innerHTML = '<div class="loading-note">Loading data from all four dashboards…</div>';
+
+  const [asymRes, cmjRes, veloRes, athRes, testRes, exRes] = await Promise.all([
+    sbClient.from('sport_blobs').select('*').eq('id','asymmetry:football'),
+    sbClient.from('sport_blobs').select('*').eq('id','cmj:football'),
+    sbClient.from('sport_blobs').select('*').eq('id','velocity:football'),
+    sbClient.from('athletes').select('*'),
+    sbClient.from('tests').select('*'),
+    sbClient.from('exercises').select('*')
+  ]);
+
+  ASYM_DATA = (asymRes.data && asymRes.data[0]) ? asymRes.data[0].data : {roster:[],entries:[]};
+  CMJ_DATA  = (cmjRes.data && cmjRes.data[0]) ? cmjRes.data[0].data : {roster:[],entries:[]};
+  VELO_DATA = (veloRes.data && veloRes.data[0]) ? veloRes.data[0].data : {athletes:[],entries:[]};
+  STR_ATHLETES = athRes.data || [];
+  STR_TESTS = testRes.data || [];
+  STR_EXERCISES = exRes.data || [];
+
+  const nameSet = new Map(); // normName -> {display, sources:Set, team}
+
+  // CMJ roster is the authoritative source for team — it's stored per-athlete
+  // on the roster record (field 'team', a string: 'Varsity'/'Soph'/'Frosh'),
+  // NOT on individual jump entries, and NOT as a number.
+  const cmjTeamByName = {};
+  (CMJ_DATA.roster||[]).forEach(a=>{ if(a.n && a.team) cmjTeamByName[normName(a.n)] = a.team; });
+
+  (ASYM_DATA.entries||[]).forEach(e=>addName(e.name,'Asymmetry'));
+  (CMJ_DATA.entries||[]).forEach(e=>addName(e.name,'CMJ'));
+  (VELO_DATA.athletes||[]).forEach(a=>addName(a.name,'Velocity'));
+  STR_ATHLETES.forEach(a=>addName((a.first_name+' '+a.last_name).trim(),'Strength'));
+
+  function addName(name, source){
+    if(!name) return;
+    const key = normName(name);
+    if(!nameSet.has(key)) nameSet.set(key,{display:name.trim(),sources:new Set(),team:null});
+    nameSet.get(key).sources.add(source);
+    if(!nameSet.get(key).team && cmjTeamByName[key]) nameSet.get(key).team = cmjTeamByName[key];
+  }
+
+  ROSTER = [...nameSet.values()].sort((a,b)=>a.display.localeCompare(b.display));
+  document.getElementById('profileArea').innerHTML = '<div class="loading-note">Search for an athlete above to see their combined profile.</div>';
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────
+function onSearchInput(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const box = document.getElementById('searchResults');
+  if(!q){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const matches = ROSTER.filter(r=>r.display.toLowerCase().includes(q)).slice(0,15);
+  if(!matches.length){ box.innerHTML = '<div class="search-result-item">No matches</div>'; box.classList.add('show'); return; }
+  box.innerHTML = matches.map(m=>
+    '<div class="search-result-item" onclick="selectAthlete(\''+m.display.replace(/'/g,"\\'")+'\')">'+
+      m.display+'<div class="sources">'+[...m.sources].join(' · ')+'</div>'+
+    '</div>'
+  ).join('');
+  box.classList.add('show');
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.search-box')) document.getElementById('searchResults').classList.remove('show');
+});
+
+// ── PROFILE RENDERING ────────────────────────────────────────────────
+function fmtDate(d){ if(!d) return '-'; const p=String(d).split('-'); return p.length===3?p[1]+'/'+p[2]+'/'+p[0]:d; }
+
+function clearSearch(){
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').classList.remove('show');
+  document.getElementById('profileArea').innerHTML = '<div class="loading-note">Search for an athlete above to see their combined profile.</div>';
+}
+
+function selectAthlete(name){
+  document.getElementById('searchInput').value = name;
+  document.getElementById('searchResults').classList.remove('show');
+  const key = normName(name);
+
+  let html = '<div class="profile-header" style="display:flex;justify-content:space-between;align-items:center;"><h2>'+name+'</h2><button class="tab-btn" onclick="clearSearch()" style="padding:6px 12px;font-size:12px;">&larr; Back to Search</button></div><div class="cards">';
+  html += renderAsymmetryCard(key,name);
+  html += renderCmjCard(key,name);
+  html += renderVelocityCard(key,name);
+  html += renderStrengthCard(key,name);
+  html += '</div>';
+  document.getElementById('profileArea').innerHTML = html;
+}
+
+// -- Asymmetry: full faithful logic, matches the real dashboard's calculation --
+function calcSet(l1,r1,l2,r2,l3,r3){
+  const avg=a=>{const v=a.filter(x=>x!=null&&x!==0);return v.length?v.reduce((s,x)=>s+x,0)/v.length:null;};
+  const L=avg([l1,l2,l3]), R=avg([r1,r2,r3]);
+  if(!L||!R)return null;
+  const pct=Math.abs(L-R)/Math.max(L,R)*100;
+  return{L,R,pct,total:L+R};
+}
+function calcAsym(e){
+  const setA=calcSet(e.s1l1||0,e.s1r1||0,e.s1l2||0,e.s1r2||0,e.s1l3||0,e.s1r3||0);
+  const setB=calcSet(e.s1l4||0,e.s1r4||0,e.s1l5||0,e.s1r5||0,e.s1l6||0,e.s1r6||0);
+  let pwrSet=null;
+  if(setA&&setB) pwrSet=setA.total>=setB.total?setA:setB; else pwrSet=setA||setB;
+  let symSet=null;
+  if(setA&&setB) symSet=setA.pct<=setB.pct?setA:setB; else symSet=setA||setB;
+  if(!pwrSet||!symSet) return{peakAvg:null,pct:null};
+  return{peakAvg:(pwrSet.L+pwrSet.R)/2, pct:symSet.pct};
+}
+function getFlagColor(p){ if(p==null)return '#ccc'; if(p<5)return 'var(--exc)'; if(p<8)return 'var(--acc)'; if(p<=12)return 'var(--mon)'; return 'var(--hrc)'; }
+
+function renderAsymmetryCard(key,name){
+  const entries = (ASYM_DATA.entries||[]).filter(e=>normName(e.name)===key).sort((a,b)=>b.date.localeCompare(a.date));
+  let body = '<div class="card"><h3>Asymmetry (Split-Switch Jump)</h3>';
+  if(!entries.length){ body += '<div class="empty">No data for this athlete in the Asymmetry dashboard.</div></div>'; return body; }
+  const latest = calcAsym(entries[0]);
+  const earliest = calcAsym(entries[entries.length-1]);
+  body += '<div class="metric-row"><div class="label">Latest Peak Power (' + fmtDate(entries[0].date) + ')</div><div class="value">'+(latest.peakAvg!=null?Math.round(latest.peakAvg)+'W':'—')+'</div></div>';
+  body += '<div class="metric-row"><div class="label">Latest Asymmetry</div><div class="value" style="color:'+getFlagColor(latest.pct)+';">'+(latest.pct!=null?latest.pct.toFixed(1)+'%':'—')+'</div></div>';
+  if(entries.length>=2 && earliest.peakAvg!=null && latest.peakAvg!=null){
+    const d = latest.peakAvg-earliest.peakAvg;
+    body += '<div class="metric-row"><div class="label">Season Change (since '+fmtDate(entries[entries.length-1].date)+')</div><div class="value delta '+(d>=0?'up':'down')+'">'+(d>=0?'▲':'▼')+' '+Math.abs(Math.round(d))+'W</div></div>';
+  }
+  body += '<div class="session-list">'+entries.slice(0,5).map(e=>{const x=calcAsym(e);return '<div><span>'+fmtDate(e.date)+'</span><span>'+(x.peakAvg!=null?Math.round(x.peakAvg)+'W':'—')+' / '+(x.pct!=null?x.pct.toFixed(1)+'%':'—')+'</span></div>';}).join('')+'</div>';
+  body += '</div>';
+  return body;
+}
+
+// -- CMJ: LIVE rolling averages, recomputed fresh from real entries every time
+// this page loads — not the old frozen per-athlete snapshot table. This is what
+// actually answers "is today a great day or a bad day," and stays accurate as
+// daily testing data comes in, with no manual refresh step needed.
+// Reconstructs the CMJ dashboard's own statistical tier system, but computed
+// LIVE from real entries every time instead of a frozen snapshot:
+//   <=3 sessions  -> insufficient data, no flag
+//   4-7 sessions  -> flat 15% / 20% drop-vs-7-day-avg thresholds
+//   8+ sessions   -> personalized: yellow = 1.5x the athlete's own variability,
+//                    red = 2x it (matches the dashboard's own "1.5 SD / 2 SD" rule)
+function computeLiveThreshold(entries){
+  const jumps = entries.map(e=>e.jump).filter(v=>v!=null);
+  const n = jumps.length;
+  if(n<=3) return {tier:'sparse', yellow_pct:null, red_pct:null};
+  const mean = jumps.reduce((s,v)=>s+v,0)/n;
+  if(n<=7) return {tier:'building', yellow_pct:-15, red_pct:-20, mean};
+  const variance = jumps.reduce((s,v)=>s+(v-mean)*(v-mean),0)/(n-1);
+  const sd = Math.sqrt(variance);
+  const cv = mean ? (sd/mean*100) : 0;
+  return {tier:'cv', yellow_pct:-(1.5*cv), red_pct:-(2*cv), mean, sd, cv};
+}
+function liveStatus(pct7, threshold){
+  if(pct7==null || threshold.yellow_pct==null) return 'GREEN';
+  if(pct7<=threshold.red_pct) return 'RED';
+  if(pct7<=threshold.yellow_pct) return 'YELLOW';
+  return 'GREEN';
+}
+function statusColor(s){ return s==='RED'?'#E24B4A':s==='YELLOW'?'#D4970A':'#4E9E2A'; }
+function statusLabel(s){ return s==='RED'?'🔴 Red — act now':s==='YELLOW'?'🟡 Yellow — monitor':'🟢 Green — on track'; }
+
+function rollingAvg(sortedAsc, beforeDate, sessionCount){
+  const list = sortedAsc.filter(e=>e.date<beforeDate).map(e=>e.jump).filter(v=>v!=null);
+  const window = list.slice(-sessionCount);
+  return window.length ? window.reduce((s,x)=>s+x,0)/window.length : null;
+}
+function renderCmjCard(key,name){
+  const entries = (CMJ_DATA.entries||[]).filter(e=>normName(e.name)===key).sort((a,b)=>a.date.localeCompare(b.date));
+  let body = '<div class="card"><h3>CMJ Fatigue</h3>';
+  if(!entries.length){ body += '<div class="empty">No data for this athlete in the CMJ dashboard.</div></div>'; return body; }
+  const latest = entries[entries.length-1];
+  const av7 = rollingAvg(entries, latest.date, 7);
+  const av21 = rollingAvg(entries, latest.date, 21);
+  const pct7 = (av7 && latest.jump!=null) ? (latest.jump-av7)/av7*100 : null;
+  const pct21 = (av21 && latest.jump!=null) ? (latest.jump-av21)/av21*100 : null;
+
+  const threshold = computeLiveThreshold(entries);
+  const status = liveStatus(pct7, threshold);
+  body += '<div style="background:'+statusColor(status)+'18;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+  body += '<div style="font-size:13px;font-weight:800;color:'+statusColor(status)+';">'+statusLabel(status)+'</div>';
+  body += '<div style="font-size:11px;color:var(--text-soft);margin-top:2px;">'+(threshold.tier==='sparse'?'Not enough sessions yet for a personalized threshold ('+entries.length+' on record)':threshold.tier==='building'?'Building baseline ('+entries.length+' sessions) \u2014 flat 15%/20% thresholds':'Personalized threshold from '+entries.length+' sessions (own variability: '+threshold.cv.toFixed(1)+'%)')+'</div>';
+  body += '</div>';
+
+  // Flag a testing gap: if there was a long break before this test, the rolling
+  // averages and personal thresholds are still catching up to current fitness,
+  // not a reliable read yet.
+  if(entries.length>=2){
+    const prev = entries[entries.length-2];
+    const gapDays = Math.round((new Date(latest.date) - new Date(prev.date)) / 86400000);
+    if(gapDays>10){
+      body += '<div style="background:#FEF5DC;border:1px solid #FDE68A;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:11px;color:#8B6008;">&#9888; '+gapDays+' days since the previous test &mdash; readings may be less reliable until a few more sessions rebuild the rolling average.</div>';
+    }
+  }
+
+  body += '<div class="metric-row"><div class="label">Today&rsquo;s Jump (' + fmtDate(latest.date) + ')</div><div class="value">'+(latest.jump!=null?latest.jump+'"':'&mdash;')+'</div></div>';
+
+  body += '<div class="metric-row"><div class="label">7-Day Rolling Avg</div><div class="value">'+(av7!=null?av7.toFixed(1)+'"':'&mdash;');
+  if(pct7!=null) body += ' <span class="delta '+(pct7>=0?'up':'down')+'">'+(pct7>=0?'\u25b2':'\u25bc')+' '+Math.abs(pct7).toFixed(1)+'%</span>';
+  body += '</div></div>';
+
+  body += '<div class="metric-row"><div class="label">21-Day Rolling Avg</div><div class="value">'+(av21!=null?av21.toFixed(1)+'"':'&mdash;');
+  if(pct21!=null) body += ' <span class="delta '+(pct21>=0?'up':'down')+'">'+(pct21>=0?'\u25b2':'\u25bc')+' '+Math.abs(pct21).toFixed(1)+'%</span>';
+  body += '</div></div>';
+
+  const reversed = entries.slice().reverse();
+  body += '<div class="session-list">'+reversed.slice(0,7).map(e=>'<div><span>'+fmtDate(e.date)+'</span><span>'+(e.jump!=null?e.jump+'"':'&mdash;')+'</span></div>').join('')+'</div>';
+  body += '</div>';
+  return body;
+}
+
+// -- Velocity: faithful estimated 1RM (via the real velocity->%1RM table) and
+// the real trending/flag logic, ported from the actual Velocity dashboard.
+function renderVelocityCard(key,name){
+  const athlete = (VELO_DATA.athletes||[]).find(a=>normName(a.name)===key);
+  let body = '<div class="card"><h3>Fixed-Load Velocity</h3>';
+  if(!athlete){ body += '<div class="empty">No data for this athlete in the Velocity dashboard.</div></div>'; return body; }
+  const allEntries = VELO_DATA.entries||[];
+  ['squat','bench'].forEach(lift=>{
+    const rows = allEntries.filter(e=>e.athleteId===athlete.id && e.lift===lift).sort((a,b)=>a.week-b.week);
+    if(!rows.length) return;
+    const t = analyzeVeloTrend(rows);
+    const color = t.status==='flag' ? 'var(--hrc)' : t.status==='up' ? 'var(--exc)' : 'var(--text-soft)';
+    body += '<div style="margin-bottom:10px;">';
+    body += '<div class="metric-row"><div class="label">'+(lift==='squat'?'Back Squat':'Bench Press')+' — Est. 1RM (Week '+rows[rows.length-1].week+')</div><div class="value">'+(t.est1RMLatest!=null?Math.round(t.est1RMLatest)+'lb':'—')+'</div></div>';
+    body += '<div style="font-size:11px;font-weight:700;color:'+color+';">'+t.label+(t.pctChange!=null?' ('+(t.pctChange>=0?'+':'')+(t.pctChange*100).toFixed(1)+'%)':'')+'</div>';
+    body += '</div>';
+  });
+  body += '</div>';
+  return body;
+}
+
+// -- Strength Board: latest recorded value per exercise vs the KPI standard. --
+function renderStrengthCard(key,name){
+  const athlete = STR_ATHLETES.find(a=>normName((a.first_name+' '+a.last_name))===key);
+  let body = '<div class="card"><h3>Strength &amp; Performance Board</h3>';
+  if(!athlete){ body += '<div class="empty">No data for this athlete in the Strength Board.</div></div>'; return body; }
+  const tests = STR_TESTS.filter(t=>t.athlete_id===athlete.id).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!tests.length){ body += '<div class="empty">Athlete is on the roster but has no logged tests yet.</div></div>'; return body; }
+  const byEx = {};
+  tests.forEach(t=>{ if(!byEx[t.ex_id]) byEx[t.ex_id]=t; }); // first hit = most recent, since sorted desc
+  Object.values(byEx).forEach(t=>{
+    const ex = STR_EXERCISES.find(e=>e.id===t.ex_id);
+    if(!ex) return;
+    let standardNote = '';
+    if(ex.kpi_type==='ratio' && athlete.weight){
+      const kpi = athlete.gender==='F' ? ex.kpi_f : ex.kpi_m;
+      if(kpi){
+        const target = kpi*athlete.weight;
+        const pass = t.value >= target;
+        standardNote = '<div class="delta '+(pass?'up':'down')+'">'+(pass?'▲ Meets':'▼ Below')+' standard ('+Math.round(target)+(ex.unit||'')+')</div>';
+      }
+    }
+    body += '<div class="metric-row"><div class="label">'+ex.name+' ('+fmtDate(t.date)+')</div><div class="value">'+t.value+(ex.unit||'')+standardNote+'</div></div>';
+  });
+  body += '</div>';
+  return body;
+}
+
+document.getElementById('headerLogo').src = LOGO;
+initAuth();
+
+// ── TEAM HEALTH CHECK ────────────────────────────────────────────────
+function switchView(view){
+  document.getElementById('tabSearchBtn').classList.toggle('active', view==='search');
+  document.getElementById('tabTeamBtn').classList.toggle('active', view==='team');
+  document.getElementById('tabHealthBtn').classList.toggle('active', view==='health');
+  document.getElementById('searchView').style.display = view==='search' ? 'block' : 'none';
+  document.getElementById('teamView').style.display = view==='team' ? 'block' : 'none';
+  document.getElementById('healthView').style.display = view==='health' ? 'block' : 'none';
+  if(view==='health') renderHealthCheck();
+  if(view==='team') renderTeamView('Varsity');
+}
+
+const TEAM_NAMES = ['Varsity','Soph','Frosh'];
+
+function renderTeamView(activeTeam){
+  const el = document.getElementById('teamView');
+  let html = '<div style="display:flex;gap:8px;margin-bottom:16px;">';
+  TEAM_NAMES.forEach(t=>{
+    html += '<button class="tab-btn'+(t===activeTeam?' active':'')+'" onclick="renderTeamView(\''+t+'\')">'+t+'</button>';
+  });
+  html += '</div>';
+
+  const members = ROSTER.filter(r=>r.team===activeTeam).sort((a,b)=>a.display.localeCompare(b.display));
+  const unassigned = activeTeam==='Varsity' ? ROSTER.filter(r=>!r.team) : [];
+
+  html += '<div class="flag-group"><h4>'+activeTeam+' <span style="font-weight:400;color:var(--text-soft);font-size:12px;">('+members.length+')</span></h4>';
+  if(!members.length){
+    html += '<div class="empty">No athletes tagged as '+activeTeam+' yet.</div>';
+  } else {
+    html += members.map(m=>
+      '<div class="flag-item"><span class="name" onclick="jumpToAthlete(\''+m.display.replace(/'/g,"\\'")+'\')">'+m.display+'</span><span class="reason">'+[...m.sources].join(' · ')+'</span></div>'
+    ).join('');
+  }
+  html += '</div>';
+
+  if(unassigned.length){
+    html += '<div class="flag-group"><h4>No Team Tag <span style="font-weight:400;color:var(--text-soft);font-size:12px;">('+unassigned.length+')</span></h4>';
+    html += '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px;">Team comes from each athlete&rsquo;s roster record in the CMJ dashboard. These athletes either don&rsquo;t have a team set there yet, or don&rsquo;t appear in CMJ at all (Velocity-only or Strength-only athletes).</div>';
+    html += unassigned.map(m=>
+      '<div class="flag-item"><span class="name" onclick="jumpToAthlete(\''+m.display.replace(/'/g,"\\'")+'\')">'+m.display+'</span><span class="reason">'+[...m.sources].join(' · ')+'</span></div>'
+    ).join('');
+    html += '</div>';
+  }
+
+  el.innerHTML = html;
+}
+
+function renderHealthCheck(){
+  const el = document.getElementById('healthView');
+  el.innerHTML = '<div class="loading-note">Scanning all four dashboards…</div>';
+
+  const asymFlags = [];
+  const asymByAthlete = {};
+  (ASYM_DATA.entries||[]).forEach(e=>{ (asymByAthlete[e.name]=asymByAthlete[e.name]||[]).push(e); });
+  Object.keys(asymByAthlete).forEach(name=>{
+    const entries = asymByAthlete[name].sort((a,b)=>b.date.localeCompare(a.date));
+    const x = calcAsym(entries[0]);
+    if(x.pct!=null && x.pct>=8){
+      asymFlags.push({name, reason:(x.pct>=12?'High Concern':'Monitor')+' — '+x.pct.toFixed(1)+'% asymmetry ('+fmtDate(entries[0].date)+')', severity:x.pct>=12?2:1});
+    }
+  });
+
+  const cmjFlags = [];
+  const cmjByAthlete = {};
+  (CMJ_DATA.entries||[]).forEach(e=>{ (cmjByAthlete[e.name]=cmjByAthlete[e.name]||[]).push(e); });
+  Object.keys(cmjByAthlete).forEach(name=>{
+    const entries = cmjByAthlete[name].sort((a,b)=>a.date.localeCompare(b.date));
+    const latest = entries[entries.length-1];
+    const av7 = rollingAvg(entries, latest.date, 7);
+    const pct7 = (av7 && latest.jump!=null) ? (latest.jump-av7)/av7*100 : null;
+    const threshold = computeLiveThreshold(entries);
+    const status = liveStatus(pct7, threshold);
+    if(status==='RED' || status==='YELLOW'){
+      let gapNote = '';
+      if(entries.length>=2){
+        const prev = entries[entries.length-2];
+        const gapDays = Math.round((new Date(latest.date) - new Date(prev.date)) / 86400000);
+        if(gapDays>10) gapNote = ' \u2014 \u26a0 '+gapDays+' days since previous test, may be a break effect';
+      }
+      cmjFlags.push({name, reason:(status==='RED'?'Red — act now':'Yellow — monitor')+' — '+pct7.toFixed(1)+'% vs 7-day avg ('+fmtDate(latest.date)+')'+gapNote, severity:status==='RED'?2:1});
+    }
+  });
+
+  const veloFlags = [];
+  (VELO_DATA.athletes||[]).forEach(a=>{
+    ['squat','bench'].forEach(lift=>{
+      const rows = (VELO_DATA.entries||[]).filter(e=>e.athleteId===a.id && e.lift===lift).sort((x,y)=>x.week-y.week);
+      if(!rows.length) return;
+      const t = analyzeVeloTrend(rows);
+      if(t.status==='flag'){
+        veloFlags.push({name:a.name, reason:(lift==='squat'?'Back Squat':'Bench Press')+' — '+t.label+' (Week '+rows[rows.length-1].week+')', severity:2});
+      }
+    });
+  });
+
+  const strFlags = [];
+  STR_ATHLETES.forEach(a=>{
+    const fullName = (a.first_name+' '+a.last_name).trim();
+    const tests = STR_TESTS.filter(t=>t.athlete_id===a.id).sort((x,y)=>y.date.localeCompare(x.date));
+    const seen = {};
+    tests.forEach(t=>{
+      if(seen[t.ex_id]) return; seen[t.ex_id]=true;
+      const ex = STR_EXERCISES.find(e=>e.id===t.ex_id);
+      if(!ex || ex.kpi_type!=='ratio' || !a.weight) return;
+      const kpi = a.gender==='F' ? ex.kpi_f : ex.kpi_m;
+      if(!kpi) return;
+      const target = kpi*a.weight;
+      if(t.value < target){
+        strFlags.push({name:fullName, reason:ex.name+' below standard — '+t.value+(ex.unit||'')+' vs target '+Math.round(target)+(ex.unit||'')+' ('+fmtDate(t.date)+')', severity:1});
+      }
+    });
+  });
+
+  function group(title, flags, emptyMsg){
+    flags.sort((a,b)=>b.severity-a.severity);
+    let h = '<div class="flag-group"><h4>'+title+' <span style="font-weight:400;color:var(--text-soft);font-size:12px;">('+flags.length+')</span></h4>';
+    if(!flags.length){ h += '<div class="empty">'+emptyMsg+'</div>'; }
+    else {
+      h += flags.map(f=>
+        '<div class="flag-item"><div><span class="name" onclick="jumpToAthlete(\''+f.name.replace(/'/g,"\\'")+'\')">'+f.name+'</span><div class="reason">'+f.reason+'</div></div>'+
+        '<span class="flag-tag" style="background:'+(f.severity===2?'var(--hrc)':'var(--acc)')+'22;color:'+(f.severity===2?'var(--hrc)':'var(--acc)')+';">'+(f.severity===2?'Red':'Yellow')+'</span></div>'
+      ).join('');
+    }
+    h += '</div>';
+    return h;
+  }
+
+  let html = '<div style="margin-bottom:16px;font-size:13px;color:var(--text-soft);">Everyone currently flagged in any dashboard, worst first within each group. Click a name to open their full profile.</div>';
+  html += group('Asymmetry — Monitor / High Concern', asymFlags, 'No athletes currently flagged.');
+  html += group('CMJ — Yellow / Red Readiness', cmjFlags, 'No athletes currently flagged.');
+  html += group('Velocity — Declining Trend', veloFlags, 'No athletes currently flagged.');
+  html += group('Strength — Below Standard', strFlags, 'No athletes currently below standard.');
+  el.innerHTML = html;
+}
+
+function jumpToAthlete(name){
+  switchView('search');
+  document.getElementById('searchInput').value = name;
+  selectAthlete(name);
+}
+</script>
+</body>
+</html>
