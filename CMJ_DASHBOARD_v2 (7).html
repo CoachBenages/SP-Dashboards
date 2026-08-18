@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMJ Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1B3A6B;--navy-dark:#0F2347;--orange:#F4581A;--gray-bg:#F2F3F5;--gray-border:#DDE1E9;--text:#1a1a2e;--text-soft:#5A6070;--green:#2E7D1F;--yellow:#8B6008;--red:#C0392B}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--gray-bg);color:var(--text)}
+.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--navy-dark),var(--navy))}
+.login-box{background:#fff;border-radius:16px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.login-logo{display:block;width:110px;height:auto;margin:0 auto 18px}
+.login-pillars{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-soft);margin-bottom:22px}
+.login-pillars i{color:var(--orange);font-style:normal}
+.login-box h1{font-size:24px;font-weight:800;margin-bottom:8px;color:var(--navy);text-align:center}
+.login-box p{text-align:center}
+.login-box p{font-size:14px;color:var(--text-soft);margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.form-group input,.form-group select{width:100%;padding:12px 14px;font-size:14px;border:1.5px solid var(--gray-border);border-radius:8px;font-family:inherit;background:#fff}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--navy)}
+.btn-login{width:100%;padding:12px;background:var(--navy);color:#fff;font-size:15px;font-weight:700;border:none;border-radius:8px;cursor:pointer;margin-top:24px}
+.error-msg{color:var(--red);font-size:12px;margin-top:8px}
+.ok-msg{color:var(--green);font-size:12px;margin-top:8px}
+.dashboard{display:none}
+.dashboard.active{display:flex;flex-direction:column;min-height:100vh}
+.header{background:linear-gradient(135deg,var(--navy-dark),var(--navy));color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand-logo{width:58px;height:auto;flex-shrink:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:6px}
+.brand-text{min-width:0}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:2px}
+.brand-title{font-size:21px;font-weight:800;line-height:1.15;margin-bottom:3px}
+.pillars{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.pillars i{color:var(--orange);font-style:normal}
+.clock{font-size:12px;font-weight:700;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-radius:99px;padding:6px 12px;white-space:nowrap}
+@media(max-width:640px){.brand-title{font-size:17px}.brand-logo{width:46px}.clock{display:none}.pillars{font-size:10px;gap:5px}}
+.logo{font-size:22px;font-weight:800}
+.header-title{font-size:13px;font-weight:700;color:rgba(255,255,255,.8)}
+.header-right{display:flex;align-items:center;gap:12px}
+.user-email{font-size:12px;opacity:.85}
+.btn-logout{padding:8px 14px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;cursor:pointer;font-size:12px;font-weight:700}
+.nav-tabs{background:#fff;border-bottom:1px solid var(--gray-border);display:flex;padding:0 12px;overflow-x:auto}
+.nav-tab{padding:14px 14px;background:none;border:none;border-bottom:3px solid transparent;color:var(--text-soft);cursor:pointer;font-size:12px;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.nav-tab.active{color:var(--navy);border-bottom-color:var(--orange)}
+.readiness-bar{background:var(--navy-dark);border-top:3px solid var(--orange);padding:10px 20px;display:flex;align-items:center;flex-wrap:wrap;gap:10px 28px}
+.rb-label{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.rb-item{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;white-space:nowrap}
+.rb-item i{width:10px;height:10px;border-radius:50%;background:currentColor;flex-shrink:0}
+.rb-green{color:#5BC85B}
+.rb-yellow{color:#F2C14E}
+.rb-red{color:#F2706B}
+@media(max-width:760px){.readiness-bar{gap:6px 16px;padding:9px 14px}.rb-item{font-size:11px;gap:6px}.rb-label{font-size:10px;width:100%}}
+.main{flex:1;padding:20px;max-width:1400px;margin:0 auto;width:100%}
+.panel{display:none}
+.panel.active{display:block}
+.card{background:#fff;border:1px solid var(--gray-border);border-radius:12px;padding:20px;margin-bottom:20px}
+.card-title{font-size:14px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:#fff;border:1.5px solid var(--gray-border);border-radius:10px;padding:16px;text-align:center}
+.stat-label{font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;margin-bottom:8px}
+.stat-value{font-size:30px;font-weight:900;color:var(--navy)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;font-weight:800;color:var(--navy);text-transform:uppercase;padding:10px;text-align:left;border-bottom:2px solid var(--gray-border);background:rgba(27,58,107,.03)}
+td{padding:10px;border-bottom:1px solid var(--gray-border)}
+.clickable{cursor:pointer;color:var(--navy);font-weight:700;text-decoration:underline}
+.badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-green{background:#E8F5E0;color:var(--green)}
+.badge-yellow{background:#FEF5DC;color:var(--yellow)}
+.badge-red{background:#FDEAEA;color:var(--red)}
+.badge-neutral{background:#F0F0F0;color:#888}
+.badge-medical{background:#FFF4E6;color:#E8A000}
+.btn{padding:10px 16px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
+.btn-green{background:var(--green)}
+.btn-orange{background:var(--orange)}
+.btn-gray{background:#888}
+.btn-amber{background:#E8A000}
+.kiosk-wrap{max-width:600px;margin:30px auto}
+.kiosk-step{display:none}
+.kiosk-step.active{display:block}
+.kiosk-card{background:#fff;border:2px solid var(--gray-border);border-radius:16px;padding:28px;text-align:center}
+.kiosk-title{font-size:26px;font-weight:900;color:var(--navy);margin-bottom:8px}
+.kiosk-sub{font-size:15px;color:var(--text-soft);margin-bottom:20px}
+.kiosk-input{width:100%;padding:14px;font-size:16px;border:1.5px solid var(--gray-border);border-radius:8px;margin-bottom:14px;font-family:inherit}
+.results{max-height:280px;overflow-y:auto;margin-bottom:14px;text-align:left}
+.result-item{padding:12px;background:var(--gray-bg);border-radius:8px;margin-bottom:8px;cursor:pointer}
+.result-item:hover{background:#E8ECFF}
+.result-name{font-weight:700;color:var(--navy)}
+.result-info{font-size:12px;color:var(--text-soft);margin-top:4px}
+.confirm-box{border-radius:12px;padding:22px;margin:16px 0}
+.confirm-value{font-size:40px;font-weight:900}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.modal.active{display:flex}
+.modal-box{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:19px;font-weight:800;margin-bottom:18px;color:var(--navy)}
+.chart-wrap{position:relative;height:320px;margin:16px 0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:12px;color:var(--text-soft);margin-top:6px}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-container">
+  <div class="login-box">
+    <img class="login-logo" alt="Naperville North Huskies" src="data:image/png;base64,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">
+    <h1>Coach Login</h1>
+    <p>Sign in with your district email.</p>
+    <div class="login-pillars"><span>Train Smart</span><i>&bull;</i><span>Lead Strong</span><i>&bull;</i><span>Compete With Purpose</span></div>
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="you@naperville203.org"></div>
+    <div class="form-group"><label>Password</label><input type="password" id="loginPassword"></div>
+    <button class="btn-login" onclick="handleLogin()">Sign In</button>
+    <div id="loginError" class="error-msg"></div>
+  </div>
+</div>
+
+<div id="dashboard" class="dashboard">
+  <div class="header">
+    <div class="brand">
+      <img class="brand-logo" alt="Naperville North Huskies" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKgAAACKCAMAAAAJ8fG7AAAKMWlDQ1BJQ0MgUHJvZmlsZQAAeJydlndUU9kWh8+9N71QkhCKlNBraFICSA29SJEuKjEJEErAkAAiNkRUcERRkaYIMijggKNDkbEiioUBUbHrBBlE1HFwFBuWSWStGd+8ee/Nm98f935rn73P3Wfvfda6AJD8gwXCTFgJgAyhWBTh58WIjYtnYAcBDPAAA2wA4HCzs0IW+EYCmQJ82IxsmRP4F726DiD5+yrTP4zBAP+flLlZIjEAUJiM5/L42VwZF8k4PVecJbdPyZi2NE3OMErOIlmCMlaTc/IsW3z2mWUPOfMyhDwZy3PO4mXw5Nwn4405Er6MkWAZF+cI+LkyviZjg3RJhkDGb+SxGXxONgAoktwu5nNTZGwtY5IoMoIt43kA4EjJX/DSL1jMzxPLD8XOzFouEiSniBkmXFOGjZMTi+HPz03ni8XMMA43jSPiMdiZGVkc4XIAZs/8WRR5bRmyIjvYODk4MG0tbb4o1H9d/JuS93aWXoR/7hlEH/jD9ld+mQ0AsKZltdn6h21pFQBd6wFQu/2HzWAvAIqyvnUOfXEeunxeUsTiLGcrq9zcXEsBn2spL+jv+p8Of0NffM9Svt3v5WF485M4knQxQ143bmZ6pkTEyM7icPkM5p+H+B8H/nUeFhH8JL6IL5RFRMumTCBMlrVbyBOIBZlChkD4n5r4D8P+pNm5lona+BHQllgCpSEaQH4eACgqESAJe2Qr0O99C8ZHA/nNi9GZmJ37z4L+fVe4TP7IFiR/jmNHRDK4ElHO7Jr8WgI0IABFQAPqQBvoAxPABLbAEbgAD+ADAkEoiARxYDHgghSQAUQgFxSAtaAYlIKtYCeoBnWgETSDNnAYdIFj4DQ4By6By2AE3AFSMA6egCnwCsxAEISFyBAVUod0IEPIHLKFWJAb5AMFQxFQHJQIJUNCSAIVQOugUqgcqobqoWboW+godBq6AA1Dt6BRaBL6FXoHIzAJpsFasBFsBbNgTzgIjoQXwcnwMjgfLoK3wJVwA3wQ7oRPw5fgEVgKP4GnEYAQETqiizARFsJGQpF4JAkRIauQEqQCaUDakB6kH7mKSJGnyFsUBkVFMVBMlAvKHxWF4qKWoVahNqOqUQdQnag+1FXUKGoK9RFNRmuizdHO6AB0LDoZnYsuRlegm9Ad6LPoEfQ4+hUGg6FjjDGOGH9MHCYVswKzGbMb0445hRnGjGGmsVisOtYc64oNxXKwYmwxtgp7EHsSewU7jn2DI+J0cLY4X1w8TogrxFXgWnAncFdwE7gZvBLeEO+MD8Xz8MvxZfhGfA9+CD+OnyEoE4wJroRIQiphLaGS0EY4S7hLeEEkEvWITsRwooC4hlhJPEQ8TxwlviVRSGYkNimBJCFtIe0nnSLdIr0gk8lGZA9yPFlM3kJuJp8h3ye/UaAqWCoEKPAUVivUKHQqXFF4pohXNFT0VFysmK9YoXhEcUjxqRJeyUiJrcRRWqVUo3RU6YbStDJV2UY5VDlDebNyi/IF5UcULMWI4kPhUYoo+yhnKGNUhKpPZVO51HXURupZ6jgNQzOmBdBSaaW0b2iDtCkVioqdSrRKnkqNynEVKR2hG9ED6On0Mvph+nX6O1UtVU9Vvuom1TbVK6qv1eaoeajx1UrU2tVG1N6pM9R91NPUt6l3qd/TQGmYaYRr5Grs0Tir8XQObY7LHO6ckjmH59zWhDXNNCM0V2ju0xzQnNbS1vLTytKq0jqj9VSbru2hnaq9Q/uE9qQOVcdNR6CzQ+ekzmOGCsOTkc6oZPQxpnQ1df11Jbr1uoO6M3rGelF6hXrtevf0Cfos/ST9Hfq9+lMGOgYhBgUGrQa3DfGGLMMUw12G/YavjYyNYow2GHUZPTJWMw4wzjduNb5rQjZxN1lm0mByzRRjyjJNM91tetkMNrM3SzGrMRsyh80dzAXmu82HLdAWThZCiwaLG0wS05OZw2xljlrSLYMtCy27LJ9ZGVjFW22z6rf6aG1vnW7daH3HhmITaFNo02Pzq62ZLde2xvbaXPJc37mr53bPfW5nbse322N3055qH2K/wb7X/oODo4PIoc1h0tHAMdGx1vEGi8YKY21mnXdCO3k5rXY65vTW2cFZ7HzY+RcXpkuaS4vLo3nG8/jzGueNueq5clzrXaVuDLdEt71uUnddd457g/sDD30PnkeTx4SnqWeq50HPZ17WXiKvDq/XbGf2SvYpb8Tbz7vEe9CH4hPlU+1z31fPN9m31XfKz95vhd8pf7R/kP82/xsBWgHcgOaAqUDHwJWBfUGkoAVB1UEPgs2CRcE9IXBIYMj2kLvzDecL53eFgtCA0O2h98KMw5aFfR+OCQ8Lrwl/GGETURDRv4C6YMmClgWvIr0iyyLvRJlESaJ6oxWjE6Kbo1/HeMeUx0hjrWJXxl6K04gTxHXHY+Oj45vipxf6LNy5cDzBPqE44foi40V5iy4s1licvvj4EsUlnCVHEtGJMYktie85oZwGzvTSgKW1S6e4bO4u7hOeB28Hb5Lvyi/nTyS5JpUnPUp2Td6ePJninlKR8lTAFlQLnqf6p9alvk4LTduf9ik9Jr09A5eRmHFUSBGmCfsytTPzMoezzLOKs6TLnJftXDYlChI1ZUPZi7K7xTTZz9SAxESyXjKa45ZTk/MmNzr3SJ5ynjBvYLnZ8k3LJ/J9879egVrBXdFboFuwtmB0pefK+lXQqqWrelfrry5aPb7Gb82BtYS1aWt/KLQuLC98uS5mXU+RVtGaorH1futbixWKRcU3NrhsqNuI2ijYOLhp7qaqTR9LeCUXS61LK0rfb+ZuvviVzVeVX33akrRlsMyhbM9WzFbh1uvb3LcdKFcuzy8f2x6yvXMHY0fJjpc7l+y8UGFXUbeLsEuyS1oZXNldZVC1tep9dUr1SI1XTXutZu2m2te7ebuv7PHY01anVVda926vYO/Ner/6zgajhop9mH05+x42Rjf2f836urlJo6m06cN+4X7pgYgDfc2Ozc0tmi1lrXCrpHXyYMLBy994f9Pdxmyrb6e3lx4ChySHHn+b+O31w0GHe4+wjrR9Z/hdbQe1o6QT6lzeOdWV0iXtjusePhp4tLfHpafje8vv9x/TPVZzXOV42QnCiaITn07mn5w+lXXq6enk02O9S3rvnIk9c60vvG/wbNDZ8+d8z53p9+w/ed71/LELzheOXmRd7LrkcKlzwH6g4wf7HzoGHQY7hxyHui87Xe4Znjd84or7ldNXva+euxZw7dLI/JHh61HXb95IuCG9ybv56Fb6ree3c27P3FlzF3235J7SvYr7mvcbfjT9sV3qID0+6j068GDBgztj3LEnP2X/9H686CH5YcWEzkTzI9tHxyZ9Jy8/Xvh4/EnWk5mnxT8r/1z7zOTZd794/DIwFTs1/lz0/NOvm1+ov9j/0u5l73TY9P1XGa9mXpe8UX9z4C3rbf+7mHcTM7nvse8rP5h+6PkY9PHup4xPn34D94Tz+6TMXDkAAAH+UExURZaZovhcD2ZVW+U9JN42ARQ6OisiNHoYEHgvHKE2HRpSeW2XsqpVAIaqwf9xcSwuQQAA/2pqAJdaS/9Vqv+ZCAAAfwBVVTFwmX8Af6M/IKdUOrPP4P8Af/9TAP//AAAtVAAAAP79/fpHAggxVTA0RXA6MNFEEf48AEw2PPXq5/7KtvxUEjJXdYw9J/8AAP9VALRCGv4+AJOnt/7ZyvtJAUhphQAbRqi4xRhEZ1Z2j/9+ALfF0P5JAPlJASVLav5KAHaTqWqFmv5JAP5KAPx5RvtmLaw5Ew88YqdCIsvU20Q3QXCMooWbrNTc4tvj6PyYcZZAJ/xJAf2qicLN1v7k2mN8kv9XAfyFV/20lz1gfTZlh/9TAM05BftxPJI1Gf8A//68ogITPE4qK7g8DjAqOfuNYtRGCf9QAAArYmZkbp6wvjFDWkdjfIssEJmzxEpYbP9RACdcg/9nAfygff7QvRklPVWEo3dBNrjT4/9SAPteIlFIUmkuJqcsBKhEFamttQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBZW3sAAACAdFJOU/4W/wrmBP8E/gj9+wP8Av8BAv8DDAID+gL///sC2QH+AP79/v7+/f7+/v///v4BBf4E/v/Q/v7+/v4C/m8w/q7+/k6O///+/v/+/v7+/v7//hL/////LP////1O9//+Af/+/gz+/xZt+////v/+/v6M+w7///79//ut/////Az/Spc7ngAAFx5JREFUeNrNnIlfm0j7wG33fu/rdx/DzAABhQQREjDm1hzmMGpttbrac3tsd9u9791//X2eGZKQmKTExn13Pq0SAsyX556BcUVZTttUql5pf1Oplbb24cPy28pyLpNO7zO1uaWkvX7fK1wH6ZJA15Wq81Rl+2mPP92FX+nfrEQznkoIiJRx8Wv9Nwq6qRR0YnHCPMYrRPWGus/8FbYy65n0bwb0tp513SxXOW8Vib6vjMjSsZ//ctC0kmEkrBDQOyly4tyWIk1/UPOqSqZWq7456cqybAhtFEARlTSrF+vSw/Rdlsmwb5zS+mb6twCauSjonBMekfZrwpvSirf71KkqOqDXlMy/CHQTOk4PxJRRShohoRlmfTMknIsAJTwMPOsU74Fl3lD5K1e2ygFi5Eucc993j1zf56RhowBB83ZjhWjN91+6YA1v7a+vp38N0E3oZnMQZ9JKofrXdOG2dO915Yl9t1vOBo0cD+538m3CChcg8lMHYwD4V4X0t+R9pa8dND2MRKK/gq7XlJLOtnDHH5TSo5BS1+I5XnQpbWe/KSkZlDOYATRgNbxX37063VeunF1XEnMWnuynC6dShMIm2d9LKmFVoX3w+S6lYY/SCvwuEq4XYH/VIVHjav3HBw/O9dr6VZ0qIegmFB3NEogQ5Ihusq9z8G1vF3zl/99LC1CL5nO557l8h5bB9Q0Q6TrsLeY72fDQIiQIy2FAtFjFkl6oIkgIuq7U+k/1AohQBxGC9dWDI9Ksf9whILrNTaW0y4nvdsP7fqvjiiAFx506jSCwyu2yZYGnUWj54BGLSIVgM5klg2LmUcHOvN0GJPJ0RrldD35BjYbgziA6paYBWwDKF3pHo9z1CrUHvzd9zjucW708P7GOurnuZ4Z3AyQp7AcxE+eBxKA6dKhpKMIMSGNfF5aHwX3rYh0CURPx3LyVd8XeBihfZ1+1wWatwyPfpHnYmeWkZRLnVPj+E08/875LnluTgm56agUIeJE4BeUjZQvAfEL8BhrjpvDvod+QxlG2c4ieDmDUNSEc9KgF0g8IOaR3DRFjS/U/NwL+QC+9lZA0Kei+p2azRCZyZRPKeWLljsIcwIIxruN9EBmKOLHMXrZCZToNwLlImMujf2GO7dHfPygp6/ueFuQo7bkN20tYBawk9CUQYQBx0rXAUv8TfCnMNUgYksZK+13vf9GbVBIVJSeUHmZ9AYr/8tQ3e4GwW04qlH5mP1GUkh2YtF1pmfnATlgFJJTopvdDMfDLlbBYDECEr7Svacsqd6xD6mbh842MB2BFhLPQuQeg8D/M+0KeaLa8C7YKbl/VGxBxQ7DZnCnCxrJAwQbrdyE8WiEJafmRh06O1mc+74KTq94NCAqoV/MoC8qlNJcN/MjZeGS5FV4Bsw3cz0CCF94jF4NVmxCXfnZ+mmjgkggUcky9YVJQVcWkL8BKt76BPlsW+DjUSsSGKC5AKbXaSFAhI9cSZsvztIFChmZ7WxCERVCFzy169/zJUkGb5EUv12nnWs8hHXrVPnQJmUj2TXbZFmQqbtKoRaGUhzwy3Bal3DIFNlGb7EFZcmYh7Ab67WWqHupiEpidkPqIYJd0tMYTy8e+IWxxBlldaJ3mKjQXmacPaL4L5RM4OIDmpOfjN3k4DjbAnssQBP6wNGeC6MSgi7Jbfo79BKTPokEHAcvrgfpVFT4fAk8Peg+ieOp3SRZMIQC50S4ZGG3oQmYAg8db7bUIu71Mr4c6bjciO2kH3QZRRbgBdtrN5sNIgughR1nriPCG+Fw8FAGph5J2RRgFyzZRlg1LhjLeSBqdEsdR8HNB5kOA6RZF3DkiENchZrq+sD0BBRkIj8sJfw9AbLiPunk0WyKFnouigTiFsP2LzWWDFi1hVc9JXsTvHHXReVeiIMRlCLUgXsJ3ltgFNoBF0+F9GPKTyDi7fAiJP5rVhLMqyUAfgurB3MoEHLtDAh4pGt08FP2FGDe5iOKhdb9I5RAf1Q+H+FmoCazopHZW2AnP+uJmtNpSQTMIinrGbiO3QItsu6aM6WYnW7SysKt8v9L9pQf2wSPf6Qlz4KRjoRzb4sbwXxsuBLYMVeMSqydZk6C5ubneIMTAx1a24st+W2VCc/d9zJ6wHzwmkKRoIQB6Qu7nQJQgecRDf4fEBmUWWHvScfQCcdTH4NP2B8UcWGQH1NiooB5znQY9xJBvwmGHFqX+wAhDNAc3rKCQ8SQh2CKFmgbl+ymWt8sDFZkJzc0FsmKkPKByCUZz2MzC+AMSEurez3ZDOFLUdaTYDRpw1v087bUoogVmIO6rlZUjApMvGbSA40lQFwmyQS6auslB8VH2yygjEnYh8oCd4r008JbykTj9bB4s5Dn1D+kJ1tQ5oY1WDu0gj+GV7S8RNI1DD3SfPJA9F6IptngIluCCf3WwCG2JHJR9YZqR+wcy6rr3wWYDK096UCxxjFgi4rrSKMBavPWlgsKQCYolsMAczQvH9akFSg3a1MLeiNVGaWLO6QQylyN+ECBwi1ayGOrzo4g7igfL9vrPzzA2mrRY7vmYDsEr3Ps5WuFgj2YUwPOj0PVc6r79mYtmncvLaAYGLexG/gvxxqASU95bJmjGU3utbJmWuXUiREi6lPMulBpQpwIeFsoh+gZYQRnrYdqDY374ASLFSZYUhYdjIVKExGQddlsvxTHgcWpJWW4KfaX9HoByXeH8smNwiApHnYLGfczgEJwa6NECAn2HMdBvF6NSA0tPF26oHZWtRbhrAbpU1eNY5MwC38FECH2DaMq+VDQ6f1fY6JHVgdqJExOYO1gYg/15X3VEYjq0ELQn06qorSHOlkVo1fcvljgKFbNi36JIVByrA8rNj3NoYoPUozlZ1y2iFLkJUi+L8YhWq2m/w4OL5g8PQlkXiOGHlHc2h5Vr0mc9SUEvTutfoxfpOnQEUZtBz1Y2eCHKdzfrMFLpEhpaKDoL02geRvyFgk7MchZCxM0zX5RWPCoS6DNNBK8s6D6TaGC/Mn+UHPP7VBEIVK9kfEvpXbJ23gBcKJKxX5847FFAeY6aoFIoUUXe/KYEA/gHbs4PjqhVfwYm+S6OREU1SJ+xPjqkn20Mp/fnT+69TqKZaCLjoVIz/icMdku363nQZr/GSD4X3l05e1QGryIqc7I5H/lQ7xUL74UVLpTT87tiaJp/9BJ90KRQy5JfALT8CWti9WBlcaCfSWfWM1eWaFopFKJJ8fXN9YvT8zL9o/HqRv1TevcrduOV1qZu6NbP2hBNi1mbGb/zcbD2fp/0WghqlJTPcdYPBA5CP+Ko+U8pZoIGivTlGYwQ4XOlYZTeElaa2b8iKJT1zKttFR6KTxc4B5HXtm7UcdLgiXIKH2HE+eynCq1UTB9C0S5GrvL7/3ce5hH0/MnFOma0Lq1A/O8g6CcfIyL/ShSM9X880T+GUPXpIzCRh4WtmjfPrdIr6XkTTszWGWOlWrXwlrIJyelbu4qgJ2ef//123aL5Ml35BEAx67x9imZKy/XbtWYbdHq3DsPL9OceJKwK5KxnwFhk558iGPszOP7K25twsxj13y/VPOgFnwesz3oknAGJpmc9UkVQnH3XmnAZ5pUYgNZvf17/I33x9j9EYM259G9vg0lW6LdaSXnyXwJ0U2EvKxJ0XfkTw1R/SHvaTZAoq0Pcuqt9B0ZE/7alfHQ7dQR7z5je1FQY580A3cS9+yv7cnsKrASNnhVoff0TEOFZ6VU9R5+9rRS8B+BFrZ4DQjnyafn8tMru47zt2Y2qbpUF6J/S+yU4iR5B5P3kGUr0J/iiYX/3E3hX3QMxnoUw4Fej+ampoPjQSHmnUPNWwAyrH0X+PRNUtGKLdn7U9Zs9+ixVYrtIBf3d7NKOS7/+5DtdxZj+knlnLwKsT842oULQrC6lL0zaeReUfPOnItZ/df0mjGDPnb727sddTGtkFmhaPEErCMtYYcIKI5cZE+wYKGTJHNZspAFCOfqxqX2do62Q/vJN2aTtHEYbXoYD/vhjif331xXgaZ+dFp7U/wOfOoEhVO4eop3iVETwYMWVoxjSyLdE7TUVNC0EV9gCyr6qAahBVM2RsPL7AewkqO9i6WuVuzgNRywrtHJdqxjmcsEhDc/rd11MpnXGtDI+a3qJhq21j1otHz4dlbHQX8FDio1PRQGAQ718foZEJeVHWyXGmgZ8h6CaOEpF/wYr2B9F+Tgo5yS+yQfDdrnHwnKqaFm+z1V1l4QAUCYqNDzW8lv5Cn5bzOY7OKHDA+ukKCenK5Xy74bXHoIKu5SUjiG/G4Fif0ZfH1kBpooRqM10FVyKj098ypkZPnpQH2v88i0SKwiC2Nfw/6tHWlO3Y6CQohShcaDUteG5Y6BCsAMr+HeM8SNQDU4jBmPGZN8DaDJ86hnfiiYhohbfITaxLzSQAeifpD9PUk4DlbDSCgrKGCgz1AgUxKvJoHUJeX6LaG09ekYK/diGGgtPoPAq+rhjTFx4Kig2Q5isNwaqaxKUoxTEQbhTt1FEmmYYskukl9YgPqoGnGJo2Ikz4tOHG5qt60NQIUrWNy7zzASNTFaPgToYyAzQHEKLDUNqDrpX5RYDO9bFBlq0+EbHH0yQsRjfUKLQ6lF/4lqaOhVmBDpdiTFjZqrOpEShbwe659JmbcQDUMe2644EdXTBCBbIpbVIMn0KqI6xQUqQ29MgI64RqIE3M9viAIcbEhR+afCfiy3bqONO4Kmj7gmC1p9KFPgaAjUeOAcUTUyf2S0ETfUSKLamweec4QjQkatGqgcbi1RfJ0OJGkKXdh1FOwXU0Gx7oHpdm9mnsKZLoDssxaY4XEwNmrOLTAMxoEQ1G8MI7LR3BxIdWCuJrDoGCnzakI+QuqMZM9QoQk9qKugavXWwzVLwpaPOCzEGmpIwT/zxVF4WbVTTNGGjjvg4cDY+BGUDPvjo2NrsTviuLSi/31udDgrNvHdnDaQz07tGF1PBhezBLQ28Xot83RGAXIaEoUR1p25rxusvLSh39jaAZyYosu6ldNG3bhtq0khuQKjUNBskajtwQc2pIwwYoriCkexCUPXWVXF/kpLSW/NAo2+lkKD23l0s+1ytcdWwHWnbCLoxENpcULqDugfQnTVhskyva/yaGdG/Uqkh6Goy0IMUExHnFt04uLMjnE+9HkJNIiLj2od791YXBL0VxXCpAHN1bwwUhk+O4zTnue1rKhMEbEpCKcadvWPZ14Kg9EPWH4HGTBrPQJfEhiZhqwvQAZ7Wb+pRnBVXWNvZfnywM2mSC4CC7uOgG0NQQ8fwtr23t/d4e42NhVxu1/t9G5oWNbFpqMPiK8KLAO/sHa/eElffTk1wLQCKuudTQCHjs8eDvWDAOykZcwfFjxT0eBMFMJ4IeCDAL45XN27ReHsTULrN+lNAbZb6cGOsk1VAjcoGOH77zja0D6MGmzs7QuzaU5vt3DLp9PZGoMcpNql6rENTjy91czBIx7Ebi7eNvbUU0zS2Tel1gJprzJ6UqMpSd6b0sxqRxi4/3kwg0VPXBErvpPRJUJ3tTO1oQxaUM0EhiKTYtYGuoleMgRozQb4UHjUHFHzz2kDp2iToHO1BNFPngdK9FLs2ULh2HBQGP6k4x8ZqPMbsYPk5BxTseA7oGFdTpKwFQDfGJcq1uIUeo7x3NuKGosZBD7Adb8R8c4o6Dvb27ogAFudKyZywACjdGQd1Unvx4IXRPSZBrLfG+hPtTsyQ1kRY3fl+dLux9DA8cefD7cd7B8fDCycBBZq4jcY0fwszJ9/V2dowhn+R0uOWtcZ0aCz1ZcziJVSKmaN9Th+TrDHHZpKAwoVioAYWfSPz5WIIMBKyuJVLPpE6HpE7IvXbsZtbY+pTMj+uJQO9k4qBapN1tcio38fuCsqqcYmC+OK2E42t4qAGWQroRrwfe+RLw6IvlmSxMNQnbZTtjXQQjeh3rwOU7qyOQJsjt/1yIB7Q7b2R+B19wuvvbcQSsnYdoANjPIiBOiPQ1VQECjngICaz2f1tD89YLuggAN7aiIMOY829RUHvpIYzhssFPTi4XHa8gUSxeCLXA7pzGfR1Nvp4zEbHOwOJGtcCepzauAT6Oq/fTvX12TbKrsdG7729dwl0PI5qURxdmx5HqQltvMwzkoFubIyPWF4Dmtq5BDolM/HxzGSMpVAcyh3EzNRJBGrieWswCNxICDqhi9fn+oPxXB+NjQ9GxqQnBhVnriYFvTMJOqV6YnOqJ6apu87oisMU+npQQzW0pPUogDJzEnSyHk3NqUcvFepD/3s96CIVPnSbOpgEVcd9c3V1Y3aFH11eH1ZPQ6ilg44POBcdM0WXj1nLIFAsH3R8gBSNQjcSjkJNOWHRHM1XfBhVhssG1fWxuYZFx/URqD3SwZ1U/3pAtVjYXHymxBxMAe2MQq9zPaqPB/P43NNesrknefzEJa8FdCw9xmfztm/Nnc0T03nbO0MZw5hy74uD43vH0fTk7uiy5nJA45VRfH4Uxhfz50dTgwd3cjpVjptTg2d5EOT2jlc3zOWpnjgx15mYcd7Z3vtiyoxzvd7sD+ec5Ssndr/pOGLkzIbP8oZTzmw5oPEaLjaHz682h89xDl88h3WGk/gx0I03ACXDCLXspyJEPHewm7q+OwC94lMRCSoKu43jx9f4nClu3PicafXLq4BCNfT94Mmdc51P7sjg6eLCT+4iUPHIBRiN3+yz0C9k9cgXeLq8LFrNiZ4uf/G6p8vyeT27qhCHL2FFixyvdpHXPq+/dby9Jt6A0BZ86WoaEp9+RBJ4btgR6+qsd0oEJU/ENt2DG3IjCHBFUGPGK0pJRK3aM98pmfuWzszowv1KudMZLFzrmnJNQIfmsqH4cwq4wDqfz7kdPliElzwazHhLx0n6rgMPLP/IHyxDlQ4o+fhg44SaxBVLmoZHyBVXvtni3G3zxKyXQBPfqlzqKRdJy5V3J7wVrQ6FD9ZwozXaDi3LitZdyxfdi4Qv5p7z3s2bCWpR2u7QaN0kYHTKtNuIg4r1IC6+FBzdCpWLBSUoPRksxlygXRHUJNlctE5RYhzyCdBQrqserHbsuOEItPUrguISn8qAzS/2RuKNQBt0tDQUZH4UhlLmPs27kcH+KqC4ZH7kP/fzYkXyCFQsx+o1xtztJAJtBW8MqibKmHLR99DoeC5XJH4l4isWh4E9GG69CMNKuxN5Pe3iGrbilUEhGTjJymD8gymtvHsyEVF5srjLi3BLbbeRMEMNA2bsPfxF3rgZfyuck9GL1nzs/ex4CuVkgSQ6yqXRK7oIimMDfbGCc3p2T3qXC51sOOJ9YgAVL2mTp4skt2sqUPmst1ZFdl9RPqjiOgd1+quiv2Y1qk9/ExtfP2al6sp6tHJkUvuyJPg1QZnHLhVvgqJWXcelbLj8SnlnTKzCu7xStfZrghK29YFYLTAchav4Xlet+lD8ta0VudZFLCIRYuVGXy7CeE8ZrmzgqsoTuZg63hK5DR9b2aB8VBWLBnaR0qtVfxaU6eHiQCHWfxPH4Ndv4b79t6KlbPaMAZ58MRBfXNTZvKbrOA2gGTNuF0f5hljKdrEv1t38LAQLGB8MKMdWMUZilauaNtc307iKUXMum7h8rXLA5nleqVSrbW1tVbEVRk18hv21Wqnk4cI1CQ3MkymQ79qOfi6XCQmRKX8pFN6JUU4st0xHfx0uWnqVUaps+ChrcO99CYhwQFbYf/hOwtXc7/y8D+xbCC2J+2N6ghGGV4hW9kZLhcbXAa5MrnKLrbxLK/u1yMVwLaMuCWvA9/AvY383cz1qGdE2ocmt0Rdjy/keCmAvwkV70DAATSywTC+ydhkMFVzMEYweiLDw8xhdZjP5XxOEI6NzxnjlilBWKrzZ2mW02/e2vNF6WxS54HuTv1MriAcS+6iwVaoV5N8zndf+CXSpPaChg7yXAAAAAElFTkSuQmCC">
+      <div class="brand-text">
+        <div class="eyebrow">Naperville North Strength &amp; Performance</div>
+        <div class="brand-title">CMJ Fatigue Dashboard</div>
+        <div class="pillars"><span>Train Smart</span><i>&bull;</i><span>Lead Strong</span><i>&bull;</i><span>Compete With Purpose</span></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="clock" id="clock"></div>
+      <div class="user-email" id="userEmail"></div>
+      <button class="btn-logout" id="kioskLockBtn" onclick="enterKioskMode()">Lock to Kiosk</button>
+      <button class="btn-logout" id="signOutBtn" onclick="handleLogout()">Sign Out</button>
+      <button class="btn-logout" id="unlockBtn" style="display:none" onclick="promptUnlock()">Coach Unlock</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="dashboard" onclick="switchTab(this,'dashboard')">Dashboard</button>
+    <button class="nav-tab" data-tab="kiosk" onclick="switchTab(this,'kiosk')">Athlete Entry</button>
+    <button class="nav-tab" data-tab="attendance" onclick="switchTab(this,'attendance')">Attendance</button>
+    <button class="nav-tab" data-tab="trends" onclick="switchTab(this,'trends')">Trends</button>
+    <button class="nav-tab" data-tab="report" onclick="switchTab(this,'report')">Reports</button>
+    <button class="nav-tab" data-tab="admin" onclick="switchTab(this,'admin')">Admin</button>
+  </div>
+
+  <div class="readiness-bar">
+    <span class="rb-label">Readiness:</span>
+    <span class="rb-item rb-green"><i></i>Green: 0% to &minus;4% &mdash; Full load</span>
+    <span class="rb-item rb-yellow"><i></i>Yellow: &minus;5% to &minus;9% &mdash; Reduce volume</span>
+    <span class="rb-item rb-red"><i></i>Red: &minus;10% or worse &mdash; Act now</span>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+        <h2 style="font-size:20px;font-weight:800;color:var(--navy)">Today's Dashboard</h2>
+        <div><label style="margin-right:8px;font-weight:700;font-size:13px">Sport:</label>
+        <select id="sportSelect" onchange="loadDashboard()" style="padding:8px 12px;border:1.5px solid var(--gray-border);border-radius:6px"></select></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Attendance Summary</div>
+        <div class="grid4">
+          <div class="stat"><div class="stat-label">Present</div><div class="stat-value" id="presentCount">0</div></div>
+          <div class="stat"><div class="stat-label">Medical</div><div class="stat-value" id="medicalCount">0</div></div>
+          <div class="stat"><div class="stat-label">Absent</div><div class="stat-value" id="absentCount">0</div></div>
+          <div class="stat"><div class="stat-label">Attendance</div><div class="stat-value" id="attendancePercent">0%</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Top 5 Jumpers Today</div>
+        <table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Position</th><th>CMJ</th><th>7-Day Avg</th><th>Status</th></tr></thead>
+        <tbody id="top5Body"><tr><td colspan="7" style="text-align:center;padding:18px;color:var(--text-soft)">No jumps logged today</td></tr></tbody></table>
+      </div>
+
+      <div id="teamSummaries"></div>
+
+      <div class="card">
+        <div class="card-title">Red Zone — Act Now</div>
+        <table><thead><tr><th>Name</th><th>Team</th><th>Position</th><th>Today</th><th>7-Day Avg</th><th>Change</th></tr></thead>
+        <tbody id="redZoneBody"><tr><td colspan="6" style="text-align:center;padding:18px;color:var(--text-soft)">No athletes in red zone</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- KIOSK -->
+    <div id="panel-kiosk" class="panel">
+      <div class="kiosk-wrap">
+        <div id="kioskStep1" class="kiosk-step active">
+          <div class="kiosk-card"><div class="kiosk-title">Welcome</div><div class="kiosk-sub">Select your sport</div><div id="sportButtons" style="display:grid;gap:10px"></div></div>
+        </div>
+        <div id="kioskStep2" class="kiosk-step">
+          <div class="kiosk-card">
+            <div class="kiosk-title">Find Your Name</div>
+            <div class="kiosk-sub" id="kioskSportLabel">Search by last name</div>
+            <input type="text" id="athleteSearch" class="kiosk-input" placeholder="Type your last name..." oninput="searchAthletes()">
+            <div class="results" id="searchResults"></div>
+            <button class="btn btn-green" style="width:100%;margin-bottom:8px" onclick="openRegister()">+ I'm new — register me</button>
+            <button class="btn btn-gray" style="width:100%" onclick="kioskStep(1)">Back</button>
+          </div>
+        </div>
+        <div id="kioskStep3" class="kiosk-step">
+          <div class="kiosk-card">
+            <div id="kioskAthleteName" class="kiosk-title">---</div>
+            <div id="kioskAthleteInfo" class="kiosk-sub"></div>
+            <div class="form-group" style="text-align:left"><label>CMJ Height (inches)</label>
+            <input type="number" id="jumpInput" class="kiosk-input" placeholder="e.g. 24.5" step="0.1" min="5" max="60"></div>
+            <button class="btn btn-green" style="width:100%;margin-bottom:8px" onclick="submitJump()">Record Jump</button>
+            <button class="btn btn-amber" style="width:100%;margin-bottom:8px" onclick="markMedical()">Mark as Medical</button>
+            <button class="btn btn-gray" style="width:100%" onclick="kioskStep(2)">Back</button>
+          </div>
+        </div>
+        <div id="kioskStep4" class="kiosk-step">
+          <div class="kiosk-card">
+            <div id="kioskConfirmation"></div>
+            <div style="display:grid;gap:10px;margin-top:18px">
+              <button class="btn btn-green" style="width:100%" onclick="resetSearchAndGo2()">Next Athlete</button>
+              <button class="btn btn-gray" style="width:100%" onclick="kioskStep(1)">Start Over</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div id="panel-attendance" class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+        <h2 style="font-size:20px;font-weight:800;color:var(--navy)">Attendance</h2>
+        <div>
+          <label style="margin-right:8px;font-weight:700;font-size:13px">Sport:</label>
+          <select id="attSportSelect" onchange="loadAttendance()" style="padding:8px 12px;border:1.5px solid var(--gray-border);border-radius:6px"></select>
+          <input type="date" id="attDate" onchange="loadAttendance()" style="padding:8px 12px;border:1.5px solid var(--gray-border);border-radius:6px;margin-left:8px">
+        </div>
+      </div>
+      <div id="attendanceTeams"></div>
+    </div>
+
+    <!-- TRENDS -->
+    <div id="panel-trends" class="panel">
+      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px">Athlete Trends</h2>
+      <div class="card">
+        <div class="row2">
+          <div class="form-group"><label>Sport</label><select id="trendSport" onchange="fillTrendAthletes()"></select></div>
+          <div class="form-group"><label>Athlete</label><select id="trendAthlete" onchange="drawTrendChart()"></select></div>
+        </div>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+        <div class="grid4">
+          <div class="stat"><div class="stat-label">Latest</div><div class="stat-value" id="tLatest">—</div></div>
+          <div class="stat"><div class="stat-label">7-Day Avg</div><div class="stat-value" id="t7">—</div></div>
+          <div class="stat"><div class="stat-label">21-Day Base</div><div class="stat-value" id="t21">—</div></div>
+          <div class="stat"><div class="stat-label">Status</div><div class="stat-value" id="tStatus" style="font-size:20px">—</div></div>
+        </div>
+        <div class="hint">Blue dots are individual jumps. Orange line is the 7-day rolling average. Grey line is the 21-day baseline.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Team Fatigue</div>
+        <div class="row2">
+          <div class="form-group"><label>Sport</label><select id="tfSport" onchange="fillTfTeams()"></select></div>
+          <div class="form-group"><label>Team</label><select id="tfTeam" onchange="drawTeamFatigue()"></select></div>
+        </div>
+        <div id="tfGate"></div>
+        <div class="chart-wrap" id="tfChartWrap"><canvas id="tfChart"></canvas></div>
+        <div class="hint">Each athlete is compared to their own 7-day average, then those percentages are averaged. An athlete joins the calculation only once they have <strong>3 or more jumps</strong> in the prior 21 days, so late sign-ups don't distort the line. The grey number on each point is how many athletes it represents &mdash; treat a point built on fewer than 5 athletes as noise.</div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="panel-report" class="panel">
+      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px">Daily Report</h2>
+      <div class="card">
+        <div class="row2">
+          <div class="form-group"><label>Sport</label><select id="reportSport"></select></div>
+          <div class="form-group"><label>Date</label><input type="date" id="reportDate"></div>
+        </div>
+        <button class="btn btn-orange" style="width:100%;padding:14px" onclick="buildReport()">Generate Report</button>
+        <div class="hint">Generates a printable page. Use your browser's Print dialog and choose "Save as PDF" to email it.</div>
+      </div>
+      <div id="reportOut"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="panel-admin" class="panel">
+      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px">Admin — Sports, Teams, Positions</h2>
+
+      <div class="card">
+        <div class="card-title">Add a Sport</div>
+        <div class="form-group"><label>Sport Name</label><input type="text" id="newSportName" placeholder="e.g. Basketball"></div>
+        <button class="btn btn-green" onclick="addSport()">Add Sport</button>
+        <div id="sportMsg"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Add a Team</div>
+        <div class="row2">
+          <div class="form-group"><label>Sport</label><select id="teamSportSelect"></select></div>
+          <div class="form-group"><label>Team Name</label><input type="text" id="newTeamName" placeholder="e.g. JV"></div>
+        </div>
+        <button class="btn btn-green" onclick="addTeam()">Add Team</button>
+        <div id="teamMsg"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Add a Position Group</div>
+        <div class="row2">
+          <div class="form-group"><label>Sport</label><select id="posSportSelect"></select></div>
+          <div class="form-group"><label>Position Name</label><input type="text" id="newPosName" placeholder="e.g. GUARDS"></div>
+        </div>
+        <button class="btn btn-green" onclick="addPosition()">Add Position</button>
+        <div id="posMsg"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Current Setup</div>
+        <div id="adminOverview"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div id="registerModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title">Register</div>
+    <div class="row2">
+      <div class="form-group"><label>First Name</label><input type="text" id="regFirst"></div>
+      <div class="form-group"><label>Last Name</label><input type="text" id="regLast"></div>
+    </div>
+    <div class="row2">
+      <div class="form-group"><label>Team</label><select id="regTeam"></select></div>
+      <div class="form-group"><label>Position</label><select id="regPosition"></select></div>
+    </div>
+    <div class="form-group"><label>Graduation Year</label><input type="number" id="regGrad" placeholder="2029"></div>
+    <div id="regMsg"></div>
+    <button class="btn btn-green" style="width:100%;margin:10px 0 8px" onclick="submitRegistration()">Register &amp; Continue</button>
+    <button class="btn btn-gray" style="width:100%" onclick="closeRegister()">Cancel</button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm';
+
+const SUPABASE_URL = 'https://qyhlsoidbyiwlatpoewl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_cZE5LZny7o9pQKpf48J2cA_Xp1vGbTn';
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let S = { user:null, sports:[], teams:[], positions:[], athletes:[], jumps:[], kioskSport:null, kioskAthlete:null, chart:null, tfChart:null };
+
+const todayStr = () => new Date().toISOString().split('T')[0];
+const daysAgoStr = n => new Date(Date.now() - n*86400000).toISOString().split('T')[0];
+const teamName = id => S.teams.find(t=>t.id===id)?.name || '—';
+const posName = id => S.positions.find(p=>p.id===id)?.name || '—';
+const sportName = id => S.sports.find(s=>s.id===id)?.name || '—';
+
+function status(pct){
+  if(pct===null||pct===undefined||isNaN(pct)) return 'NEUTRAL';
+  if(pct >= -4) return 'GREEN';
+  if(pct >= -9) return 'YELLOW';
+  return 'RED';
+}
+function statusColor(s){
+  return s==='GREEN'?'var(--green)':s==='YELLOW'?'var(--yellow)':s==='RED'?'var(--red)':'#888';
+}
+
+const MIN_BASELINE = 3; // jumps required in prior 21 days before an athlete counts toward team fatigue
+
+// rolling average plus the number of jumps behind it
+function rollingAvgN(athleteId, days, beforeDate){
+  const end = beforeDate || todayStr();
+  const start = new Date(new Date(end).getTime() - days*86400000).toISOString().split('T')[0];
+  const js = S.jumps.filter(j => j.athlete_id===athleteId && !j.is_medical && j.cmj_inches!=null && j.jump_date >= start && j.jump_date < end);
+  if(!js.length) return { avg:null, n:0 };
+  return { avg: js.reduce((a,j)=>a+Number(j.cmj_inches),0)/js.length, n: js.length };
+}
+
+// rolling average over the N days BEFORE a given date (exclusive)
+function rollingAvg(athleteId, days, beforeDate){
+  const end = beforeDate || todayStr();
+  const start = new Date(new Date(end).getTime() - days*86400000).toISOString().split('T')[0];
+  const js = S.jumps.filter(j => j.athlete_id===athleteId && !j.is_medical && j.cmj_inches!=null && j.jump_date >= start && j.jump_date < end);
+  if(!js.length) return null;
+  return js.reduce((a,j)=>a+Number(j.cmj_inches),0)/js.length;
+}
+
+window.addEventListener('load', init);
+
+async function init(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session){ S.user = session.user; showApp(); await loadAll(); }
+  else showLogin();
+}
+
+window.handleLogin = async function(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const err = document.getElementById('loginError');
+  err.textContent = '';
+  if(!email.toLowerCase().endsWith('@naperville203.org')){ err.textContent='Use your @naperville203.org email.'; return; }
+  if(!password){ err.textContent='Enter your password.'; return; }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ err.textContent = error.message; return; }
+  S.user = data.user; showApp(); await loadAll();
+};
+
+window.handleLogout = async function(){ await sb.auth.signOut(); S.user=null; showLogin(); };
+
+function showLogin(){
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('dashboard').classList.remove('active');
+}
+function tickClock(){
+  const el=document.getElementById('clock');
+  if(!el) return;
+  const d=new Date();
+  el.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})
+    + ' \u00b7 ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+}
+
+/* ---------- KIOSK LOCK ----------
+   Change COACH_PIN below to whatever you want. Four digits is plenty.
+   When locked, only the Athlete Entry tab is reachable and the lock
+   survives a page refresh, so a student cannot get out by hitting reload. */
+const COACH_PIN = '2468';
+
+// localStorage throws on file:// origins and in some private modes.
+// Fall back to an in-memory flag so the lock still works for the session.
+let lockFallback = false;
+function lockGet(){
+  try { return localStorage.getItem('cmjKiosk')==='1'; }
+  catch(e){ return lockFallback; }
+}
+function lockSet(on){
+  lockFallback = on;
+  try { on ? localStorage.setItem('cmjKiosk','1') : localStorage.removeItem('cmjKiosk'); }
+  catch(e){ /* memory-only for this session */ }
+}
+
+function isLocked(){ return lockGet(); }
+
+function applyLockState(){
+  const locked = isLocked();
+  document.querySelectorAll('.nav-tab').forEach(t=>{
+    t.style.display = (locked && t.dataset.tab!=='kiosk') ? 'none' : '';
+  });
+  document.getElementById('kioskLockBtn').style.display = locked ? 'none' : '';
+  document.getElementById('signOutBtn').style.display   = locked ? 'none' : '';
+  document.getElementById('unlockBtn').style.display    = locked ? '' : 'none';
+  document.querySelector('.readiness-bar').style.display = locked ? 'none' : '';
+  if(locked){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-kiosk').classList.add('active');
+    document.querySelector('[data-tab="kiosk"]').classList.add('active');
+    kioskStep(1);
+  }
+}
+
+window.enterKioskMode = function(){
+  lockSet(true);
+  applyLockState();
+};
+
+window.promptUnlock = function(){
+  const pin = prompt('Coach PIN:');
+  if(pin===null) return;
+  if(pin.trim()!==COACH_PIN){ alert('Wrong PIN.'); return; }
+  lockSet(false);
+  applyLockState();
+  loadDashboard();
+};
+
+function showApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('dashboard').classList.add('active');
+  document.getElementById('userEmail').textContent = S.user.email;
+  tickClock(); setInterval(tickClock,1000);
+  applyLockState();
+}
+
+async function loadAll(){
+  const [sp, tm, ps, at, jp] = await Promise.all([
+    sb.from('cmj_sports').select('*').order('name'),
+    sb.from('cmj_teams').select('*'),
+    sb.from('cmj_positions').select('*').order('sort_order'),
+    sb.from('cmj_athletes').select('*'),
+    sb.from('cmj_jumps').select('*')
+  ]);
+  if(sp.error){ alert('Could not load data: '+sp.error.message); return; }
+  S.sports = sp.data||[]; S.teams = tm.data||[]; S.positions = ps.data||[];
+  S.athletes = at.data||[]; S.jumps = jp.data||[];
+  fillSportDropdowns();
+  loadDashboard(); loadAttendance(); fillTrendAthletes(); drawTeamFatigue(); renderAdminOverview();
+}
+
+function fillSelect(el, items, selected){
+  if(!el) return;
+  const keep = selected || el.value;
+  el.innerHTML='';
+  items.forEach(i=>{
+    const o=document.createElement('option'); o.value=i.id; o.textContent=i.name; el.appendChild(o);
+  });
+  if(keep && items.some(i=>i.id===keep)) el.value=keep;
+}
+
+function fillSportDropdowns(){
+  ['sportSelect','attSportSelect','reportSport','trendSport','tfSport','teamSportSelect','posSportSelect']
+    .forEach(id => fillSelect(document.getElementById(id), S.sports));
+  fillSelect(document.getElementById('tfTeam'), S.teams.filter(t=>t.sport_id===document.getElementById('tfSport').value));
+  const wrap = document.getElementById('sportButtons');
+  wrap.innerHTML='';
+  S.sports.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='btn btn-orange'; b.style.width='100%'; b.style.padding='16px'; b.style.fontSize='16px';
+    b.textContent=s.name; b.onclick=()=>startKiosk(s.id);
+    wrap.appendChild(b);
+  });
+  if(!document.getElementById('attDate').value) document.getElementById('attDate').value = todayStr();
+  if(!document.getElementById('reportDate').value) document.getElementById('reportDate').value = todayStr();
+}
+
+/* ---------- DASHBOARD ---------- */
+window.loadDashboard = function(){
+  const sportId = document.getElementById('sportSelect').value;
+  const d = todayStr();
+  const roster = S.athletes.filter(a=>a.sport_id===sportId);
+  const todays = S.jumps.filter(j=>j.sport_id===sportId && j.jump_date===d);
+  const present = todays.filter(j=>!j.is_medical).length;
+  const medical = todays.filter(j=>j.is_medical).length;
+  const absent = Math.max(roster.length-(present+medical),0);
+  document.getElementById('presentCount').textContent = present;
+  document.getElementById('medicalCount').textContent = medical;
+  document.getElementById('absentCount').textContent = absent;
+  document.getElementById('attendancePercent').textContent = roster.length ? Math.round((present+medical)/roster.length*100)+'%' : '0%';
+
+  // top 5
+  const tb = document.getElementById('top5Body');
+  const top = todays.filter(j=>!j.is_medical && j.cmj_inches!=null).sort((a,b)=>b.cmj_inches-a.cmj_inches).slice(0,5);
+  tb.innerHTML = top.length ? top.map((j,i)=>{
+    const a=S.athletes.find(x=>x.id===j.athlete_id);
+    const avg=rollingAvg(j.athlete_id,7,d);
+    const pct=avg?((j.cmj_inches-avg)/avg*100):null;
+    const st=status(pct);
+    return `<tr><td>${i+1}</td><td class="clickable" onclick="openTrend('${j.athlete_id}')">${a?.first_name} ${a?.last_name}</td><td>${teamName(a?.team_id)}</td><td>${posName(a?.position_id)}</td><td style="font-weight:700">${j.cmj_inches}"</td><td>${avg?avg.toFixed(1)+'"':'—'}</td><td><span class="badge badge-${st.toLowerCase()}">${st}</span></td></tr>`;
+  }).join('') : '<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--text-soft)">No jumps logged today</td></tr>';
+
+  // team summaries
+  const ts = document.getElementById('teamSummaries');
+  ts.innerHTML='';
+  S.teams.filter(t=>t.sport_id===sportId).forEach(t=>{
+    const ath=roster.filter(a=>a.team_id===t.id);
+    const tj=todays.filter(j=>!j.is_medical && j.cmj_inches!=null && ath.some(a=>a.id===j.athlete_id));
+    const avg=tj.length?(tj.reduce((s,j)=>s+Number(j.cmj_inches),0)/tj.length).toFixed(1):'—';
+    const part=ath.length?Math.round(tj.length/ath.length*100):0;
+    ts.insertAdjacentHTML('beforeend',
+      `<div class="card"><div class="card-title">${t.name}</div><div class="grid4">
+        <div class="stat"><div class="stat-label">Avg CMJ</div><div class="stat-value">${avg==='—'?'—':avg+'"'}</div></div>
+        <div class="stat"><div class="stat-label">Jumped</div><div class="stat-value">${tj.length}</div></div>
+        <div class="stat"><div class="stat-label">Roster</div><div class="stat-value">${ath.length}</div></div>
+        <div class="stat"><div class="stat-label">Participation</div><div class="stat-value">${part}%</div></div>
+      </div></div>`);
+  });
+
+  // red zone
+  const rz = roster.map(a=>{
+    const j=todays.find(x=>x.athlete_id===a.id && !x.is_medical && x.cmj_inches!=null);
+    if(!j) return null;
+    const avg=rollingAvg(a.id,7,d);
+    if(!avg) return null;
+    const pct=(j.cmj_inches-avg)/avg*100;
+    return status(pct)==='RED' ? {a,j,avg,pct} : null;
+  }).filter(Boolean).sort((x,y)=>x.pct-y.pct);
+
+  document.getElementById('redZoneBody').innerHTML = rz.length ? rz.map(r=>
+    `<tr><td class="clickable" onclick="openTrend('${r.a.id}')">${r.a.first_name} ${r.a.last_name}</td><td>${teamName(r.a.team_id)}</td><td>${posName(r.a.position_id)}</td><td style="font-weight:700">${r.j.cmj_inches}"</td><td>${r.avg.toFixed(1)}"</td><td style="color:var(--red);font-weight:700">${r.pct.toFixed(1)}%</td></tr>`
+  ).join('') : '<tr><td colspan="6" style="text-align:center;padding:18px;color:var(--text-soft)">No athletes in red zone</td></tr>';
+};
+
+/* ---------- ATTENDANCE ---------- */
+window.loadAttendance = function(){
+  const sportId = document.getElementById('attSportSelect').value;
+  const d = document.getElementById('attDate').value || todayStr();
+  const wrap = document.getElementById('attendanceTeams');
+  wrap.innerHTML='';
+  const teams = S.teams.filter(t=>t.sport_id===sportId);
+  if(!teams.length){ wrap.innerHTML='<div class="card">No teams set up for this sport yet. Add one in the Admin tab.</div>'; return; }
+
+  teams.forEach(t=>{
+    const ath=S.athletes.filter(a=>a.team_id===t.id);
+    const js=S.jumps.filter(j=>j.jump_date===d && ath.some(a=>a.id===j.athlete_id));
+    const jumped=ath.filter(a=>js.some(j=>j.athlete_id===a.id && !j.is_medical));
+    const med=ath.filter(a=>js.some(j=>j.athlete_id===a.id && j.is_medical));
+    const abs=ath.filter(a=>!js.some(j=>j.athlete_id===a.id));
+    const pct=ath.length?Math.round((jumped.length+med.length)/ath.length*100):0;
+
+    wrap.insertAdjacentHTML('beforeend', `<div class="card">
+      <div class="card-title">${t.name}</div>
+      <div class="grid4" style="margin-bottom:14px">
+        <div class="stat"><div class="stat-label">Jumped</div><div class="stat-value">${jumped.length}</div></div>
+        <div class="stat"><div class="stat-label">Medical</div><div class="stat-value">${med.length}</div></div>
+        <div class="stat"><div class="stat-label">Absent</div><div class="stat-value">${abs.length}</div></div>
+        <div class="stat"><div class="stat-label">Attendance</div><div class="stat-value">${pct}%</div></div>
+      </div>
+      ${jumped.length?`<h4 style="color:var(--green);margin:12px 0 6px;font-size:13px">Present (${jumped.length})</h4><table><tbody>${jumped.map(a=>{
+        const j=js.find(x=>x.athlete_id===a.id);
+        return `<tr><td class="clickable" onclick="openTrend('${a.id}')">${a.first_name} ${a.last_name}</td><td>${posName(a.position_id)}</td><td>${j.cmj_inches}"</td></tr>`;
+      }).join('')}</tbody></table>`:''}
+      ${med.length?`<h4 style="color:#E8A000;margin:12px 0 6px;font-size:13px">Medical (${med.length})</h4><table><tbody>${med.map(a=>
+        `<tr><td>${a.first_name} ${a.last_name}</td><td>${posName(a.position_id)}</td><td><span class="badge badge-medical">Medical</span></td></tr>`).join('')}</tbody></table>`:''}
+      ${abs.length?`<h4 style="color:var(--red);margin:12px 0 6px;font-size:13px">Absent (${abs.length})</h4><table><tbody>${abs.map(a=>
+        `<tr><td>${a.first_name} ${a.last_name}</td><td>${posName(a.position_id)}</td></tr>`).join('')}</tbody></table>`:''}
+    </div>`);
+  });
+};
+
+/* ---------- TRENDS ---------- */
+window.fillTrendAthletes = function(){
+  const sportId = document.getElementById('trendSport').value;
+  const sel = document.getElementById('trendAthlete');
+  const list = S.athletes.filter(a=>a.sport_id===sportId)
+    .sort((a,b)=>a.last_name.localeCompare(b.last_name))
+    .map(a=>({id:a.id, name:`${a.last_name}, ${a.first_name} (${teamName(a.team_id)} • ${posName(a.position_id)})`}));
+  fillSelect(sel, list);
+  drawTrendChart();
+};
+
+window.openTrend = function(athleteId){
+  const a = S.athletes.find(x=>x.id===athleteId);
+  if(!a) return;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('[data-tab="trends"]').classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-trends').classList.add('active');
+  document.getElementById('trendSport').value = a.sport_id;
+  fillTrendAthletes();
+  document.getElementById('trendAthlete').value = athleteId;
+  drawTrendChart();
+};
+
+window.drawTrendChart = function(){
+  const athleteId = document.getElementById('trendAthlete').value;
+  const canvas = document.getElementById('trendChart');
+  if(S.chart){ S.chart.destroy(); S.chart=null; }
+  if(!athleteId){ document.getElementById('tLatest').textContent='—'; return; }
+
+  const js = S.jumps.filter(j=>j.athlete_id===athleteId && !j.is_medical && j.cmj_inches!=null)
+                    .sort((a,b)=>a.jump_date.localeCompare(b.jump_date));
+
+  const labels = js.map(j=>j.jump_date);
+  const raw = js.map(j=>Number(j.cmj_inches));
+  const avg7 = js.map(j=>{ const v=rollingAvg(athleteId,7,j.jump_date); return v?Number(v.toFixed(2)):null; });
+  const avg21 = js.map(j=>{ const v=rollingAvg(athleteId,21,j.jump_date); return v?Number(v.toFixed(2)):null; });
+
+  S.chart = new Chart(canvas, {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:'CMJ', data:raw, borderColor:'#1B3A6B', backgroundColor:'#1B3A6B', pointRadius:4, tension:.2 },
+      { label:'7-Day Avg', data:avg7, borderColor:'#F4581A', pointRadius:0, borderDash:[6,4], tension:.3, spanGaps:true },
+      { label:'21-Day Baseline', data:avg21, borderColor:'#8A93A6', pointRadius:0, borderDash:[2,4], tension:.3, spanGaps:true }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ y:{ title:{display:true,text:'Inches'} }, x:{ title:{display:true,text:'Date'} } },
+      plugins:{ legend:{ position:'bottom' } } }
+  });
+
+  const latest = js.length ? js[js.length-1] : null;
+  const a7 = latest ? rollingAvg(athleteId,7,latest.jump_date) : null;
+  const a21 = latest ? rollingAvg(athleteId,21,latest.jump_date) : null;
+  const pct = (latest && a7) ? ((latest.cmj_inches-a7)/a7*100) : null;
+  const st = status(pct);
+  document.getElementById('tLatest').textContent = latest ? latest.cmj_inches+'"' : '—';
+  document.getElementById('t7').textContent = a7 ? a7.toFixed(1)+'"' : '—';
+  document.getElementById('t21').textContent = a21 ? a21.toFixed(1)+'"' : '—';
+  const se = document.getElementById('tStatus');
+  se.textContent = st; se.style.color = statusColor(st);
+};
+
+/* ---------- TEAM FATIGUE ---------- */
+window.fillTfTeams = function(){
+  const sportId = document.getElementById('tfSport').value;
+  fillSelect(document.getElementById('tfTeam'), S.teams.filter(t=>t.sport_id===sportId));
+  drawTeamFatigue();
+};
+
+// average of each qualified athlete's % change vs their own 7-day average
+function teamFatigueOn(teamId, date){
+  const ath = S.athletes.filter(a=>a.team_id===teamId);
+  const pcts = [];
+  ath.forEach(a=>{
+    const j = S.jumps.find(x=>x.athlete_id===a.id && x.jump_date===date && !x.is_medical && x.cmj_inches!=null);
+    if(!j) return;                                   // absent or medical: contributes nothing
+    const base = rollingAvgN(a.id, 21, date);
+    if(base.n < MIN_BASELINE) return;                // not enough history yet
+    const r7 = rollingAvg(a.id, 7, date);
+    if(!r7) return;
+    pcts.push((j.cmj_inches - r7) / r7 * 100);
+  });
+  if(!pcts.length) return null;
+  return { pct: pcts.reduce((a,b)=>a+b,0)/pcts.length, n: pcts.length };
+}
+
+window.drawTeamFatigue = function(){
+  const teamId = document.getElementById('tfTeam').value;
+  const gate = document.getElementById('tfGate');
+  const wrap = document.getElementById('tfChartWrap');
+  if(S.tfChart){ S.tfChart.destroy(); S.tfChart=null; }
+  gate.innerHTML=''; wrap.style.display='block';
+
+  if(!teamId){ wrap.style.display='none'; gate.innerHTML='<div style="color:var(--text-soft);padding:12px">Pick a team.</div>'; return; }
+
+  const ath = S.athletes.filter(a=>a.team_id===teamId);
+  const dates = [...new Set(S.jumps.filter(j=>ath.some(a=>a.id===j.athlete_id) && !j.is_medical && j.cmj_inches!=null).map(j=>j.jump_date))].sort();
+
+  const pts = dates.map(d=>({ d, ...(teamFatigueOn(teamId,d)||{pct:null,n:0}) })).filter(p=>p.pct!==null);
+
+  if(!pts.length){
+    wrap.style.display='none';
+    const qualified = ath.filter(a=>rollingAvgN(a.id,21,todayStr()).n >= MIN_BASELINE).length;
+    gate.innerHTML = `<div style="background:var(--gray-bg);border-radius:10px;padding:20px;text-align:center">
+      <div style="font-weight:800;color:var(--navy);margin-bottom:6px">Not enough data yet</div>
+      <div style="font-size:13px;color:var(--text-soft)">${qualified} of ${ath.length} athletes on this team have ${MIN_BASELINE}+ jumps in the last 21 days. This chart turns on by itself as they accumulate &mdash; roughly two weeks of regular testing.</div>
+    </div>`;
+    return;
+  }
+
+  const latest = pts[pts.length-1];
+  if(latest.n < 5){
+    gate.innerHTML = `<div style="background:#FEF5DC;border:1px solid #E8C97A;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#7a5a08">
+      Building up: the most recent point covers only ${latest.n} athlete${latest.n===1?'':'s'}. Read it loosely until that number passes 5.</div>`;
+  }
+
+  S.tfChart = new Chart(document.getElementById('tfChart'), {
+    type:'line',
+    data:{ labels: pts.map(p=>p.d), datasets:[
+      { label:'Team change vs own baseline (%)', data: pts.map(p=>Number(p.pct.toFixed(2))),
+        borderColor:'#1B3A6B', backgroundColor:'#1B3A6B', pointRadius:4, tension:.25,
+        segment:{ borderColor: c => c.p1.parsed.y <= -9 ? '#C0392B' : c.p1.parsed.y <= -4 ? '#8B6008' : '#2E7D1F' } }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ y:{ title:{display:true,text:'% vs own 7-day avg'},
+        grid:{ color: ctx => ctx.tick.value===0 ? '#999' : 'rgba(0,0,0,.06)' } },
+        x:{ title:{display:true,text:'Date'} } },
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ afterLabel: ctx => `Athletes counted: ${pts[ctx.dataIndex].n}` } } } }
+  });
+};
+
+/* ---------- KIOSK ---------- */
+function startKiosk(sportId){
+  S.kioskSport = sportId;
+  document.getElementById('kioskSportLabel').textContent = sportName(sportId)+' — search by last name';
+  document.getElementById('athleteSearch').value='';
+  document.getElementById('searchResults').innerHTML='';
+  kioskStep(2);
+  setTimeout(()=>document.getElementById('athleteSearch').focus(),100);
+}
+window.startKiosk = startKiosk;
+
+window.resetSearchAndGo2 = function(){
+  document.getElementById('athleteSearch').value='';
+  document.getElementById('searchResults').innerHTML='';
+  kioskStep(2);
+  setTimeout(()=>document.getElementById('athleteSearch').focus(),100);
+};
+
+window.searchAthletes = function(){
+  const q = document.getElementById('athleteSearch').value.trim().toLowerCase();
+  const box = document.getElementById('searchResults');
+  if(!q){ box.innerHTML=''; return; }
+  const res = S.athletes.filter(a=>a.sport_id===S.kioskSport &&
+    (a.last_name.toLowerCase().includes(q) || a.first_name.toLowerCase().includes(q)))
+    .sort((a,b)=>a.last_name.localeCompare(b.last_name));
+  if(!res.length){ box.innerHTML='<div style="padding:12px;color:var(--text-soft);text-align:center">No match. Use the register button below.</div>'; return; }
+  box.innerHTML = res.map(a=>{
+    const done = S.jumps.some(j=>j.athlete_id===a.id && j.jump_date===todayStr());
+    return `<div class="result-item" onclick="pickAthlete('${a.id}')">
+      <div class="result-name">${a.first_name} ${a.last_name} ${done?'<span class="badge badge-neutral">done today</span>':''}</div>
+      <div class="result-info">${teamName(a.team_id)} • ${posName(a.position_id)} • Class of ${a.grad_year||'—'}</div>
+    </div>`;
+  }).join('');
+};
+
+window.pickAthlete = function(id){
+  S.kioskAthlete = S.athletes.find(a=>a.id===id);
+  if(!S.kioskAthlete) return;
+  document.getElementById('kioskAthleteName').textContent = `${S.kioskAthlete.first_name} ${S.kioskAthlete.last_name}`;
+  document.getElementById('kioskAthleteInfo').textContent = `${teamName(S.kioskAthlete.team_id)} • ${posName(S.kioskAthlete.position_id)}`;
+  document.getElementById('jumpInput').value='';
+  kioskStep(3);
+  setTimeout(()=>document.getElementById('jumpInput').focus(),100);
+};
+
+window.submitJump = async function(){
+  const v = parseFloat(document.getElementById('jumpInput').value);
+  if(isNaN(v) || v<5 || v>60){ alert('Enter a jump between 5 and 60 inches.'); return; }
+  const { error } = await sb.from('cmj_jumps').upsert([{
+    athlete_id:S.kioskAthlete.id, sport_id:S.kioskSport, jump_date:todayStr(),
+    cmj_inches:v, is_medical:false, created_by:S.user.email
+  }], { onConflict:'athlete_id,jump_date' });
+  if(error){ alert('Could not save: '+error.message); return; }
+  await refreshJumps();
+  showConfirm(v,false);
+};
+
+window.markMedical = async function(){
+  const { error } = await sb.from('cmj_jumps').upsert([{
+    athlete_id:S.kioskAthlete.id, sport_id:S.kioskSport, jump_date:todayStr(),
+    cmj_inches:null, is_medical:true, created_by:S.user.email
+  }], { onConflict:'athlete_id,jump_date' });
+  if(error){ alert('Could not save: '+error.message); return; }
+  await refreshJumps();
+  showConfirm(null,true);
+};
+
+async function refreshJumps(){
+  const { data } = await sb.from('cmj_jumps').select('*');
+  S.jumps = data||[];
+  loadDashboard(); loadAttendance();
+}
+
+function showConfirm(v, isMedical){
+  const box = document.getElementById('kioskConfirmation');
+  if(isMedical){
+    box.innerHTML = `<div class="kiosk-title" style="color:#E8A000">Marked Medical</div>
+      <div class="confirm-box" style="background:#FFF4E6;border:2px solid #E8A000">
+      <div style="font-size:16px;color:#8a6000;font-weight:700">You're counted as present today.</div></div>`;
+    return;
+  }
+  const a7 = rollingAvg(S.kioskAthlete.id,7,todayStr());
+  const a21 = rollingAvg(S.kioskAthlete.id,21,todayStr());
+  const pct = a7 ? ((v-a7)/a7*100) : null;
+  const st = status(pct);
+  const msg = st==='GREEN'?'Full load — you\'re good to go.'
+            : st==='YELLOW'?'Reduce volume today.'
+            : st==='RED'?'See a coach before you lift.'
+            : 'First jumps logged — building your baseline.';
+  const bg = st==='GREEN'?'#E8F5E0':st==='YELLOW'?'#FEF5DC':st==='RED'?'#FDEAEA':'#F0F0F0';
+  const bd = statusColor(st);
+  box.innerHTML = `<div class="kiosk-title">${S.kioskAthlete.first_name} ${S.kioskAthlete.last_name}</div>
+    <div class="confirm-box" style="background:${bg};border:2px solid ${bd}">
+      <div class="confirm-value" style="color:${bd}">${v}"</div>
+      <div style="font-size:14px;margin-top:6px">7-Day Avg: ${a7?a7.toFixed(1)+'"':'no baseline yet'}${pct!==null?` &nbsp;(${pct>0?'+':''}${pct.toFixed(1)}%)`:''}</div>
+      <div style="font-size:13px;color:var(--text-soft);margin-top:2px">21-Day Baseline: ${a21?a21.toFixed(1)+'"':'—'}</div>
+      <div style="font-size:20px;font-weight:900;color:${bd};margin-top:12px">${st==='NEUTRAL'?'LOGGED':st}</div>
+      <div style="font-size:14px;margin-top:4px">${msg}</div>
+    </div>`;
+  kioskStep(4);
+}
+
+window.kioskStep = function(n){
+  document.querySelectorAll('.kiosk-step').forEach(e=>e.classList.remove('active'));
+  document.getElementById('kioskStep'+n).classList.add('active');
+};
+
+/* ---------- REGISTRATION ---------- */
+window.openRegister = function(){
+  const teams = S.teams.filter(t=>t.sport_id===S.kioskSport);
+  const poss = S.positions.filter(p=>p.sport_id===S.kioskSport);
+  if(!teams.length || !poss.length){ alert('This sport has no teams or positions yet. A coach needs to add them in the Admin tab.'); return; }
+  fillSelect(document.getElementById('regTeam'), teams);
+  fillSelect(document.getElementById('regPosition'), poss);
+  document.getElementById('regMsg').innerHTML='';
+  document.getElementById('registerModal').classList.add('active');
+};
+window.closeRegister = function(){ document.getElementById('registerModal').classList.remove('active'); };
+
+window.submitRegistration = async function(){
+  const first=document.getElementById('regFirst').value.trim();
+  const last=document.getElementById('regLast').value.trim();
+  const team=document.getElementById('regTeam').value;
+  const pos=document.getElementById('regPosition').value;
+  const grad=parseInt(document.getElementById('regGrad').value);
+  const msg=document.getElementById('regMsg');
+  msg.className='error-msg';
+  if(!first||!last||!team||!pos||!grad){ msg.textContent='Fill in every field.'; return; }
+
+  const dupe = S.athletes.find(a=>a.sport_id===S.kioskSport &&
+    a.first_name.toLowerCase()===first.toLowerCase() && a.last_name.toLowerCase()===last.toLowerCase() && a.team_id===team);
+  if(dupe){ msg.textContent='That name already exists on this team. Go back and search for it.'; return; }
+
+  const { data, error } = await sb.from('cmj_athletes').insert([{
+    sport_id:S.kioskSport, team_id:team, position_id:pos,
+    first_name:first, last_name:last, grad_year:grad
+  }]).select();
+  if(error){ msg.textContent='Could not register: '+error.message; return; }
+
+  S.athletes.push(data[0]);
+  document.getElementById('regFirst').value='';
+  document.getElementById('regLast').value='';
+  document.getElementById('regGrad').value='';
+  closeRegister();
+  pickAthlete(data[0].id);
+  fillTrendAthletes();
+};
+
+/* ---------- ADMIN ---------- */
+window.addSport = async function(){
+  const name=document.getElementById('newSportName').value.trim();
+  const msg=document.getElementById('sportMsg');
+  if(!name){ msg.className='error-msg'; msg.textContent='Enter a sport name.'; return; }
+  const { error } = await sb.from('cmj_sports').insert([{name}]);
+  if(error){ msg.className='error-msg'; msg.textContent=error.message; return; }
+  document.getElementById('newSportName').value='';
+  msg.className='ok-msg'; msg.textContent=name+' added. Now add its teams and positions below.';
+  await loadAll();
+};
+
+window.addTeam = async function(){
+  const sport=document.getElementById('teamSportSelect').value;
+  const name=document.getElementById('newTeamName').value.trim();
+  const msg=document.getElementById('teamMsg');
+  if(!sport||!name){ msg.className='error-msg'; msg.textContent='Pick a sport and enter a team name.'; return; }
+  const { error } = await sb.from('cmj_teams').insert([{sport_id:sport, name}]);
+  if(error){ msg.className='error-msg'; msg.textContent=error.message; return; }
+  document.getElementById('newTeamName').value='';
+  msg.className='ok-msg'; msg.textContent=name+' added to '+sportName(sport)+'.';
+  await loadAll();
+};
+
+window.addPosition = async function(){
+  const sport=document.getElementById('posSportSelect').value;
+  const name=document.getElementById('newPosName').value.trim();
+  const msg=document.getElementById('posMsg');
+  if(!sport||!name){ msg.className='error-msg'; msg.textContent='Pick a sport and enter a position name.'; return; }
+  const order=S.positions.filter(p=>p.sport_id===sport).length;
+  const { error } = await sb.from('cmj_positions').insert([{sport_id:sport, name, sort_order:order}]);
+  if(error){ msg.className='error-msg'; msg.textContent=error.message; return; }
+  document.getElementById('newPosName').value='';
+  msg.className='ok-msg'; msg.textContent=name+' added to '+sportName(sport)+'.';
+  await loadAll();
+};
+
+function renderAdminOverview(){
+  const el=document.getElementById('adminOverview');
+  if(!S.sports.length){ el.innerHTML='<div style="color:var(--text-soft)">No sports yet.</div>'; return; }
+  el.innerHTML = S.sports.map(s=>{
+    const tms=S.teams.filter(t=>t.sport_id===s.id).map(t=>t.name);
+    const pss=S.positions.filter(p=>p.sport_id===s.id).map(p=>p.name);
+    const n=S.athletes.filter(a=>a.sport_id===s.id).length;
+    return `<div style="padding:12px 0;border-bottom:1px solid var(--gray-border)">
+      <div style="font-weight:800;color:var(--navy);margin-bottom:4px">${s.name} — ${n} athletes</div>
+      <div style="font-size:13px;color:var(--text-soft)">Teams: ${tms.length?tms.join(', '):'none yet'}</div>
+      <div style="font-size:13px;color:var(--text-soft)">Positions: ${pss.length?pss.join(', '):'none yet'}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- REPORT ---------- */
+window.buildReport = function(){
+  const sportId=document.getElementById('reportSport').value;
+  const d=document.getElementById('reportDate').value||todayStr();
+  const roster=S.athletes.filter(a=>a.sport_id===sportId);
+  const js=S.jumps.filter(j=>j.sport_id===sportId && j.jump_date===d);
+  const present=js.filter(j=>!j.is_medical);
+  const medical=js.filter(j=>j.is_medical);
+  const absent=roster.length-(present.length+medical.length);
+
+  const top=present.filter(j=>j.cmj_inches!=null).sort((a,b)=>b.cmj_inches-a.cmj_inches).slice(0,5);
+  const red=roster.map(a=>{
+    const j=present.find(x=>x.athlete_id===a.id);
+    if(!j) return null;
+    const avg=rollingAvg(a.id,7,d);
+    if(!avg) return null;
+    const pct=(j.cmj_inches-avg)/avg*100;
+    return status(pct)==='RED'?{a,j,avg,pct}:null;
+  }).filter(Boolean).sort((x,y)=>x.pct-y.pct);
+
+  let html=`<div class="card"><h2 style="color:var(--navy);margin-bottom:4px">CMJ Readiness Report</h2>
+    <div style="color:var(--text-soft);margin-bottom:16px">${sportName(sportId)} — ${new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
+    <div class="grid4" style="margin-bottom:18px">
+      <div class="stat"><div class="stat-label">Present</div><div class="stat-value">${present.length}</div></div>
+      <div class="stat"><div class="stat-label">Medical</div><div class="stat-value">${medical.length}</div></div>
+      <div class="stat"><div class="stat-label">Absent</div><div class="stat-value">${absent}</div></div>
+      <div class="stat"><div class="stat-label">Attendance</div><div class="stat-value">${roster.length?Math.round((present.length+medical.length)/roster.length*100):0}%</div></div>
+    </div>`;
+
+  html+=`<h3 style="color:var(--navy);margin:16px 0 8px;font-size:15px">Top 5 Jumpers</h3>`;
+  html+= top.length?`<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Position</th><th>CMJ</th></tr></thead><tbody>${
+    top.map((j,i)=>{const a=S.athletes.find(x=>x.id===j.athlete_id);
+    return `<tr><td>${i+1}</td><td>${a?.first_name} ${a?.last_name}</td><td>${teamName(a?.team_id)}</td><td>${posName(a?.position_id)}</td><td>${j.cmj_inches}"</td></tr>`;}).join('')
+  }</tbody></table>`:'<div style="color:var(--text-soft)">No jumps recorded.</div>';
+
+  S.teams.filter(t=>t.sport_id===sportId).forEach(t=>{
+    const ath=roster.filter(a=>a.team_id===t.id);
+    const tj=present.filter(j=>j.cmj_inches!=null && ath.some(a=>a.id===j.athlete_id));
+    const avg=tj.length?(tj.reduce((s,j)=>s+Number(j.cmj_inches),0)/tj.length).toFixed(1):'—';
+    html+=`<h3 style="color:var(--navy);margin:16px 0 8px;font-size:15px">${t.name}</h3>
+      <div style="font-size:13px">Roster ${ath.length} • Jumped ${tj.length} • Avg CMJ ${avg==='—'?'—':avg+'"'} • Participation ${ath.length?Math.round(tj.length/ath.length*100):0}%</div>`;
+  });
+
+  html+=`<h3 style="color:var(--red);margin:18px 0 8px;font-size:15px">Red Zone (${red.length})</h3>`;
+  html+= red.length?`<table><thead><tr><th>Name</th><th>Team</th><th>Today</th><th>7-Day Avg</th><th>Change</th></tr></thead><tbody>${
+    red.map(r=>`<tr><td>${r.a.first_name} ${r.a.last_name}</td><td>${teamName(r.a.team_id)}</td><td>${r.j.cmj_inches}"</td><td>${r.avg.toFixed(1)}"</td><td style="color:var(--red);font-weight:700">${r.pct.toFixed(1)}%</td></tr>`).join('')
+  }</tbody></table>`:'<div style="color:var(--text-soft)">No athletes flagged.</div>';
+
+  html+=`<button class="btn btn-orange" style="margin-top:18px" onclick="window.print()">Print / Save as PDF</button></div>`;
+  document.getElementById('reportOut').innerHTML=html;
+};
+
+/* ---------- TABS ---------- */
+window.switchTab = function(btn, tab){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(tab==='dashboard') loadDashboard();
+  if(tab==='attendance') loadAttendance();
+  if(tab==='trends'){ drawTrendChart(); drawTeamFatigue(); }
+  if(tab==='admin') renderAdminOverview();
+};
+</script>
+</body>
+</html>
