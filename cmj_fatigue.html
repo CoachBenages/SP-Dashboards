@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMJ Dashboard</title>
+<title>Huskies Readiness</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--navy:#1B3A6B;--navy-dark:#0F2347;--orange:#F4581A;--gray-bg:#F2F3F5;--gray-border:#DDE1E9;--text:#1a1a2e;--text-soft:#5A6070;--green:#2E7D1F;--yellow:#8B6008;--red:#C0392B}
+:root{--navy:#002F55;--navy-dark:#001B33;--orange:#FA4616;--gray-bg:#F2F3F5;--gray-border:#DDE1E9;--text:#1a1a2e;--text-soft:#5A6070;--green:#2E7D1F;--yellow:#8B6008;--red:#C0392B}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--gray-bg);color:var(--text)}
 .login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--navy-dark),var(--navy))}
 .login-box{background:#fff;border-radius:16px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
@@ -62,7 +62,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-seri
 .stat-label{font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;margin-bottom:8px}
 .stat-value{font-size:30px;font-weight:900;color:var(--navy)}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{font-size:11px;font-weight:800;color:var(--navy);text-transform:uppercase;padding:10px;text-align:left;border-bottom:2px solid var(--gray-border);background:rgba(27,58,107,.03)}
+th{font-size:11px;font-weight:800;color:var(--navy);text-transform:uppercase;padding:10px;text-align:left;border-bottom:2px solid var(--gray-border);background:rgba(0,47,85,.04)}
 td{padding:10px;border-bottom:1px solid var(--gray-border)}
 .clickable{cursor:pointer;color:var(--navy);font-weight:700;text-decoration:underline}
 .badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700}
@@ -85,7 +85,7 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
 .kiosk-input{width:100%;padding:14px;font-size:16px;border:1.5px solid var(--gray-border);border-radius:8px;margin-bottom:14px;font-family:inherit}
 .results{max-height:280px;overflow-y:auto;margin-bottom:14px;text-align:left}
 .result-item{padding:12px;background:var(--gray-bg);border-radius:8px;margin-bottom:8px;cursor:pointer}
-.result-item:hover{background:#E8ECFF}
+.result-item:hover{background:#E6EEF5}
 .result-name{font-weight:700;color:var(--navy)}
 .result-info{font-size:12px;color:var(--text-soft);margin-top:4px}
 .confirm-box{border-radius:12px;padding:22px;margin:16px 0}
@@ -97,6 +97,227 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
 .chart-wrap{position:relative;height:320px;margin:16px 0}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .hint{font-size:12px;color:var(--text-soft);margin-top:6px}
+/* ===================== v3 additions ===================== */
+:root{--teal:#FA4616;--k-bg:#000D1A;--k-card:#021A31;--k-line:#16365A;--k-soft:#8B97A8;
+  --b-green:#2E9E5B;--b-yellow:#FFD60A;--b-orange:#F08A24;--b-red:#D64545}
+.muted{color:var(--text-soft)} .small{font-size:11px} .empty{text-align:center;padding:18px;color:var(--text-soft)}
+.of{font-size:16px;color:var(--text-soft);font-weight:700}
+.banner{background:#FEF5DC;border:1px solid #E8C97A;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#6b4e05;font-weight:600}
+.btn-sm{padding:6px 12px;font-size:12px}
+.in-sm{width:96px;padding:6px 8px;border:1.5px solid var(--gray-border);border-radius:6px;font-family:inherit}
+.tbl-scroll{overflow-x:auto}
+.h4{margin:12px 0 6px;font-size:13px}.h4.green{color:var(--green)}.h4.amber{color:#C98A00}.h4.red{color:var(--red)}
+.g{color:#2E7D1F}.r{color:#C0392B}.n{color:#6B7280}
+
+/* wellness chips */
+.chip{display:inline-block;min-width:38px;text-align:center;padding:3px 8px;border-radius:6px;font-weight:800;font-size:12px}
+.chip-green{background:#DDF3E5;color:#1E7A43}.chip-yellow{background:#FFF4BF;color:#7A5D00}
+.chip-orange{background:#FFE3C7;color:#A84A00}.chip-red{background:#FBDADA;color:#A42323}.chip-none{background:#EEE;color:#888}
+.stat .chip{font-size:22px;padding:4px 14px}
+.flag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;background:#FDEAEA;color:#A42323;margin:1px 2px}
+.flag-grey{background:#ECEEF2;color:#4B5563}.flag-blue{background:#E1EEFF;color:#1D4ED8}
+.wt-red{color:#C0392B;font-weight:800}.wt-green{color:#2E7D1F;font-weight:800}.wt-none{color:var(--text);font-weight:700}
+.tr-improving{color:#2E7D1F;font-weight:800}.tr-steady{color:#4B5563;font-weight:800}.tr-slipping{color:#C0392B;font-weight:800}
+
+/* readiness words */
+.rd{display:inline-block;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:900;letter-spacing:.08em}
+.rd-ready{background:#1E7A43;color:#fff}.rd-monitor{background:#FFD60A;color:#3d2f00}
+.rd-checkin{background:#C0392B;color:#fff}.rd-medical{background:#FFF4E6;color:#B07500;border:1px solid #F0C36A}.rd-absent{background:#ECEEF2;color:#6B7280}
+table.rt td{vertical-align:middle}
+
+/* readiness tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.tile{background:#001B33;color:#fff;border-radius:12px;padding:14px 14px 12px;position:relative;overflow:hidden;border-top:4px solid #8A93A6}
+.tile .tl{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+.tile .tv{font-size:34px;font-weight:900;line-height:1.1;margin-top:4px}
+.tile .tv-sm{font-size:24px}
+.tile .tv .g{color:#5BD98A}.tile .tv .r{color:#FF7A73}.tile .tv .n{color:#C9D1DD}
+.tile .ts{font-size:11px;opacity:.7;margin-top:2px}
+.t-ready{border-top-color:#2E9E5B}.t-monitor{border-top-color:#FFD60A}.t-checkin{border-top-color:#D64545}
+.t-medical{border-top-color:#F0A830}.t-absent{border-top-color:#6B7280}
+.chipbg-green{border-top-color:#2E9E5B}.chipbg-green .tv{color:#5BD98A}
+.chipbg-yellow{border-top-color:#FFD60A}.chipbg-yellow .tv{color:#FFD60A}
+.chipbg-orange{border-top-color:#F08A24}.chipbg-orange .tv{color:#FFB066}
+.chipbg-red{border-top-color:#D64545}.chipbg-red .tv{color:#FF7A73}
+
+/* legend bar: two rows */
+.rb-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 22px;width:100%}
+.rb-orange{color:#FFA552}
+.rb-sep{width:100%;height:0}
+
+/* admin */
+.sd-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-border)}
+.sd-name{font-weight:800;color:var(--navy);min-width:120px}
+.sd-days{display:flex;gap:6px;flex-wrap:wrap}
+.sd-day input{display:none}
+.sd-day span{display:inline-block;padding:7px 11px;border-radius:7px;border:1.5px solid var(--gray-border);font-size:12px;font-weight:800;cursor:pointer;color:var(--text-soft)}
+.sd-day input:checked+span{background:var(--navy);color:#fff;border-color:var(--navy)}
+.sd-msg{font-size:12px}
+
+/* report */
+.seg{display:inline-flex;border:1.5px solid var(--gray-border);border-radius:9px;overflow:hidden;margin-bottom:14px}
+.seg button{padding:9px 18px;border:none;background:#fff;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-soft);cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff}
+.report{background:#fff;border:1px solid var(--gray-border);border-radius:14px;padding:0 0 20px;margin-bottom:20px;overflow:hidden}
+.report>*:not(.rep-head){margin-left:22px;margin-right:22px}
+.rep-head{background:linear-gradient(120deg,#000D1A 0%,#001B33 70%,#002F55 100%);color:#fff;padding:22px;display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;border-bottom:4px solid var(--orange);margin-bottom:18px}
+.rep-eyebrow{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}
+.rep-title{font-size:26px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;margin:4px 0}
+.rep-sub{font-size:13px;color:rgba(255,255,255,.75)}
+.rep-h3{font-size:13px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin:20px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--gray-border)}
+.rep-h3.red{color:#C0392B;border-bottom-color:#F3C4C0}
+.rep-h3 .small{letter-spacing:0;text-transform:none;font-weight:600}
+.rep-list{font-size:13px;line-height:1.9}
+.rep-key{font-size:11px;color:var(--text-soft);line-height:1.6;margin-top:16px;padding:10px 12px;background:var(--gray-bg);border-radius:8px}
+
+/* ===================== KIOSK (dark, athlete-facing) ===================== */
+#panel-kiosk{background:radial-gradient(1200px 600px at 85% -10%,#0A3A66 0%,transparent 60%),var(--k-bg);border-radius:18px;padding:28px 18px 40px;color:#fff;min-height:calc(100vh - 230px)}
+body.kiosk-locked{background:var(--k-bg)}
+body.kiosk-locked .main{padding:12px}
+#panel-kiosk .kiosk-wrap{max-width:860px;margin:0 auto}
+.kx-card{background:linear-gradient(180deg,#03203B,#001326);border:1px solid var(--k-line);border-radius:20px;padding:28px 26px}
+.kx-eyebrow{font-size:11px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--teal)}
+.kx-name{font-size:34px;font-weight:900;text-transform:uppercase;letter-spacing:.02em;line-height:1.1;margin:6px 0 4px}
+.kx-sub{color:var(--k-soft);font-size:14px;margin-bottom:18px}
+.kx-sub b{color:var(--teal);font-weight:700}
+.kx-sport{display:block;width:100%;padding:18px;margin-bottom:10px;background:#042441;border:1px solid var(--k-line);border-left:4px solid var(--orange);color:#fff;border-radius:12px;font-size:18px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-align:left;cursor:pointer}
+.kx-sport:hover{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal),0 0 24px rgba(250,70,22,.18)}
+.kx-input{width:100%;padding:16px;font-size:18px;background:#001326;border:1.5px solid var(--k-line);border-radius:10px;color:#fff;font-family:inherit;margin-bottom:12px}
+.kx-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(250,70,22,.15)}
+.kx-input::placeholder{color:#55606F}
+#panel-kiosk .results{max-height:320px}
+.kx-result{padding:14px;background:#042441;border:1px solid var(--k-line);border-radius:10px;margin-bottom:8px;cursor:pointer}
+.kx-result:hover{border-color:var(--teal)}
+.kx-rname{font-weight:800;font-size:16px}
+.kx-rinfo{font-size:12px;color:var(--k-soft);margin-top:3px}
+.kx-tag{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:#3A2A0A;color:#FFC24D;margin-left:6px;vertical-align:middle}
+.kx-tag.done{background:#0F3B24;color:#6BE39A}
+.kx-none{padding:12px;color:var(--k-soft);text-align:center}
+.kx-btn{display:block;width:100%;padding:14px;border-radius:10px;border:1px solid var(--k-line);background:#042441;color:#fff;font-weight:800;font-size:14px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-top:8px}
+.kx-btn.primary{background:var(--teal);color:#FFFFFF;border-color:var(--teal)}
+.kx-btn.accent{background:transparent;border-color:var(--orange);color:#FFB085}
+.kx-btn:disabled{opacity:.5}
+.kx-mode{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px}
+.kx-mode button{padding:13px;border-radius:10px;border:1.5px solid var(--k-line);background:#001326;color:var(--k-soft);font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.kx-mode button.on{border-color:var(--teal);color:#fff;box-shadow:0 0 0 1px var(--teal) inset,0 0 18px rgba(250,70,22,.15)}
+#modeMed.on{border-color:#F0A830;box-shadow:0 0 0 1px #F0A830 inset,0 0 18px rgba(240,168,48,.15)}
+.kx-sec{border-top:1px solid var(--k-line);padding-top:20px;margin-top:6px;margin-bottom:18px}
+.kx-sec-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.kx-sig{font-size:11px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--teal)}
+.kx-sec-h h3{font-size:26px;font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+.kx-hint{font-size:12px;color:var(--k-soft);margin-left:auto}
+.kx-well{display:grid;grid-template-columns:1fr 250px;gap:22px;align-items:center}
+.kx-q{display:grid;grid-template-columns:150px auto;align-items:center;column-gap:14px;margin-bottom:12px}
+.kx-qlabel{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.kx-qlabel i{width:6px;height:6px;background:var(--teal);border-radius:1px;display:inline-block}
+.kx-btns{display:flex;gap:7px}
+.kx-b{width:46px;height:46px;border-radius:9px;border:1px solid #1E4468;background:#042441;color:#9AA6B6;font-size:16px;font-weight:800;cursor:pointer;transition:.12s}
+.kx-b:hover{border-color:#2D5A86;color:#fff}
+.kx-b.on{background:#0A3A66;border-color:#FFFFFF;color:#fff;box-shadow:0 0 0 1px #FFFFFF,0 0 16px rgba(255,255,255,.28)}
+.kx-anchor{grid-column:2;display:flex;justify-content:space-between;max-width:262px;font-size:10px;color:#6C7889;margin-top:4px;font-weight:600}
+.kx-score{display:flex;flex-direction:column;align-items:center;gap:18px}
+.kx-ring{width:170px;height:170px;border-radius:50%;border:4px solid #1E4468;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.2s}
+.kx-ring .kx-rl{font-size:11px;font-weight:800;letter-spacing:.2em;color:var(--k-soft)}
+.kx-ring .kx-rv{font-size:54px;font-weight:900;line-height:1}
+.kx-ring .kx-rb{font-size:11px;font-weight:900;letter-spacing:.2em;margin-top:4px;color:var(--k-soft)}
+.kx-ring.band-green{border-color:var(--b-green);box-shadow:0 0 30px rgba(46,158,91,.35)}.kx-ring.band-green .kx-rb{color:#5BD98A}
+.kx-ring.band-yellow{border-color:var(--b-yellow);box-shadow:0 0 30px rgba(255,214,10,.35)}.kx-ring.band-yellow .kx-rb{color:var(--b-yellow)}
+.kx-ring.band-orange{border-color:var(--b-orange);box-shadow:0 0 30px rgba(240,138,36,.35)}.kx-ring.band-orange .kx-rb{color:#FFB066}
+.kx-ring.band-red{border-color:var(--b-red);box-shadow:0 0 30px rgba(214,69,69,.4)}.kx-ring.band-red .kx-rb{color:#FF7A73}
+.kx-band{width:100%}
+.kx-band-l{font-size:9px;font-weight:800;letter-spacing:.2em;color:var(--k-soft);margin-bottom:6px}
+.kx-segs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;position:relative}
+.kx-seg{height:30px;border-radius:5px;opacity:.35;transition:.15s}
+.kx-seg[data-band=RED]{background:var(--b-red)}.kx-seg[data-band=ORANGE]{background:var(--b-orange)}
+.kx-seg[data-band=YELLOW]{background:var(--b-yellow)}.kx-seg[data-band=GREEN]{background:var(--b-green)}
+.kx-seg.on{opacity:1;box-shadow:0 0 18px currentColor}
+.kx-seg[data-band=YELLOW].on{color:var(--b-yellow)}.kx-seg[data-band=GREEN].on{color:var(--b-green)}
+.kx-seg[data-band=ORANGE].on{color:var(--b-orange)}.kx-seg[data-band=RED].on{color:var(--b-red)}
+.kx-seglabels{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:5px;text-align:center;font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--k-soft)}
+.kx-seglabels span small{display:block;font-weight:600;letter-spacing:0;opacity:.7}
+#wellMarker{position:absolute;top:-9px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #fff;transform:translateX(-6px);display:none}
+.kx-row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.kx-field label{display:block;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--k-soft);margin-bottom:6px}
+.kx-note{font-size:11px;color:#6C7889;margin-top:-6px}
+.kx-err{color:#FF8A84;font-weight:700;font-size:14px;min-height:20px;margin:6px 0}
+.kx-confirm{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.kx-tile{background:#001326;border:1px solid var(--k-line);border-top:4px solid #285077;border-radius:14px;padding:18px 16px}
+.kx-tl{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--k-soft)}
+.kx-tv{font-size:44px;font-weight:900;line-height:1.1;margin-top:6px}
+.kx-tw{font-size:13px;font-weight:900;letter-spacing:.14em;margin-top:2px}
+.kx-tm{font-size:13px;color:#C3CCD8;margin-top:8px;line-height:1.4}
+.kx-tm.low{color:#FFC24D}
+.kx-tile.band-green,.kx-tile.st-green{border-top-color:var(--b-green)}.kx-tile.band-green .kx-tw,.kx-tile.st-green .kx-tw{color:#5BD98A}
+.kx-tile.band-yellow,.kx-tile.st-yellow{border-top-color:var(--b-yellow)}.kx-tile.band-yellow .kx-tw,.kx-tile.st-yellow .kx-tw{color:var(--b-yellow)}
+.kx-tile.band-orange{border-top-color:var(--b-orange)}.kx-tile.band-orange .kx-tw{color:#FFB066}
+.kx-tile.band-red,.kx-tile.st-red{border-top-color:var(--b-red)}.kx-tile.band-red .kx-tw,.kx-tile.st-red .kx-tw{color:#FF7A73}
+.kx-tile.st-neutral .kx-tw{color:var(--teal)}
+.kx-tile.med{border-top-color:#F0A830}.kx-tile.med .kx-tv{font-size:28px;color:#FFC24D;margin-top:14px}
+.kx-tile.bw-ok{border-top-color:var(--b-green)}.kx-tile.bw-ok .kx-tv{color:#6BE39A}
+.kx-tile.bw-miss{border-top-color:#285077}
+@media(max-width:760px){
+  .kx-well{grid-template-columns:1fr}.kx-score{order:-1}
+  .kx-q{grid-template-columns:1fr}.kx-anchor{grid-column:1}
+  .kx-b{width:52px;height:48px}
+  .kx-confirm,.kx-row2{grid-template-columns:1fr}
+  .kx-name{font-size:26px}
+}
+
+/* ===================== PRINT ===================== */
+@media print{
+  @page{margin:12mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff}
+  .header,.nav-tabs,.readiness-bar,.no-print,#panel-report>.rep-controls,#panel-report>h2{display:none!important}
+  .panel{display:none!important}
+  #panel-report{display:block!important}
+  .main{padding:0;max-width:none}
+  .report{border:none;border-radius:0}
+  table{font-size:10px} td,th{padding:5px 6px}
+  tr,.tile{break-inside:avoid}
+  .rep-h3{break-after:avoid}
+  .tile .tv{font-size:26px}
+}
+
+/* edit data */
+.ed-results{max-height:340px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.ed-item{padding:10px 12px;border:1.5px solid var(--gray-border);border-radius:9px;cursor:pointer;background:#fff}
+.ed-item:hover,.ed-item.on{border-color:var(--navy);background:rgba(0,47,85,.04)}
+.ed-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.ed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 14px}
+@media(max-width:760px){.ed-grid{grid-template-columns:1fr 1fr}}
+.ed-msg{font-size:13px;font-weight:700;border-radius:8px;margin-bottom:12px}
+.ed-msg.ok{background:#E3F4E8;color:#1E7A43;padding:10px 12px}.ed-msg.err{background:#FDEAEA;color:#A42323;padding:10px 12px}
+.ed-danger{margin-top:20px;padding:14px;border:1.5px dashed #E6B4AE;border-radius:10px;font-size:13px;display:grid;gap:10px}
+.ed-inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ed-inline select{padding:7px 10px;border:1.5px solid var(--gray-border);border-radius:6px;min-width:220px}
+.btn-del{background:#fff;color:#C0392B;border:1.5px solid #E6B4AE}
+.ed-tbl td{padding:6px 5px;white-space:nowrap}.ed-tbl th{padding:8px 5px}
+.ed-tbl .c{text-align:center}
+.ed-tbl .ed-date{width:138px}.ed-tbl .ed-num{width:70px}
+.ed-w{padding:5px 4px;border:1.5px solid var(--gray-border);border-radius:6px}
+.ed-move{padding:5px 6px;border:1.5px solid var(--gray-border);border-radius:6px;max-width:120px;font-size:12px}
+.ed-actions{display:flex;gap:6px;align-items:center}
+.ed-tbl tr#new{background:#FFF6F1}
+.ed-pen{border:none;background:none;color:var(--text-soft);cursor:pointer;font-size:13px;padding:0 3px}
+.ed-pen:hover{color:var(--orange)}
+.ad-chip{display:inline-flex;align-items:center;gap:2px;background:var(--gray-bg);border:1px solid var(--gray-border);border-radius:6px;padding:2px 4px 2px 8px;margin:2px 3px 2px 0;font-weight:700;color:var(--navy);font-size:12px}
+.ad-chip button{border:none;background:none;cursor:pointer;color:var(--text-soft);font-size:11px;padding:2px 4px}
+.ad-chip button:hover{color:var(--orange)}
+body.kiosk-locked .ed-pen{display:none}
+@media print{.ed-pen{display:none}}
+
+/* athlete goal question */
+.kx-goal{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kx-goal button{padding:16px 12px;border-radius:12px;border:1.5px solid var(--k-line);background:#001326;color:#C3CCD8;cursor:pointer;text-align:left}
+.kx-goal button b{display:block;font-size:17px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#fff}
+.kx-goal button span{font-size:12px}
+.kx-goal button.on{background:#0A3A66;border-color:#FFFFFF;box-shadow:0 0 0 1px #FFFFFF,0 0 16px rgba(255,255,255,.22)}
+.kx-new{display:inline-block;font-size:10px;font-weight:900;letter-spacing:.14em;background:var(--orange);color:#fff;padding:3px 7px;border-radius:4px;margin-left:8px;vertical-align:middle}
+.flag-amber{background:#FFF1D6;color:#8A5A00}
+.banner-info{background:#E6EEF5;border-color:#B9CCDD;color:#002F55}
+.banner-info a{color:#002F55;font-weight:800}
+
 </style>
 </head>
 <body>
@@ -120,7 +341,7 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
       <img class="brand-logo" alt="Naperville North Huskies" src="data:image/png;base64,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">
       <div class="brand-text">
         <div class="eyebrow">Naperville North Strength &amp; Performance</div>
-        <div class="brand-title">CMJ Fatigue Dashboard</div>
+        <div class="brand-title">Athlete Readiness Dashboard</div>
         <div class="pillars"><span>Train Smart</span><i>&bull;</i><span>Lead Strong</span><i>&bull;</i><span>Compete With Purpose</span></div>
       </div>
     </div>
@@ -139,14 +360,20 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
     <button class="nav-tab" data-tab="attendance" onclick="switchTab(this,'attendance')">Attendance</button>
     <button class="nav-tab" data-tab="trends" onclick="switchTab(this,'trends')">Trends</button>
     <button class="nav-tab" data-tab="report" onclick="switchTab(this,'report')">Reports</button>
+    <button class="nav-tab" data-tab="edit" onclick="switchTab(this,'edit')">Edit Data</button>
     <button class="nav-tab" data-tab="admin" onclick="switchTab(this,'admin')">Admin</button>
   </div>
 
   <div class="readiness-bar">
-    <span class="rb-label">Readiness:</span>
-    <span class="rb-item rb-green"><i></i>Green: 0% to &minus;4% &mdash; Full load</span>
-    <span class="rb-item rb-yellow"><i></i>Yellow: &minus;5% to &minus;9% &mdash; Reduce volume</span>
-    <span class="rb-item rb-red"><i></i>Red: &minus;10% or worse &mdash; Act now</span>
+    <div class="rb-row"><span class="rb-label">CMJ:</span>
+    <span class="rb-item rb-green"><i></i>0% to &minus;4% &mdash; Full load</span>
+    <span class="rb-item rb-yellow"><i></i>&minus;5% to &minus;9% &mdash; Reduce volume</span>
+    <span class="rb-item rb-red"><i></i>&minus;10% or worse &mdash; Act now</span></div>
+    <div class="rb-row"><span class="rb-label">Wellness:</span>
+    <span class="rb-item rb-green"><i></i>4.0+</span>
+    <span class="rb-item rb-yellow"><i></i>3.0&ndash;3.9</span>
+    <span class="rb-item rb-orange"><i></i>2.0&ndash;2.9</span>
+    <span class="rb-item rb-red"><i></i>Under 2 &nbsp;&middot;&nbsp; any answer of 1&ndash;2 is flagged</span></div>
   </div>
 
   <div class="main">
@@ -157,6 +384,13 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
         <h2 style="font-size:20px;font-weight:800;color:var(--navy)">Today's Dashboard</h2>
         <div><label style="margin-right:8px;font-weight:700;font-size:13px">Sport:</label>
         <select id="sportSelect" onchange="loadDashboard()" style="padding:8px 12px;border:1.5px solid var(--gray-border);border-radius:6px"></select></div>
+      </div>
+      <div id="sessionBanner"></div>
+
+      <div class="card">
+        <div class="card-title">Today's Readiness &mdash; CMJ + Wellness</div>
+        <div id="readyTiles"></div>
+        <div id="readyTable"></div>
       </div>
 
       <div class="card">
@@ -177,47 +411,89 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
 
       <div id="teamSummaries"></div>
 
-      <div class="card">
-        <div class="card-title">Red Zone — Act Now</div>
-        <table><thead><tr><th>Name</th><th>Team</th><th>Position</th><th>Today</th><th>7-Day Avg</th><th>Change</th></tr></thead>
-        <tbody id="redZoneBody"><tr><td colspan="6" style="text-align:center;padding:18px;color:var(--text-soft)">No athletes in red zone</td></tr></tbody></table>
-      </div>
     </div>
 
     <!-- KIOSK -->
     <div id="panel-kiosk" class="panel">
       <div class="kiosk-wrap">
         <div id="kioskStep1" class="kiosk-step active">
-          <div class="kiosk-card"><div class="kiosk-title">Welcome</div><div class="kiosk-sub">Select your sport</div><div id="sportButtons" style="display:grid;gap:10px"></div></div>
+          <div class="kx-card">
+            <div class="kx-eyebrow">Huskies Strength &amp; Performance</div>
+            <div class="kx-name">Daily Check-In</div>
+            <div class="kx-sub">Wellness &middot; Bodyweight &middot; CMJ &mdash; pick your sport</div>
+            <div id="sportButtons"></div>
+          </div>
         </div>
         <div id="kioskStep2" class="kiosk-step">
-          <div class="kiosk-card">
-            <div class="kiosk-title">Find Your Name</div>
-            <div class="kiosk-sub" id="kioskSportLabel">Search by last name</div>
-            <input type="text" id="athleteSearch" class="kiosk-input" placeholder="Type your last name..." oninput="searchAthletes()">
+          <div class="kx-card">
+            <div class="kx-eyebrow">Step 1</div>
+            <div class="kx-name">Find Your Name</div>
+            <div class="kx-sub" id="kioskSportLabel">Search by last name</div>
+            <input type="text" id="athleteSearch" class="kx-input" placeholder="Type your last name..." oninput="searchAthletes()" autocomplete="off">
             <div class="results" id="searchResults"></div>
-            <button class="btn btn-green" style="width:100%;margin-bottom:8px" onclick="openRegister()">+ I'm new — register me</button>
-            <button class="btn btn-gray" style="width:100%" onclick="kioskStep(1)">Back</button>
+            <button class="kx-btn accent" onclick="openRegister()">+ I'm new &mdash; register me</button>
+            <button class="kx-btn" onclick="kioskStep(1)">Back</button>
           </div>
         </div>
         <div id="kioskStep3" class="kiosk-step">
-          <div class="kiosk-card">
-            <div id="kioskAthleteName" class="kiosk-title">---</div>
-            <div id="kioskAthleteInfo" class="kiosk-sub"></div>
-            <div class="form-group" style="text-align:left"><label>CMJ Height (inches)</label>
-            <input type="number" id="jumpInput" class="kiosk-input" placeholder="e.g. 24.5" step="0.1" min="5" max="60"></div>
-            <button class="btn btn-green" style="width:100%;margin-bottom:8px" onclick="submitJump()">Record Jump</button>
-            <button class="btn btn-amber" style="width:100%;margin-bottom:8px" onclick="markMedical()">Mark as Medical</button>
-            <button class="btn btn-gray" style="width:100%" onclick="kioskStep(2)">Back</button>
+          <div class="kx-card">
+            <div class="kx-eyebrow">Daily Check-In</div>
+            <div id="kioskAthleteName" class="kx-name">---</div>
+            <div id="kioskAthleteInfo" class="kx-sub"></div>
+            <div class="kx-mode">
+              <button id="modeTest" class="on" onclick="setMode('test')">Testing Today</button>
+              <button id="modeMed" onclick="setMode('medical')">Medical &mdash; Can't Jump</button>
+            </div>
+
+            <section class="kx-sec" id="goalSection" style="display:none">
+              <div class="kx-sec-h"><span class="kx-sig">One-time question</span><h3>Your Goal</h3><span class="kx-new">NEW</span></div>
+              <div class="kx-sub" style="margin:-6px 0 12px">What's your bodyweight goal right now? Your coach can see this and may adjust it with you.</div>
+              <div class="kx-goal">
+                <button type="button" data-goal="maintain" onclick="setGoalChoice('maintain')"><b>Maintain</b><span>Hold my weight where it is</span></button>
+                <button type="button" data-goal="gain" onclick="setGoalChoice('gain')"><b>Gain</b><span>Put on weight / size</span></button>
+              </div>
+              <div class="kx-field" style="max-width:320px"><label>Goal weight (optional)</label><input type="number" id="goalTarget" class="kx-input" placeholder="e.g. 200" step="0.1" min="60" max="450" inputmode="decimal"></div>
+            </section>
+
+            <section class="kx-sec">
+              <div class="kx-sec-h"><span class="kx-sig">Signal 01</span><h3>Wellness</h3><span class="kx-hint">5 = good &nbsp;&middot;&nbsp; 1 = bad</span></div>
+              <div class="kx-well">
+                <div id="wellRows"></div>
+                <div class="kx-score">
+                  <div id="wellRing" class="kx-ring band-none"><div class="kx-rl">AVERAGE</div><div class="kx-rv" id="wellVal">0/5</div><div class="kx-rb" id="wellBandTxt">ANSWER ALL 5</div></div>
+                  <div class="kx-band">
+                    <div class="kx-band-l">SCORE BAND</div>
+                    <div class="kx-segs"><div id="wellMarker"></div>
+                      <div class="kx-seg" data-band="RED"></div><div class="kx-seg" data-band="ORANGE"></div><div class="kx-seg" data-band="YELLOW"></div><div class="kx-seg" data-band="GREEN"></div>
+                    </div>
+                    <div class="kx-seglabels"><span>RED<small>1&ndash;1.9</small></span><span>ORANGE<small>2&ndash;2.9</small></span><span>YELLOW<small>3&ndash;3.9</small></span><span>GREEN<small>4+</small></span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <div class="kx-row2">
+              <section class="kx-sec">
+                <div class="kx-sec-h"><span class="kx-sig">Signal 02</span><h3>Bodyweight</h3></div>
+                <div class="kx-field"><label>Pounds</label><input type="number" id="bwInput" class="kx-input" placeholder="e.g. 185.4" step="0.1" min="60" max="450" inputmode="decimal"></div>
+                <div class="kx-note">Weighed in earlier? Enter that number. Haven't yet? Skip it and come back later today. Only coaches see your weight.</div>
+              </section>
+              <section class="kx-sec" id="cmjSection">
+                <div class="kx-sec-h"><span class="kx-sig">Signal 03</span><h3>CMJ</h3></div>
+                <div class="kx-field"><label>Jump height (inches)</label><input type="number" id="jumpInput" class="kx-input" placeholder="e.g. 24.5" step="0.1" min="5" max="60" inputmode="decimal"></div>
+              </section>
+            </div>
+
+            <div id="kxErr" class="kx-err"></div>
+            <button id="kxSubmit" class="kx-btn primary" onclick="submitCheckin()">Submit Check-In</button>
+            <button class="kx-btn" onclick="kioskStep(2)">Back</button>
           </div>
         </div>
         <div id="kioskStep4" class="kiosk-step">
-          <div class="kiosk-card">
+          <div class="kx-card">
             <div id="kioskConfirmation"></div>
-            <div style="display:grid;gap:10px;margin-top:18px">
-              <button class="btn btn-green" style="width:100%" onclick="resetSearchAndGo2()">Next Athlete</button>
-              <button class="btn btn-gray" style="width:100%" onclick="kioskStep(1)">Start Over</button>
-            </div>
+            <button class="kx-btn primary" style="margin-top:20px" onclick="resetSearchAndGo2()">Next Athlete</button>
+            <button class="kx-btn" onclick="kioskStep(1)">Start Over</button>
           </div>
         </div>
       </div>
@@ -249,9 +525,17 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
           <div class="stat"><div class="stat-label">Latest</div><div class="stat-value" id="tLatest">—</div></div>
           <div class="stat"><div class="stat-label">7-Day Avg</div><div class="stat-value" id="t7">—</div></div>
           <div class="stat"><div class="stat-label">21-Day Base</div><div class="stat-value" id="t21">—</div></div>
-          <div class="stat"><div class="stat-label">Status</div><div class="stat-value" id="tStatus" style="font-size:20px">—</div></div>
+          <div class="stat"><div class="stat-label">CMJ Status</div><div class="stat-value" id="tStatus" style="font-size:20px">—</div></div>
+          <div class="stat"><div class="stat-label">Last Wellness</div><div class="stat-value" id="tWell">—</div></div>
+          <div class="stat"><div class="stat-label">Weight vs Start</div><div class="stat-value" id="tWeight" style="font-size:16px">—</div></div>
         </div>
         <div class="hint">Blue dots are individual jumps. Orange line is the 7-day rolling average. Grey line is the 21-day baseline.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Wellness &amp; Bodyweight</div>
+        <div class="chart-wrap"><canvas id="wbChart"></canvas></div>
+        <div class="hint">Bars are each day's wellness average, colored by band. Navy line is bodyweight; dashed grey is the start weight it's measured against.</div>
       </div>
 
       <div class="card">
@@ -268,21 +552,38 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
 
     <!-- REPORTS -->
     <div id="panel-report" class="panel">
-      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px">Daily Report</h2>
-      <div class="card">
+      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px">Reports</h2>
+      <div class="card rep-controls no-print">
+        <div class="seg"><button id="repWeekly" class="on" onclick="setReportMode('weekly')">Weekly &mdash; Head Coach</button><button id="repDaily" onclick="setReportMode('daily')">Daily</button></div>
         <div class="row2">
           <div class="form-group"><label>Sport</label><select id="reportSport"></select></div>
-          <div class="form-group"><label>Date</label><input type="date" id="reportDate"></div>
+          <div class="form-group"><label id="reportDateLabel">Any day in the week</label><input type="date" id="reportDate"></div>
         </div>
         <button class="btn btn-orange" style="width:100%;padding:14px" onclick="buildReport()">Generate Report</button>
-        <div class="hint">Generates a printable page. Use your browser's Print dialog and choose "Save as PDF" to email it.</div>
+        <div class="hint">Weekly covers Monday&ndash;Sunday of the week you pick. Hit "Print / Save as PDF" on the report, then choose "Save as PDF" to email it.</div>
       </div>
       <div id="reportOut"></div>
     </div>
 
+    
+    <!-- EDIT DATA -->
+    <div id="panel-edit" class="panel">
+      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px">Edit Data</h2>
+      <div class="hint" style="margin:0 0 16px">Fix anything a kid entered: names, teams, wrong numbers, a check-in under the wrong name, a missed day, or a double registration.</div>
+      <div class="card">
+        <div class="card-title">Find an Athlete</div>
+        <div class="row2">
+          <div class="form-group"><label>Sport</label><select id="editSport" onchange="renderEditSearch()"></select></div>
+          <div class="form-group"><label>Search</label><input type="text" id="editSearch" oninput="renderEditSearch()" placeholder="Last or first name"></div>
+        </div>
+        <div id="editResults" class="ed-results"></div>
+      </div>
+      <div id="editAthlete"></div>
+    </div>
+
     <!-- ADMIN -->
     <div id="panel-admin" class="panel">
-      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px">Admin — Sports, Teams, Positions</h2>
+      <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px">Admin — Setup, Training Days &amp; Goals</h2>
 
       <div class="card">
         <div class="card-title">Add a Sport</div>
@@ -312,11 +613,39 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
       </div>
 
       <div class="card">
+        <div class="card-title">Training Days</div>
+        <div class="hint" style="margin:-8px 0 8px">Athletes who don't check in on a training day are marked absent. Other days never count against anyone.</div>
+        <div id="sessionDaysAdmin"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Bodyweight Goals</div>
+        <div class="hint" style="margin:-8px 0 12px">Start weight is what change is measured from. Leave it blank and it fills in automatically from the athlete's first 3 weigh-ins. Enter a number to reset it (e.g., start of a new block).</div>
+        <div class="row2">
+          <div class="form-group"><label>Sport</label><select id="goalSport" onchange="fillGoalTeams()"></select></div>
+          <div class="form-group"><label>Team</label><select id="goalTeam" onchange="renderGoals()"></select></div>
+        </div>
+        <div id="goalTable"></div>
+      </div>
+
+      <div class="card">
         <div class="card-title">Current Setup</div>
         <div id="adminOverview"></div>
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- UNLOCK MODAL -->
+<div id="unlockModal" class="modal">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-title">Coach Unlock</div>
+    <div class="hint" style="margin:-10px 0 14px">Enter the password for <b id="unlockEmail"></b></div>
+    <div class="form-group"><label>Password</label><input type="password" id="unlockPw" onkeydown="if(event.key==='Enter')doUnlock()"></div>
+    <div id="unlockErr" class="error-msg"></div>
+    <button class="btn" style="width:100%;margin:10px 0 8px" onclick="doUnlock()">Unlock</button>
+    <button class="btn btn-gray" style="width:100%" onclick="closeUnlock()">Cancel</button>
   </div>
 </div>
 
@@ -333,6 +662,10 @@ td{padding:10px;border-bottom:1px solid var(--gray-border)}
       <div class="form-group"><label>Position</label><select id="regPosition"></select></div>
     </div>
     <div class="form-group"><label>Graduation Year</label><input type="number" id="regGrad" placeholder="2029"></div>
+    <div class="row2">
+      <div class="form-group"><label>Bodyweight goal</label><select id="regGoal"><option value="">Pick one&hellip;</option><option value="maintain">Maintain &mdash; hold my weight</option><option value="gain">Gain &mdash; put on size</option></select></div>
+      <div class="form-group"><label>Goal weight (optional)</label><input type="number" id="regTarget" step="0.1" placeholder="lb"></div>
+    </div>
     <div id="regMsg"></div>
     <button class="btn btn-green" style="width:100%;margin:10px 0 8px" onclick="submitRegistration()">Register &amp; Continue</button>
     <button class="btn btn-gray" style="width:100%" onclick="closeRegister()">Cancel</button>
@@ -346,14 +679,31 @@ const SUPABASE_URL = 'https://qyhlsoidbyiwlatpoewl.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_cZE5LZny7o9pQKpf48J2cA_Xp1vGbTn';
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let S = { user:null, sports:[], teams:[], positions:[], athletes:[], jumps:[], kioskSport:null, kioskAthlete:null, chart:null, tfChart:null };
+let S = { user:null, sports:[], teams:[], positions:[], athletes:[], jumps:[], kioskSport:null, kioskAthlete:null,
+          chart:null, wbChart:null, tfChart:null, kx:{ mode:'test', ans:{} } };
 
-const todayStr = () => new Date().toISOString().split('T')[0];
-const daysAgoStr = n => new Date(Date.now() - n*86400000).toISOString().split('T')[0];
-const teamName = id => S.teams.find(t=>t.id===id)?.name || '—';
-const posName = id => S.positions.find(p=>p.id===id)?.name || '—';
-const sportName = id => S.sports.find(s=>s.id===id)?.name || '—';
+/* ---------- DATES (local time, so evening entries land on the right day) ---------- */
+const pad = n => String(n).padStart(2,'0');
+const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayStr = () => fmtDate(new Date());
+const addDays = (ds, n) => { const d = new Date(ds+'T12:00:00'); d.setDate(d.getDate()+n); return fmtDate(d); };
+const dow = ds => new Date(ds+'T12:00:00').getDay();
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const longDate = ds => new Date(ds+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const shortDate = ds => new Date(ds+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const weekStartOf = ds => addDays(ds, -((dow(ds)+6)%7));   // Monday
 
+/* ---------- SMALL HELPERS ---------- */
+const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fullName = a => a ? esc(`${a.first_name} ${a.last_name}`) : '—';
+const teamName = id => esc(S.teams.find(t=>t.id===id)?.name || '—');
+const posName = id => esc(S.positions.find(p=>p.id===id)?.name || '—');
+const sportName = id => esc(S.sports.find(s=>s.id===id)?.name || '—');
+const rowOn = (athleteId, ds) => S.jumps.find(j=>j.athlete_id===athleteId && j.jump_date===ds);
+const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+const schemaHint = msg => /column|schema cache/i.test(msg||'') ? '\n\nThe database update (cmj_update_v3.sql) has not been run yet. Run it in Supabase first.' : '';
+
+/* ---------- CMJ STATUS ---------- */
 function status(pct){
   if(pct===null||pct===undefined||isNaN(pct)) return 'NEUTRAL';
   if(pct >= -4) return 'GREEN';
@@ -364,24 +714,149 @@ function statusColor(s){
   return s==='GREEN'?'var(--green)':s==='YELLOW'?'var(--yellow)':s==='RED'?'var(--red)':'#888';
 }
 
-const MIN_BASELINE = 3; // jumps required in prior 21 days before an athlete counts toward team fatigue
+const MIN_BASELINE = 3; // jumps required in prior 21 days before an athlete gets a CMJ color
 
-// rolling average plus the number of jumps behind it
+// rolling average over the N days BEFORE a given date (exclusive), plus how many jumps are behind it
 function rollingAvgN(athleteId, days, beforeDate){
   const end = beforeDate || todayStr();
-  const start = new Date(new Date(end).getTime() - days*86400000).toISOString().split('T')[0];
+  const start = addDays(end, -days);
   const js = S.jumps.filter(j => j.athlete_id===athleteId && !j.is_medical && j.cmj_inches!=null && j.jump_date >= start && j.jump_date < end);
   if(!js.length) return { avg:null, n:0 };
   return { avg: js.reduce((a,j)=>a+Number(j.cmj_inches),0)/js.length, n: js.length };
 }
+function rollingAvg(athleteId, days, beforeDate){ return rollingAvgN(athleteId, days, beforeDate).avg; }
 
-// rolling average over the N days BEFORE a given date (exclusive)
-function rollingAvg(athleteId, days, beforeDate){
-  const end = beforeDate || todayStr();
-  const start = new Date(new Date(end).getTime() - days*86400000).toISOString().split('T')[0];
-  const js = S.jumps.filter(j => j.athlete_id===athleteId && !j.is_medical && j.cmj_inches!=null && j.jump_date >= start && j.jump_date < end);
-  if(!js.length) return null;
-  return js.reduce((a,j)=>a+Number(j.cmj_inches),0)/js.length;
+// Status gate: no GREEN/YELLOW/RED until MIN_BASELINE+ jumps in the prior 21 days.
+function hasBaseline(athleteId, beforeDate){ return rollingAvgN(athleteId, 21, beforeDate).n >= MIN_BASELINE; }
+function statusAvg(athleteId, beforeDate){ return hasBaseline(athleteId, beforeDate) ? rollingAvg(athleteId, 7, beforeDate) : null; }
+
+function cmjOn(athleteId, ds){
+  const j = rowOn(athleteId, ds);
+  if(!j || j.is_medical || j.cmj_inches==null) return { v:null, avg:null, pct:null, st:'NEUTRAL' };
+  const a7 = statusAvg(athleteId, ds);
+  const pct = a7 ? (Number(j.cmj_inches)-a7)/a7*100 : null;
+  return { v:Number(j.cmj_inches), avg:a7, pct, st:status(pct) };
+}
+
+/* ---------- WELLNESS ---------- */
+const WELL_Q = [
+  { key:'w_fatigue',  label:'Fatigue',       lo:'Exhausted',    hi:'Fresh' },
+  { key:'w_sleep',    label:'Sleep Quality', lo:'Barely slept', hi:'Slept great' },
+  { key:'w_soreness', label:'Soreness',      lo:'Very sore',    hi:'Not sore' },
+  { key:'w_energy',   label:'Energy Level',  lo:'Drained',      hi:'Fired up' },
+  { key:'w_stress',   label:'Stress',        lo:'Overwhelmed',  hi:'Relaxed' }
+];
+function wellAvg(j){
+  if(!j) return null;
+  const v = WELL_Q.map(q=>j[q.key]).filter(x=>x!=null).map(Number);
+  return v.length===WELL_Q.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
+}
+function wellBand(x){
+  if(x==null) return 'NONE';
+  if(x >= 4) return 'GREEN';
+  if(x >= 3) return 'YELLOW';
+  if(x >= 2) return 'ORANGE';
+  return 'RED';
+}
+const lowItems = j => j ? WELL_Q.filter(q=>j[q.key]!=null && Number(j[q.key])<=2) : [];
+function wellFlagged(j){ const b = wellBand(wellAvg(j)); return b==='ORANGE' || b==='RED' || lowItems(j).length>0; }
+// same five answers on 5+ check-ins in a row (coach-only flag)
+function straightLined(athleteId, ds){
+  const rows = S.jumps.filter(j=>j.athlete_id===athleteId && j.jump_date<=ds && wellAvg(j)!=null)
+                      .sort((a,b)=>b.jump_date.localeCompare(a.jump_date)).slice(0,5);
+  if(rows.length<5) return false;
+  const sig = r => WELL_Q.map(q=>r[q.key]).join('');
+  return rows.every(r=>sig(r)===sig(rows[0]));
+}
+const fmt1 = x => x==null ? '—' : (Math.round(x*10)/10).toFixed(1);
+function wellChip(x){
+  const b = wellBand(x);
+  return b==='NONE' ? '<span class="chip chip-none">—</span>' : `<span class="chip chip-${b.toLowerCase()}">${fmt1(x)}</span>`;
+}
+
+/* ---------- BODYWEIGHT ---------- */
+const WEIGHT_SWING = 5;      // lb vs reference that turns red / green
+const HYDRATION_DROP = 2;    // % below recent average that raises the hydration flag
+function weighIns(athleteId){
+  return S.jumps.filter(j=>j.athlete_id===athleteId && j.bodyweight_lb!=null)
+                .sort((a,b)=>a.jump_date.localeCompare(b.jump_date));
+}
+// reference = coach-entered start weight, otherwise the average of the first 3 weigh-ins
+function weightRef(a){
+  if(a.weight_start_lb!=null) return { ref:Number(a.weight_start_lb), auto:false };
+  const w = weighIns(a.id).slice(0,3);
+  return w.length<3 ? { ref:null, auto:true, n:w.length } : { ref:avg(w.map(j=>Number(j.bodyweight_lb))), auto:true };
+}
+function weightAvgThrough(athleteId, ds, days=7){
+  const w = weighIns(athleteId).filter(j=>j.jump_date<=ds && j.jump_date>addDays(ds,-days));
+  return w.length ? avg(w.map(j=>Number(j.bodyweight_lb))) : null;
+}
+function weightOn(a, ds){
+  const { ref } = weightRef(a);
+  const cur = weightAvgThrough(a.id, ds);
+  const goal = a.weight_goal || 'maintain';
+  if(ref==null || cur==null) return { state:'BUILDING', goal, ref, cur, delta:null };
+  const delta = cur - ref;
+  const word = delta>=2 ? 'Rising' : delta<=-2 ? 'Dropping' : 'Holding';
+  // the 5 lb swing is good or bad depending on the athlete's goal
+  const good = goal==='lose' ? delta<=-WEIGHT_SWING : delta>=WEIGHT_SWING;
+  const bad  = goal==='lose' ? delta>=WEIGHT_SWING  : delta<=-WEIGHT_SWING;
+  const color = bad ? 'red' : good ? 'green' : 'none';
+  return { state:'OK', goal, ref, cur, delta, word, color, offGoal:bad };
+}
+// today's weight more than HYDRATION_DROP % under the prior week's average (needs 2+ earlier weigh-ins)
+function hydrationFlag(athleteId, ds){
+  const j = rowOn(athleteId, ds);
+  if(!j || j.bodyweight_lb==null) return false;
+  const prior = weighIns(athleteId).filter(x=>x.jump_date<ds && x.jump_date>=addDays(ds,-7));
+  if(prior.length<2) return false;
+  const base = avg(prior.map(x=>Number(x.bodyweight_lb)));
+  return (Number(j.bodyweight_lb)-base)/base*100 <= -HYDRATION_DROP;
+}
+function weightCell(w){
+  if(w.state!=='OK') return '<span class="muted">building</span>';
+  const arrow = w.delta>0 ? '▲' : w.delta<0 ? '▼' : '•';
+  const cls = w.color==='red' ? 'wt-red' : w.color==='green' ? 'wt-green' : 'wt-none';
+  return `<span class="${cls}">${arrow} ${Math.abs(w.delta).toFixed(1)} lb</span> <span class="muted small">${w.word}${w.goal!=='maintain'?' · '+w.goal:''}</span>`;
+}
+
+/* ---------- READINESS (CMJ + wellness → one word) ---------- */
+// CHECK IN: CMJ red, wellness red, or both signals flagged.  MONITOR: one signal flagged.  READY: neither.
+function readinessOn(a, ds){
+  const j = rowOn(a.id, ds);
+  if(!j) return 'ABSENT';
+  if(j.is_medical) return 'MEDICAL';
+  const c = cmjOn(a.id, ds);
+  const cFlag = c.st==='YELLOW' || c.st==='RED';
+  const wb = wellBand(wellAvg(j));
+  const wFlag = wellFlagged(j);
+  if(c.st==='RED' || wb==='RED' || (cFlag && wFlag)) return 'CHECK IN';
+  if(cFlag || wFlag) return 'MONITOR';
+  return 'READY';
+}
+const READY_ORDER = { 'CHECK IN':0, 'MONITOR':1, 'READY':2, 'MEDICAL':3, 'ABSENT':4 };
+const readyBadge = r => `<span class="rd rd-${r.replace(' ','').toLowerCase()}">${r}</span>`;
+
+/* ---------- SESSIONS & ATTENDANCE ---------- */
+const sessionDays = sportId => (S.sports.find(s=>s.id===sportId)?.session_days || 'Mon,Wed,Fri').split(',').map(x=>x.trim()).filter(Boolean);
+const isSessionDay = (sportId, ds) => sessionDays(sportId).includes(DAYS[dow(ds)]);
+// a past session day with zero check-ins across the whole sport is treated as cancelled (holiday, snow day)
+function sessionHeld(sportId, ds){
+  if(!isSessionDay(sportId, ds) || ds > todayStr()) return false;
+  if(ds===todayStr()) return true;
+  const ids = new Set(S.athletes.filter(a=>a.sport_id===sportId).map(a=>a.id));
+  return S.jumps.some(j=>j.jump_date===ds && ids.has(j.athlete_id));
+}
+function sessionsBetween(sportId, from, to){
+  const out=[]; for(let d=from; d<=to; d=addDays(d,1)) if(sessionHeld(sportId,d)) out.push(d); return out;
+}
+const activeFrom = a => a.created_at ? fmtDate(new Date(a.created_at)) : '0000-00-00';
+// Today only counts for athletes who already checked in; today's absences count once the day is over.
+function attendanceFor(a, from, to){
+  const t = todayStr();
+  const held = sessionsBetween(a.sport_id, from, to).filter(d=>d>=activeFrom(a) && (d<t || rowOn(a.id,d)));
+  const att = held.filter(d=>rowOn(a.id,d)).length;
+  return { att, held:held.length };
 }
 
 window.addEventListener('load', init);
@@ -415,17 +890,14 @@ function tickClock(){
   if(!el) return;
   const d=new Date();
   el.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})
-    + ' \u00b7 ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+    + ' · ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
 }
 
 /* ---------- KIOSK LOCK ----------
-   Change COACH_PIN below to whatever you want. Four digits is plenty.
-   When locked, only the Athlete Entry tab is reachable and the lock
-   survives a page refresh, so a student cannot get out by hitting reload. */
-const COACH_PIN = '2468';
+   When locked, only the Athlete Entry tab is reachable and the lock survives a
+   page refresh. Unlocking takes the signed-in coach's own password (checked by
+   Supabase), so there is no PIN sitting in the public GitHub file. */
 
-// localStorage throws on file:// origins and in some private modes.
-// Fall back to an in-memory flag so the lock still works for the session.
 let lockFallback = false;
 function lockGet(){
   try { return localStorage.getItem('cmjKiosk')==='1'; }
@@ -436,11 +908,11 @@ function lockSet(on){
   try { on ? localStorage.setItem('cmjKiosk','1') : localStorage.removeItem('cmjKiosk'); }
   catch(e){ /* memory-only for this session */ }
 }
-
 function isLocked(){ return lockGet(); }
 
 function applyLockState(){
   const locked = isLocked();
+  document.body.classList.toggle('kiosk-locked', locked);
   document.querySelectorAll('.nav-tab').forEach(t=>{
     t.style.display = (locked && t.dataset.tab!=='kiosk') ? 'none' : '';
   });
@@ -449,6 +921,7 @@ function applyLockState(){
   document.getElementById('unlockBtn').style.display    = locked ? '' : 'none';
   document.querySelector('.readiness-bar').style.display = locked ? 'none' : '';
   if(locked){
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     document.getElementById('panel-kiosk').classList.add('active');
     document.querySelector('[data-tab="kiosk"]').classList.add('active');
@@ -456,15 +929,23 @@ function applyLockState(){
   }
 }
 
-window.enterKioskMode = function(){
-  lockSet(true);
-  applyLockState();
-};
+window.enterKioskMode = function(){ lockSet(true); applyLockState(); };
 
 window.promptUnlock = function(){
-  const pin = prompt('Coach PIN:');
-  if(pin===null) return;
-  if(pin.trim()!==COACH_PIN){ alert('Wrong PIN.'); return; }
+  document.getElementById('unlockEmail').textContent = S.user?.email || '';
+  document.getElementById('unlockPw').value = '';
+  document.getElementById('unlockErr').textContent = '';
+  document.getElementById('unlockModal').classList.add('active');
+  setTimeout(()=>document.getElementById('unlockPw').focus(),50);
+};
+window.closeUnlock = function(){ document.getElementById('unlockModal').classList.remove('active'); };
+window.doUnlock = async function(){
+  const pw = document.getElementById('unlockPw').value;
+  const err = document.getElementById('unlockErr');
+  if(!pw){ err.textContent='Enter your password.'; return; }
+  const { error } = await sb.auth.signInWithPassword({ email:S.user.email, password:pw });
+  if(error){ err.textContent='Wrong password.'; return; }
+  closeUnlock();
   lockSet(false);
   applyLockState();
   loadDashboard();
@@ -490,7 +971,7 @@ async function loadAll(){
   S.sports = sp.data||[]; S.teams = tm.data||[]; S.positions = ps.data||[];
   S.athletes = at.data||[]; S.jumps = jp.data||[];
   fillSportDropdowns();
-  loadDashboard(); loadAttendance(); fillTrendAthletes(); drawTeamFatigue(); renderAdminOverview();
+  loadDashboard(); loadAttendance(); fillTrendAthletes(); drawTeamFatigue(); renderAdmin();
 }
 
 function fillSelect(el, items, selected){
@@ -504,19 +985,59 @@ function fillSelect(el, items, selected){
 }
 
 function fillSportDropdowns(){
-  ['sportSelect','attSportSelect','reportSport','trendSport','tfSport','teamSportSelect','posSportSelect']
+  ['sportSelect','attSportSelect','reportSport','trendSport','tfSport','teamSportSelect','posSportSelect','goalSport','editSport']
     .forEach(id => fillSelect(document.getElementById(id), S.sports));
   fillSelect(document.getElementById('tfTeam'), S.teams.filter(t=>t.sport_id===document.getElementById('tfSport').value));
   const wrap = document.getElementById('sportButtons');
   wrap.innerHTML='';
   S.sports.forEach(s=>{
     const b=document.createElement('button');
-    b.className='btn btn-orange'; b.style.width='100%'; b.style.padding='16px'; b.style.fontSize='16px';
-    b.textContent=s.name; b.onclick=()=>startKiosk(s.id);
+    b.className='kx-sport'; b.textContent=s.name; b.onclick=()=>startKiosk(s.id);
     wrap.appendChild(b);
   });
   if(!document.getElementById('attDate').value) document.getElementById('attDate').value = todayStr();
   if(!document.getElementById('reportDate').value) document.getElementById('reportDate').value = todayStr();
+}
+
+/* ---------- READINESS TABLE (dashboard + daily report) ---------- */
+function readinessRows(roster, ds){
+  return roster.filter(a=>rowOn(a.id,ds)).map(a=>{
+    const j = rowOn(a.id, ds);
+    return { a, j, c:cmjOn(a.id,ds), w:wellAvg(j), low:lowItems(j), sl:straightLined(a.id,ds),
+             wt:weightOn(a,ds), hyd:hydrationFlag(a.id,ds), r:readinessOn(a,ds) };
+  }).sort((x,y)=> READY_ORDER[x.r]-READY_ORDER[y.r] || (x.w??9)-(y.w??9) || x.a.last_name.localeCompare(y.a.last_name));
+}
+function readinessTable(rows, opts={}){
+  if(!rows.length) return '<div class="empty">No check-ins yet.</div>';
+  return `<div class="tbl-scroll"><table class="rt"><thead><tr><th>Athlete</th><th>Team</th><th>Pos</th><th>CMJ</th><th>Wellness</th><th>Bodyweight</th><th>Readiness</th></tr></thead><tbody>${
+    rows.map(r=>{
+      const cmj = r.j.is_medical ? '<span class="badge badge-medical">Medical</span>'
+        : r.c.v==null ? '<span class="muted">—</span>'
+        : `<b>${r.c.v}"</b> <span class="badge badge-${r.c.st.toLowerCase()}">${r.c.st==='NEUTRAL'?'BASELINE':r.c.st}</span>${r.c.pct!=null?` <span class="muted small">${r.c.pct>0?'+':''}${r.c.pct.toFixed(1)}%</span>`:''}`;
+      const notes = [
+        ...r.low.map(q=>`<span class="flag">${esc(q.label)} ${r.j[q.key]}</span>`),
+        r.sl ? '<span class="flag flag-grey" title="Same five answers on 5 check-ins in a row">⚑ same answers 5×</span>' : ''
+      ].join(' ');
+      const bw = r.j.bodyweight_lb==null ? '<span class="muted">not entered</span>'
+        : `${weightCell(r.wt)}${r.hyd?' <span class="flag flag-blue" title="2%+ under last week\'s average">💧 hydration</span>':''}`;
+      const nm = opts.print ? fullName(r.a) : `<span class="clickable" onclick="openTrend('${r.a.id}')">${fullName(r.a)}</span> <button class="ed-pen" title="Edit" onclick="openEditor('${r.a.id}')">✎</button>`;
+      return `<tr><td>${nm}</td><td>${teamName(r.a.team_id)}</td><td>${posName(r.a.position_id)}</td><td>${cmj}</td><td>${wellChip(r.w)} ${notes}</td><td>${bw}</td><td>${readyBadge(r.r)}</td></tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+function readinessTiles(rows, roster, ds, sportId){
+  const n = k => rows.filter(r=>r.r===k).length;
+  const wv = rows.map(r=>r.w).filter(x=>x!=null);
+  const pulse = avg(wv);
+  const session = isSessionDay(sportId, ds);
+  const absent = session ? roster.filter(a=>!rowOn(a.id,ds)).length : 0;
+  return `<div class="tiles">
+    <div class="tile t-ready"><div class="tl">Ready</div><div class="tv">${n('READY')}</div></div>
+    <div class="tile t-monitor"><div class="tl">Monitor</div><div class="tv">${n('MONITOR')}</div></div>
+    <div class="tile t-checkin"><div class="tl">Check In</div><div class="tv">${n('CHECK IN')}</div></div>
+    <div class="tile t-medical"><div class="tl">Medical</div><div class="tv">${n('MEDICAL')}</div></div>
+    <div class="tile t-absent"><div class="tl">Absent</div><div class="tv">${session?absent:'—'}</div></div>
+    <div class="tile t-pulse chipbg-${wellBand(pulse).toLowerCase()}"><div class="tl">Wellness Pulse</div><div class="tv">${fmt1(pulse)}</div><div class="ts">${wv.length} survey${wv.length===1?'':'s'}</div></div>
+  </div>`;
 }
 
 /* ---------- DASHBOARD ---------- */
@@ -524,25 +1045,32 @@ window.loadDashboard = function(){
   const sportId = document.getElementById('sportSelect').value;
   const d = todayStr();
   const roster = S.athletes.filter(a=>a.sport_id===sportId);
-  const todays = S.jumps.filter(j=>j.sport_id===sportId && j.jump_date===d);
+  const todays = S.jumps.filter(j=>j.jump_date===d && roster.some(a=>a.id===j.athlete_id));
+  const session = isSessionDay(sportId, d);
   const present = todays.filter(j=>!j.is_medical).length;
   const medical = todays.filter(j=>j.is_medical).length;
-  const absent = Math.max(roster.length-(present+medical),0);
+  const absent = session ? Math.max(roster.length-(present+medical),0) : 0;
+  const toReview = roster.filter(a=>a.weight_goal_set_by==='athlete').length;
+  document.getElementById('sessionBanner').innerHTML = (session ? '' :
+    `<div class="banner">No ${sportName(sportId)} session scheduled ${DAYS[dow(d)]}day (training days: ${sessionDays(sportId).join(', ')}). Check-ins still save, but nobody is marked absent today.</div>`)
+    + (toReview ? `<div class="banner banner-info">${toReview} athlete-set bodyweight goal${toReview===1?'':'s'} to review &mdash; <a href="#" onclick="goReviewGoals();return false">open Bodyweight Goals</a></div>` : '');
   document.getElementById('presentCount').textContent = present;
   document.getElementById('medicalCount').textContent = medical;
-  document.getElementById('absentCount').textContent = absent;
-  document.getElementById('attendancePercent').textContent = roster.length ? Math.round((present+medical)/roster.length*100)+'%' : '0%';
+  document.getElementById('absentCount').textContent = session ? absent : '—';
+  document.getElementById('attendancePercent').textContent = !session ? '—' : roster.length ? Math.round((present+medical)/roster.length*100)+'%' : '0%';
+
+  const rows = readinessRows(roster, d);
+  document.getElementById('readyTiles').innerHTML = readinessTiles(rows, roster, d, sportId);
+  document.getElementById('readyTable').innerHTML = readinessTable(rows);
 
   // top 5
   const tb = document.getElementById('top5Body');
   const top = todays.filter(j=>!j.is_medical && j.cmj_inches!=null).sort((a,b)=>b.cmj_inches-a.cmj_inches).slice(0,5);
   tb.innerHTML = top.length ? top.map((j,i)=>{
     const a=S.athletes.find(x=>x.id===j.athlete_id);
-    const avg=rollingAvg(j.athlete_id,7,d);
-    const pct=avg?((j.cmj_inches-avg)/avg*100):null;
-    const st=status(pct);
-    return `<tr><td>${i+1}</td><td class="clickable" onclick="openTrend('${j.athlete_id}')">${a?.first_name} ${a?.last_name}</td><td>${teamName(a?.team_id)}</td><td>${posName(a?.position_id)}</td><td style="font-weight:700">${j.cmj_inches}"</td><td>${avg?avg.toFixed(1)+'"':'—'}</td><td><span class="badge badge-${st.toLowerCase()}">${st}</span></td></tr>`;
-  }).join('') : '<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--text-soft)">No jumps logged today</td></tr>';
+    const c=cmjOn(j.athlete_id,d);
+    return `<tr><td>${i+1}</td><td class="clickable" onclick="openTrend('${j.athlete_id}')">${fullName(a)}</td><td>${teamName(a?.team_id)}</td><td>${posName(a?.position_id)}</td><td style="font-weight:700">${j.cmj_inches}"</td><td>${c.avg?c.avg.toFixed(1)+'"':'—'}</td><td><span class="badge badge-${c.st.toLowerCase()}">${c.st==='NEUTRAL'?'BASELINE':c.st}</span></td></tr>`;
+  }).join('') : '<tr><td colspan="7" class="empty">No jumps logged today</td></tr>';
 
   // team summaries
   const ts = document.getElementById('teamSummaries');
@@ -550,30 +1078,17 @@ window.loadDashboard = function(){
   S.teams.filter(t=>t.sport_id===sportId).forEach(t=>{
     const ath=roster.filter(a=>a.team_id===t.id);
     const tj=todays.filter(j=>!j.is_medical && j.cmj_inches!=null && ath.some(a=>a.id===j.athlete_id));
-    const avg=tj.length?(tj.reduce((s,j)=>s+Number(j.cmj_inches),0)/tj.length).toFixed(1):'—';
-    const part=ath.length?Math.round(tj.length/ath.length*100):0;
+    const cm=tj.length?(tj.reduce((s,j)=>s+Number(j.cmj_inches),0)/tj.length).toFixed(1):'—';
+    const wv=avg(todays.filter(j=>ath.some(a=>a.id===j.athlete_id)).map(wellAvg).filter(x=>x!=null));
+    const checked=todays.filter(j=>ath.some(a=>a.id===j.athlete_id)).length;
     ts.insertAdjacentHTML('beforeend',
-      `<div class="card"><div class="card-title">${t.name}</div><div class="grid4">
-        <div class="stat"><div class="stat-label">Avg CMJ</div><div class="stat-value">${avg==='—'?'—':avg+'"'}</div></div>
-        <div class="stat"><div class="stat-label">Jumped</div><div class="stat-value">${tj.length}</div></div>
-        <div class="stat"><div class="stat-label">Roster</div><div class="stat-value">${ath.length}</div></div>
-        <div class="stat"><div class="stat-label">Participation</div><div class="stat-value">${part}%</div></div>
+      `<div class="card"><div class="card-title">${esc(t.name)}</div><div class="grid4">
+        <div class="stat"><div class="stat-label">Avg CMJ</div><div class="stat-value">${cm==='—'?'—':cm+'"'}</div></div>
+        <div class="stat"><div class="stat-label">Avg Wellness</div><div class="stat-value">${wellChip(wv)}</div></div>
+        <div class="stat"><div class="stat-label">Checked In</div><div class="stat-value">${checked}<span class="of">/${ath.length}</span></div></div>
+        <div class="stat"><div class="stat-label">Participation</div><div class="stat-value">${ath.length?Math.round(checked/ath.length*100):0}%</div></div>
       </div></div>`);
   });
-
-  // red zone
-  const rz = roster.map(a=>{
-    const j=todays.find(x=>x.athlete_id===a.id && !x.is_medical && x.cmj_inches!=null);
-    if(!j) return null;
-    const avg=rollingAvg(a.id,7,d);
-    if(!avg) return null;
-    const pct=(j.cmj_inches-avg)/avg*100;
-    return status(pct)==='RED' ? {a,j,avg,pct} : null;
-  }).filter(Boolean).sort((x,y)=>x.pct-y.pct);
-
-  document.getElementById('redZoneBody').innerHTML = rz.length ? rz.map(r=>
-    `<tr><td class="clickable" onclick="openTrend('${r.a.id}')">${r.a.first_name} ${r.a.last_name}</td><td>${teamName(r.a.team_id)}</td><td>${posName(r.a.position_id)}</td><td style="font-weight:700">${r.j.cmj_inches}"</td><td>${r.avg.toFixed(1)}"</td><td style="color:var(--red);font-weight:700">${r.pct.toFixed(1)}%</td></tr>`
-  ).join('') : '<tr><td colspan="6" style="text-align:center;padding:18px;color:var(--text-soft)">No athletes in red zone</td></tr>';
 };
 
 /* ---------- ATTENDANCE ---------- */
@@ -584,31 +1099,29 @@ window.loadAttendance = function(){
   wrap.innerHTML='';
   const teams = S.teams.filter(t=>t.sport_id===sportId);
   if(!teams.length){ wrap.innerHTML='<div class="card">No teams set up for this sport yet. Add one in the Admin tab.</div>'; return; }
+  const session = sessionHeld(sportId, d) || (isSessionDay(sportId,d) && d===todayStr());
+  if(!isSessionDay(sportId,d)) wrap.insertAdjacentHTML('beforeend', `<div class="banner">${DAYS[dow(d)]}day is not a training day for ${sportName(sportId)} (${sessionDays(sportId).join(', ')}). Nobody is marked absent.</div>`);
+  else if(!session) wrap.insertAdjacentHTML('beforeend', `<div class="banner">No one in ${sportName(sportId)} checked in on this date, so it's treated as a cancelled session and nobody is marked absent.</div>`);
 
   teams.forEach(t=>{
-    const ath=S.athletes.filter(a=>a.team_id===t.id);
-    const js=S.jumps.filter(j=>j.jump_date===d && ath.some(a=>a.id===j.athlete_id));
-    const jumped=ath.filter(a=>js.some(j=>j.athlete_id===a.id && !j.is_medical));
-    const med=ath.filter(a=>js.some(j=>j.athlete_id===a.id && j.is_medical));
-    const abs=ath.filter(a=>!js.some(j=>j.athlete_id===a.id));
-    const pct=ath.length?Math.round((jumped.length+med.length)/ath.length*100):0;
-
+    const ath=S.athletes.filter(a=>a.team_id===t.id).filter(a=>activeFrom(a)<=d);
+    const tested=ath.filter(a=>{ const j=rowOn(a.id,d); return j && !j.is_medical; });
+    const med=ath.filter(a=>rowOn(a.id,d)?.is_medical);
+    const abs= session ? ath.filter(a=>!rowOn(a.id,d)) : [];
+    const pct= session && ath.length ? Math.round((tested.length+med.length)/ath.length*100)+'%' : '—';
+    const line = a => { const j=rowOn(a.id,d); return `<tr><td><span class="clickable" onclick="openTrend('${a.id}')">${fullName(a)}</span> <button class="ed-pen" title="Edit" onclick="openEditor('${a.id}')">✎</button></td><td>${posName(a.position_id)}</td><td>${j.is_medical?'<span class="badge badge-medical">Medical</span>':j.cmj_inches!=null?j.cmj_inches+'"':'—'}</td><td>${wellChip(wellAvg(j))}</td><td>${j.bodyweight_lb!=null?'<span class="muted">BW ✓</span>':'<span class="muted">no BW</span>'}</td></tr>`; };
     wrap.insertAdjacentHTML('beforeend', `<div class="card">
-      <div class="card-title">${t.name}</div>
+      <div class="card-title">${esc(t.name)}</div>
       <div class="grid4" style="margin-bottom:14px">
-        <div class="stat"><div class="stat-label">Jumped</div><div class="stat-value">${jumped.length}</div></div>
-        <div class="stat"><div class="stat-label">Medical</div><div class="stat-value">${med.length}</div></div>
-        <div class="stat"><div class="stat-label">Absent</div><div class="stat-value">${abs.length}</div></div>
-        <div class="stat"><div class="stat-label">Attendance</div><div class="stat-value">${pct}%</div></div>
+        <div class="stat"><div class="stat-label">Present</div><div class="stat-value">${tested.length}</div></div>
+        <div class="stat"><div class="stat-label">Medical (present)</div><div class="stat-value">${med.length}</div></div>
+        <div class="stat"><div class="stat-label">Absent</div><div class="stat-value">${session?abs.length:'—'}</div></div>
+        <div class="stat"><div class="stat-label">Attendance</div><div class="stat-value">${pct}</div></div>
       </div>
-      ${jumped.length?`<h4 style="color:var(--green);margin:12px 0 6px;font-size:13px">Present (${jumped.length})</h4><table><tbody>${jumped.map(a=>{
-        const j=js.find(x=>x.athlete_id===a.id);
-        return `<tr><td class="clickable" onclick="openTrend('${a.id}')">${a.first_name} ${a.last_name}</td><td>${posName(a.position_id)}</td><td>${j.cmj_inches}"</td></tr>`;
-      }).join('')}</tbody></table>`:''}
-      ${med.length?`<h4 style="color:#E8A000;margin:12px 0 6px;font-size:13px">Medical (${med.length})</h4><table><tbody>${med.map(a=>
-        `<tr><td>${a.first_name} ${a.last_name}</td><td>${posName(a.position_id)}</td><td><span class="badge badge-medical">Medical</span></td></tr>`).join('')}</tbody></table>`:''}
-      ${abs.length?`<h4 style="color:var(--red);margin:12px 0 6px;font-size:13px">Absent (${abs.length})</h4><table><tbody>${abs.map(a=>
-        `<tr><td>${a.first_name} ${a.last_name}</td><td>${posName(a.position_id)}</td></tr>`).join('')}</tbody></table>`:''}
+      ${tested.length?`<h4 class="h4 green">Present (${tested.length})</h4><table><tbody>${tested.map(line).join('')}</tbody></table>`:''}
+      ${med.length?`<h4 class="h4 amber">Medical — present, limited (${med.length})</h4><table><tbody>${med.map(line).join('')}</tbody></table>`:''}
+      ${abs.length?`<h4 class="h4 red">Absent (${abs.length})</h4><table><tbody>${abs.map(a=>
+        `<tr><td><span class="clickable" onclick="openTrend('${a.id}')">${fullName(a)}</span> <button class="ed-pen" title="Add a missed check-in" onclick="openEditor('${a.id}')">✎</button></td><td>${posName(a.position_id)}</td></tr>`).join('')}</tbody></table>`:''}
     </div>`);
   });
 };
@@ -619,14 +1132,14 @@ window.fillTrendAthletes = function(){
   const sel = document.getElementById('trendAthlete');
   const list = S.athletes.filter(a=>a.sport_id===sportId)
     .sort((a,b)=>a.last_name.localeCompare(b.last_name))
-    .map(a=>({id:a.id, name:`${a.last_name}, ${a.first_name} (${teamName(a.team_id)} • ${posName(a.position_id)})`}));
+    .map(a=>({id:a.id, name:`${a.last_name}, ${a.first_name} (${S.teams.find(t=>t.id===a.team_id)?.name||'—'} • ${S.positions.find(p=>p.id===a.position_id)?.name||'—'})`}));
   fillSelect(sel, list);
   drawTrendChart();
 };
 
 window.openTrend = function(athleteId){
   const a = S.athletes.find(x=>x.id===athleteId);
-  if(!a) return;
+  if(!a || isLocked()) return;
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('[data-tab="trends"]').classList.add('active');
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -639,23 +1152,24 @@ window.openTrend = function(athleteId){
 
 window.drawTrendChart = function(){
   const athleteId = document.getElementById('trendAthlete').value;
-  const canvas = document.getElementById('trendChart');
   if(S.chart){ S.chart.destroy(); S.chart=null; }
-  if(!athleteId){ document.getElementById('tLatest').textContent='—'; return; }
+  if(S.wbChart){ S.wbChart.destroy(); S.wbChart=null; }
+  ['tLatest','t7','t21','tStatus','tWell','tWeight'].forEach(id=>{ const e=document.getElementById(id); if(e){ e.textContent='—'; e.style.color=''; } });
+  if(!athleteId) return;
+  const a = S.athletes.find(x=>x.id===athleteId);
 
   const js = S.jumps.filter(j=>j.athlete_id===athleteId && !j.is_medical && j.cmj_inches!=null)
-                    .sort((a,b)=>a.jump_date.localeCompare(b.jump_date));
-
+                    .sort((x,y)=>x.jump_date.localeCompare(y.jump_date));
   const labels = js.map(j=>j.jump_date);
   const raw = js.map(j=>Number(j.cmj_inches));
   const avg7 = js.map(j=>{ const v=rollingAvg(athleteId,7,j.jump_date); return v?Number(v.toFixed(2)):null; });
   const avg21 = js.map(j=>{ const v=rollingAvg(athleteId,21,j.jump_date); return v?Number(v.toFixed(2)):null; });
 
-  S.chart = new Chart(canvas, {
+  S.chart = new Chart(document.getElementById('trendChart'), {
     type:'line',
     data:{ labels, datasets:[
-      { label:'CMJ', data:raw, borderColor:'#1B3A6B', backgroundColor:'#1B3A6B', pointRadius:4, tension:.2 },
-      { label:'7-Day Avg', data:avg7, borderColor:'#F4581A', pointRadius:0, borderDash:[6,4], tension:.3, spanGaps:true },
+      { label:'CMJ', data:raw, borderColor:'#002F55', backgroundColor:'#002F55', pointRadius:4, tension:.2 },
+      { label:'7-Day Avg', data:avg7, borderColor:'#FA4616', pointRadius:0, borderDash:[6,4], tension:.3, spanGaps:true },
       { label:'21-Day Baseline', data:avg21, borderColor:'#8A93A6', pointRadius:0, borderDash:[2,4], tension:.3, spanGaps:true }
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -664,15 +1178,40 @@ window.drawTrendChart = function(){
   });
 
   const latest = js.length ? js[js.length-1] : null;
-  const a7 = latest ? rollingAvg(athleteId,7,latest.jump_date) : null;
-  const a21 = latest ? rollingAvg(athleteId,21,latest.jump_date) : null;
-  const pct = (latest && a7) ? ((latest.cmj_inches-a7)/a7*100) : null;
-  const st = status(pct);
-  document.getElementById('tLatest').textContent = latest ? latest.cmj_inches+'"' : '—';
-  document.getElementById('t7').textContent = a7 ? a7.toFixed(1)+'"' : '—';
-  document.getElementById('t21').textContent = a21 ? a21.toFixed(1)+'"' : '—';
-  const se = document.getElementById('tStatus');
-  se.textContent = st; se.style.color = statusColor(st);
+  if(latest){
+    const c = cmjOn(athleteId, latest.jump_date);
+    const a21 = rollingAvg(athleteId,21,latest.jump_date);
+    document.getElementById('tLatest').textContent = latest.cmj_inches+'"';
+    const r7 = rollingAvg(athleteId,7,latest.jump_date);
+    document.getElementById('t7').textContent = r7 ? r7.toFixed(1)+'"' : '—';
+    document.getElementById('t21').textContent = a21 ? a21.toFixed(1)+'"' : '—';
+    const se = document.getElementById('tStatus');
+    se.textContent = c.st==='NEUTRAL'?'BASELINE':c.st; se.style.color = statusColor(c.st);
+  }
+
+  // wellness + bodyweight chart
+  const all = S.jumps.filter(j=>j.athlete_id===athleteId && (wellAvg(j)!=null || j.bodyweight_lb!=null))
+                     .sort((x,y)=>x.jump_date.localeCompare(y.jump_date));
+  const BAND_HEX = { GREEN:'#2E9E5B', YELLOW:'#E0B400', ORANGE:'#E07A1F', RED:'#C0392B', NONE:'#ccc' };
+  const wv = all.map(j=>{ const x=wellAvg(j); return x==null?null:Number(x.toFixed(1)); });
+  const bw = all.map(j=>j.bodyweight_lb==null?null:Number(j.bodyweight_lb));
+  const ref = a ? weightRef(a).ref : null;
+  const sets = [
+    { type:'bar', label:'Wellness (1–5)', data:wv, yAxisID:'y', backgroundColor:wv.map(x=>BAND_HEX[wellBand(x)]), borderRadius:4, maxBarThickness:22 },
+    { type:'line', label:'Bodyweight (lb)', data:bw, yAxisID:'y1', borderColor:'#002F55', backgroundColor:'#002F55', pointRadius:3, tension:.25, spanGaps:true }
+  ];
+  if(ref!=null) sets.push({ type:'line', label:'Reference weight', data:all.map(()=>Number(ref.toFixed(1))), yAxisID:'y1', borderColor:'#8A93A6', borderDash:[4,4], pointRadius:0 });
+  S.wbChart = new Chart(document.getElementById('wbChart'), {
+    data:{ labels: all.map(j=>j.jump_date), datasets: sets },
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ y:{ min:0, max:5, ticks:{stepSize:1}, title:{display:true,text:'Wellness'} },
+               y1:{ position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'Pounds'} } },
+      plugins:{ legend:{ position:'bottom' } } }
+  });
+  const lastW = [...all].reverse().find(j=>wellAvg(j)!=null);
+  const we = document.getElementById('tWell');
+  if(lastW){ const x=wellAvg(lastW); we.innerHTML = wellChip(x); }
+  if(a){ const w = weightOn(a, todayStr()); document.getElementById('tWeight').innerHTML = w.state==='OK' ? weightCell(w) : 'building'; }
 };
 
 /* ---------- TEAM FATIGUE ---------- */
@@ -682,15 +1221,14 @@ window.fillTfTeams = function(){
   drawTeamFatigue();
 };
 
-// average of each qualified athlete's % change vs their own 7-day average
 function teamFatigueOn(teamId, date){
   const ath = S.athletes.filter(a=>a.team_id===teamId);
   const pcts = [];
   ath.forEach(a=>{
     const j = S.jumps.find(x=>x.athlete_id===a.id && x.jump_date===date && !x.is_medical && x.cmj_inches!=null);
-    if(!j) return;                                   // absent or medical: contributes nothing
+    if(!j) return;
     const base = rollingAvgN(a.id, 21, date);
-    if(base.n < MIN_BASELINE) return;                // not enough history yet
+    if(base.n < MIN_BASELINE) return;
     const r7 = rollingAvg(a.id, 7, date);
     if(!r7) return;
     pcts.push((j.cmj_inches - r7) / r7 * 100);
@@ -705,12 +1243,10 @@ window.drawTeamFatigue = function(){
   const wrap = document.getElementById('tfChartWrap');
   if(S.tfChart){ S.tfChart.destroy(); S.tfChart=null; }
   gate.innerHTML=''; wrap.style.display='block';
-
-  if(!teamId){ wrap.style.display='none'; gate.innerHTML='<div style="color:var(--text-soft);padding:12px">Pick a team.</div>'; return; }
+  if(!teamId){ wrap.style.display='none'; gate.innerHTML='<div class="empty">Pick a team.</div>'; return; }
 
   const ath = S.athletes.filter(a=>a.team_id===teamId);
   const dates = [...new Set(S.jumps.filter(j=>ath.some(a=>a.id===j.athlete_id) && !j.is_medical && j.cmj_inches!=null).map(j=>j.jump_date))].sort();
-
   const pts = dates.map(d=>({ d, ...(teamFatigueOn(teamId,d)||{pct:null,n:0}) })).filter(p=>p.pct!==null);
 
   if(!pts.length){
@@ -718,22 +1254,19 @@ window.drawTeamFatigue = function(){
     const qualified = ath.filter(a=>rollingAvgN(a.id,21,todayStr()).n >= MIN_BASELINE).length;
     gate.innerHTML = `<div style="background:var(--gray-bg);border-radius:10px;padding:20px;text-align:center">
       <div style="font-weight:800;color:var(--navy);margin-bottom:6px">Not enough data yet</div>
-      <div style="font-size:13px;color:var(--text-soft)">${qualified} of ${ath.length} athletes on this team have ${MIN_BASELINE}+ jumps in the last 21 days. This chart turns on by itself as they accumulate &mdash; roughly two weeks of regular testing.</div>
+      <div style="font-size:13px;color:var(--text-soft)">${qualified} of ${ath.length} athletes on this team have ${MIN_BASELINE}+ jumps in the last 21 days. This chart turns on by itself as they accumulate &mdash; about a week of Mon/Wed/Fri testing.</div>
     </div>`;
     return;
   }
-
   const latest = pts[pts.length-1];
   if(latest.n < 5){
-    gate.innerHTML = `<div style="background:#FEF5DC;border:1px solid #E8C97A;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#7a5a08">
-      Building up: the most recent point covers only ${latest.n} athlete${latest.n===1?'':'s'}. Read it loosely until that number passes 5.</div>`;
+    gate.innerHTML = `<div class="banner">Building up: the most recent point covers only ${latest.n} athlete${latest.n===1?'':'s'}. Read it loosely until that number passes 5.</div>`;
   }
-
   S.tfChart = new Chart(document.getElementById('tfChart'), {
     type:'line',
     data:{ labels: pts.map(p=>p.d), datasets:[
       { label:'Team change vs own baseline (%)', data: pts.map(p=>Number(p.pct.toFixed(2))),
-        borderColor:'#1B3A6B', backgroundColor:'#1B3A6B', pointRadius:4, tension:.25,
+        borderColor:'#002F55', backgroundColor:'#002F55', pointRadius:4, tension:.25,
         segment:{ borderColor: c => c.p1.parsed.y <= -9 ? '#C0392B' : c.p1.parsed.y <= -4 ? '#8B6008' : '#2E7D1F' } }
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -748,7 +1281,7 @@ window.drawTeamFatigue = function(){
 /* ---------- KIOSK ---------- */
 function startKiosk(sportId){
   S.kioskSport = sportId;
-  document.getElementById('kioskSportLabel').textContent = sportName(sportId)+' — search by last name';
+  document.getElementById('kioskSportLabel').textContent = (S.sports.find(s=>s.id===sportId)?.name||'')+' — search by last name';
   document.getElementById('athleteSearch').value='';
   document.getElementById('searchResults').innerHTML='';
   kioskStep(2);
@@ -770,46 +1303,129 @@ window.searchAthletes = function(){
   const res = S.athletes.filter(a=>a.sport_id===S.kioskSport &&
     (a.last_name.toLowerCase().includes(q) || a.first_name.toLowerCase().includes(q)))
     .sort((a,b)=>a.last_name.localeCompare(b.last_name));
-  if(!res.length){ box.innerHTML='<div style="padding:12px;color:var(--text-soft);text-align:center">No match. Use the register button below.</div>'; return; }
+  if(!res.length){ box.innerHTML='<div class="kx-none">No match. Use the register button below.</div>'; return; }
   box.innerHTML = res.map(a=>{
-    const done = S.jumps.some(j=>j.athlete_id===a.id && j.jump_date===todayStr());
-    return `<div class="result-item" onclick="pickAthlete('${a.id}')">
-      <div class="result-name">${a.first_name} ${a.last_name} ${done?'<span class="badge badge-neutral">done today</span>':''}</div>
-      <div class="result-info">${teamName(a.team_id)} • ${posName(a.position_id)} • Class of ${a.grad_year||'—'}</div>
+    const j = rowOn(a.id, todayStr());
+    const tag = !j ? '' : (j.bodyweight_lb==null ? '<span class="kx-tag">checked in · add weight</span>' : '<span class="kx-tag done">checked in ✓</span>');
+    return `<div class="kx-result" onclick="pickAthlete('${a.id}')">
+      <div class="kx-rname">${fullName(a)} ${tag}</div>
+      <div class="kx-rinfo">${teamName(a.team_id)} • ${posName(a.position_id)} • Class of ${esc(a.grad_year||'—')}</div>
     </div>`;
   }).join('');
+};
+
+function renderWellRows(){
+  document.getElementById('wellRows').innerHTML = WELL_Q.map(q=>`
+    <div class="kx-q">
+      <div class="kx-qlabel"><i></i>${q.label}</div>
+      <div class="kx-btns">${[1,2,3,4,5].map(n=>`<button type="button" class="kx-b${S.kx.ans[q.key]===n?' on':''}" onclick="setWell('${q.key}',${n})">${n}</button>`).join('')}</div>
+      <div class="kx-anchor"><span>1 = ${q.lo}</span><span>5 = ${q.hi}</span></div>
+    </div>`).join('');
+  updateWellScore();
+}
+window.setWell = function(key, n){ S.kx.ans[key]=n; renderWellRows(); };
+
+function updateWellScore(){
+  const vals = WELL_Q.map(q=>S.kx.ans[q.key]).filter(x=>x!=null);
+  const done = vals.length===WELL_Q.length;
+  const x = done ? avg(vals) : null;
+  const b = done ? wellBand(x) : 'NONE';
+  const ring = document.getElementById('wellRing');
+  ring.className = 'kx-ring band-'+b.toLowerCase();
+  document.getElementById('wellVal').textContent = done ? fmt1(x) : `${vals.length}/5`;
+  document.getElementById('wellBandTxt').textContent = done ? b : 'ANSWER ALL 5';
+  document.querySelectorAll('.kx-seg').forEach(s=>s.classList.toggle('on', s.dataset.band===b));
+  const mk = document.getElementById('wellMarker');
+  if(done){ mk.style.display='block'; mk.style.left = (Math.min(Math.max((x-1)/4,0),1)*100)+'%'; } else mk.style.display='none';
+}
+
+window.setMode = function(m){
+  S.kx.mode = m;
+  document.getElementById('modeTest').classList.toggle('on', m==='test');
+  document.getElementById('modeMed').classList.toggle('on', m==='medical');
+  document.getElementById('cmjSection').style.display = m==='medical' ? 'none' : '';
+  document.getElementById('kxSubmit').textContent = m==='medical' ? 'Submit Check-In (Medical)' : 'Submit Check-In';
 };
 
 window.pickAthlete = function(id){
   S.kioskAthlete = S.athletes.find(a=>a.id===id);
   if(!S.kioskAthlete) return;
+  const j = rowOn(id, todayStr());
   document.getElementById('kioskAthleteName').textContent = `${S.kioskAthlete.first_name} ${S.kioskAthlete.last_name}`;
-  document.getElementById('kioskAthleteInfo').textContent = `${teamName(S.kioskAthlete.team_id)} • ${posName(S.kioskAthlete.position_id)}`;
-  document.getElementById('jumpInput').value='';
+  document.getElementById('kioskAthleteInfo').innerHTML = `${teamName(S.kioskAthlete.team_id)} • ${posName(S.kioskAthlete.position_id)}${j?' • <b>already checked in today — update anything below</b>':''}`;
+  S.kx.ans = {};
+  if(j) WELL_Q.forEach(q=>{ if(j[q.key]!=null) S.kx.ans[q.key]=Number(j[q.key]); });
+  document.getElementById('jumpInput').value = j && j.cmj_inches!=null ? j.cmj_inches : '';
+  document.getElementById('bwInput').value = j && j.bodyweight_lb!=null ? j.bodyweight_lb : '';
+  document.getElementById('kxErr').textContent='';
+  setMode(j && j.is_medical ? 'medical' : 'test');
+  renderWellRows();
+  // athletes who have never answered the goal question get it once, here
+  S.kx.goal = null;
+  const askGoal = !S.kioskAthlete.weight_goal_set_by;
+  document.getElementById('goalSection').style.display = askGoal ? '' : 'none';
+  document.getElementById('goalTarget').value = '';
+  setGoalChoice(null);
   kioskStep(3);
-  setTimeout(()=>document.getElementById('jumpInput').focus(),100);
+  window.scrollTo({top:0,behavior:'smooth'});
 };
 
-window.submitJump = async function(){
-  const v = parseFloat(document.getElementById('jumpInput').value);
-  if(isNaN(v) || v<5 || v>60){ alert('Enter a jump between 5 and 60 inches.'); return; }
-  const { error } = await sb.from('cmj_jumps').upsert([{
-    athlete_id:S.kioskAthlete.id, sport_id:S.kioskSport, jump_date:todayStr(),
-    cmj_inches:v, is_medical:false, created_by:S.user.email
-  }], { onConflict:'athlete_id,jump_date' });
-  if(error){ alert('Could not save: '+error.message); return; }
-  await refreshJumps();
-  showConfirm(v,false);
+window.setGoalChoice = function(g){
+  S.kx.goal = g;
+  document.querySelectorAll('.kx-goal button').forEach(b=>b.classList.toggle('on', b.dataset.goal===g));
 };
+function readGoal(goalOn, targetEl){
+  if(!goalOn) return { goal:null };
+  if(!S.kx.goal) return { err:'Pick your bodyweight goal: Maintain or Gain.' };
+  const t = targetEl.value.trim();
+  const tv = t==='' ? null : Math.round(parseFloat(t)*10)/10;
+  if(tv!=null && (isNaN(tv) || tv<60 || tv>450)) return { err:'Goal weight should be between 60 and 450 lb, or leave it blank.' };
+  return { goal:{ weight_goal:S.kx.goal, weight_target_lb:tv, weight_goal_set_by:'athlete' } };
+}
 
-window.markMedical = async function(){
-  const { error } = await sb.from('cmj_jumps').upsert([{
-    athlete_id:S.kioskAthlete.id, sport_id:S.kioskSport, jump_date:todayStr(),
-    cmj_inches:null, is_medical:true, created_by:S.user.email
-  }], { onConflict:'athlete_id,jump_date' });
-  if(error){ alert('Could not save: '+error.message); return; }
+window.submitCheckin = async function(){
+  const err = document.getElementById('kxErr');
+  err.textContent='';
+  const g = readGoal(document.getElementById('goalSection').style.display!=='none', document.getElementById('goalTarget'));
+  if(g.err){ err.textContent = g.err; return; }
+  const missing = WELL_Q.filter(q=>S.kx.ans[q.key]==null);
+  if(missing.length){ err.textContent = 'Answer every wellness question: '+missing.map(q=>q.label).join(', '); return; }
+  const medical = S.kx.mode==='medical';
+  const jr = document.getElementById('jumpInput').value.trim();
+  const br = document.getElementById('bwInput').value.trim();
+  const v = parseFloat(jr), bw = parseFloat(br);
+  if(!medical && (isNaN(v) || v<5 || v>60)){ err.textContent='Enter your jump between 5 and 60 inches — or tap "Medical" if you can\'t jump today.'; return; }
+  if(br && (isNaN(bw) || bw<60 || bw>450)){ err.textContent='Bodyweight should be between 60 and 450 lb.'; return; }
+  // typo guard: a number far from the athlete's own normal gets a second look before saving
+  const id = S.kioskAthlete.id, today = todayStr();
+  if(!medical){
+    const norm = rollingAvgN(id, 21, today);
+    if(norm.n>=2 && Math.abs(v-norm.avg)/norm.avg > 0.25 &&
+       !confirm(`Double-check your jump: ${v}" is a long way from your normal (about ${norm.avg.toFixed(1)}").\n\nOK = it's right, save it.\nCancel = let me fix it.`)) return;
+  }
+  if(br){
+    const prev = weighIns(id).filter(j=>j.jump_date<today).pop();
+    if(prev && Math.abs(bw-Number(prev.bodyweight_lb))/Number(prev.bodyweight_lb) > 0.07 &&
+       !confirm(`Double-check your bodyweight: ${bw} lb is very different from your last weigh-in.\n\nOK = it's right, save it.\nCancel = let me fix it.`)) return;
+  }
+  const row = {
+    athlete_id:S.kioskAthlete.id, sport_id:S.kioskSport||S.kioskAthlete.sport_id, jump_date:todayStr(),
+    cmj_inches: medical ? null : v, is_medical: medical, created_by:S.user.email,
+    bodyweight_lb: br ? Math.round(bw*10)/10 : null
+  };
+  WELL_Q.forEach(q=>row[q.key]=S.kx.ans[q.key]);
+  const btn = document.getElementById('kxSubmit'); btn.disabled = true;
+  if(g.goal){
+    const r = await sb.from('cmj_athletes').update(g.goal).eq('id', id);
+    if(r.error){ btn.disabled=false; err.textContent = 'Could not save your goal: '+r.error.message+schemaHint(r.error.message); return; }
+    Object.assign(S.kioskAthlete, g.goal);
+    document.getElementById('goalSection').style.display='none';
+  }
+  const { error } = await sb.from('cmj_jumps').upsert([row], { onConflict:'athlete_id,jump_date' });
+  btn.disabled = false;
+  if(error){ err.textContent = 'Could not save: '+error.message+schemaHint(error.message); return; }
   await refreshJumps();
-  showConfirm(null,true);
+  showConfirm();
 };
 
 async function refreshJumps(){
@@ -818,31 +1434,32 @@ async function refreshJumps(){
   loadDashboard(); loadAttendance();
 }
 
-function showConfirm(v, isMedical){
+function showConfirm(){
+  const a = S.kioskAthlete, d = todayStr();
+  const j = rowOn(a.id, d);
   const box = document.getElementById('kioskConfirmation');
-  if(isMedical){
-    box.innerHTML = `<div class="kiosk-title" style="color:#E8A000">Marked Medical</div>
-      <div class="confirm-box" style="background:#FFF4E6;border:2px solid #E8A000">
-      <div style="font-size:16px;color:#8a6000;font-weight:700">You're counted as present today.</div></div>`;
-    return;
+  const x = wellAvg(j), b = wellBand(x);
+  const wMsg = { GREEN:'Ready to roll.', YELLOW:'Solid. Stay on top of recovery.', ORANGE:'Below your normal. Tell your coach how you feel.', RED:'Talk to a coach before you train.' }[b] || '';
+  const low = lowItems(j);
+  let cmjTile;
+  if(j.is_medical){
+    cmjTile = `<div class="kx-tile med"><div class="kx-tl">CMJ</div><div class="kx-tv">MEDICAL</div><div class="kx-tm">You're counted present. Do what your trainer cleared.</div></div>`;
+  } else {
+    const c = cmjOn(a.id, d);
+    const baseN = rollingAvgN(a.id,21,d).n;
+    const msg = c.st==='GREEN'?'Full load. You\'re good to go.' : c.st==='YELLOW'?'Reduce volume today.' : c.st==='RED'?'See a coach before you lift.'
+              : `Building your baseline: jump ${Math.min(baseN+1,MIN_BASELINE)} of ${MIN_BASELINE}. Train as normal.`;
+    cmjTile = `<div class="kx-tile st-${c.st.toLowerCase()}"><div class="kx-tl">CMJ</div><div class="kx-tv">${c.v}"</div>
+      <div class="kx-tw">${c.st==='NEUTRAL'?'LOGGED':c.st}${c.pct!=null?` · ${c.pct>0?'+':''}${c.pct.toFixed(1)}%`:''}</div><div class="kx-tm">${msg}</div></div>`;
   }
-  const a7 = rollingAvg(S.kioskAthlete.id,7,todayStr());
-  const a21 = rollingAvg(S.kioskAthlete.id,21,todayStr());
-  const pct = a7 ? ((v-a7)/a7*100) : null;
-  const st = status(pct);
-  const msg = st==='GREEN'?'Full load — you\'re good to go.'
-            : st==='YELLOW'?'Reduce volume today.'
-            : st==='RED'?'See a coach before you lift.'
-            : 'First jumps logged — building your baseline.';
-  const bg = st==='GREEN'?'#E8F5E0':st==='YELLOW'?'#FEF5DC':st==='RED'?'#FDEAEA':'#F0F0F0';
-  const bd = statusColor(st);
-  box.innerHTML = `<div class="kiosk-title">${S.kioskAthlete.first_name} ${S.kioskAthlete.last_name}</div>
-    <div class="confirm-box" style="background:${bg};border:2px solid ${bd}">
-      <div class="confirm-value" style="color:${bd}">${v}"</div>
-      <div style="font-size:14px;margin-top:6px">7-Day Avg: ${a7?a7.toFixed(1)+'"':'no baseline yet'}${pct!==null?` &nbsp;(${pct>0?'+':''}${pct.toFixed(1)}%)`:''}</div>
-      <div style="font-size:13px;color:var(--text-soft);margin-top:2px">21-Day Baseline: ${a21?a21.toFixed(1)+'"':'—'}</div>
-      <div style="font-size:20px;font-weight:900;color:${bd};margin-top:12px">${st==='NEUTRAL'?'LOGGED':st}</div>
-      <div style="font-size:14px;margin-top:4px">${msg}</div>
+  box.innerHTML = `<div class="kx-eyebrow">Checked In · ${new Date().toLocaleDateString('en-US',{weekday:'long'})}</div>
+    <div class="kx-name">${fullName(a)}</div>
+    <div class="kx-confirm">
+      <div class="kx-tile band-${b.toLowerCase()}"><div class="kx-tl">Wellness</div><div class="kx-tv">${fmt1(x)}</div><div class="kx-tw">${b}</div><div class="kx-tm">${wMsg}</div>
+        ${low.length?`<div class="kx-tm low">Low: ${low.map(q=>`${q.label} (${j[q.key]})`).join(', ')}. A coach may check in with you.</div>`:''}</div>
+      ${cmjTile}
+      <div class="kx-tile ${j.bodyweight_lb!=null?'bw-ok':'bw-miss'}"><div class="kx-tl">Bodyweight</div><div class="kx-tv">${j.bodyweight_lb!=null?'✓':'—'}</div>
+        <div class="kx-tm">${j.bodyweight_lb!=null?'Logged. Only coaches see your weight.':'Not entered yet. Weigh in and come back to add it today.'}</div></div>
     </div>`;
   kioskStep(4);
 }
@@ -873,21 +1490,21 @@ window.submitRegistration = async function(){
   const msg=document.getElementById('regMsg');
   msg.className='error-msg';
   if(!first||!last||!team||!pos||!grad){ msg.textContent='Fill in every field.'; return; }
-
+  const rgoal = document.getElementById('regGoal').value;
+  if(!rgoal){ msg.textContent='Pick your bodyweight goal.'; return; }
+  const rt = document.getElementById('regTarget').value.trim();
+  const rtv = rt==='' ? null : Math.round(parseFloat(rt)*10)/10;
+  if(rtv!=null && (isNaN(rtv) || rtv<60 || rtv>450)){ msg.textContent='Goal weight should be between 60 and 450 lb, or leave it blank.'; return; }
   const dupe = S.athletes.find(a=>a.sport_id===S.kioskSport &&
     a.first_name.toLowerCase()===first.toLowerCase() && a.last_name.toLowerCase()===last.toLowerCase() && a.team_id===team);
   if(dupe){ msg.textContent='That name already exists on this team. Go back and search for it.'; return; }
-
   const { data, error } = await sb.from('cmj_athletes').insert([{
-    sport_id:S.kioskSport, team_id:team, position_id:pos,
-    first_name:first, last_name:last, grad_year:grad
+    sport_id:S.kioskSport, team_id:team, position_id:pos, first_name:first, last_name:last, grad_year:grad,
+    weight_goal:rgoal, weight_target_lb:rtv, weight_goal_set_by:'athlete'
   }]).select();
-  if(error){ msg.textContent='Could not register: '+error.message; return; }
-
+  if(error){ msg.textContent='Could not register: '+error.message+schemaHint(error.message); return; }
   S.athletes.push(data[0]);
-  document.getElementById('regFirst').value='';
-  document.getElementById('regLast').value='';
-  document.getElementById('regGrad').value='';
+  ['regFirst','regLast','regGrad','regTarget','regGoal'].forEach(id=>document.getElementById(id).value='');
   closeRegister();
   pickAthlete(data[0].id);
   fillTrendAthletes();
@@ -904,7 +1521,6 @@ window.addSport = async function(){
   msg.className='ok-msg'; msg.textContent=name+' added. Now add its teams and positions below.';
   await loadAll();
 };
-
 window.addTeam = async function(){
   const sport=document.getElementById('teamSportSelect').value;
   const name=document.getElementById('newTeamName').value.trim();
@@ -913,10 +1529,9 @@ window.addTeam = async function(){
   const { error } = await sb.from('cmj_teams').insert([{sport_id:sport, name}]);
   if(error){ msg.className='error-msg'; msg.textContent=error.message; return; }
   document.getElementById('newTeamName').value='';
-  msg.className='ok-msg'; msg.textContent=name+' added to '+sportName(sport)+'.';
+  msg.className='ok-msg'; msg.textContent=name+' added.';
   await loadAll();
 };
-
 window.addPosition = async function(){
   const sport=document.getElementById('posSportSelect').value;
   const name=document.getElementById('newPosName').value.trim();
@@ -926,76 +1541,226 @@ window.addPosition = async function(){
   const { error } = await sb.from('cmj_positions').insert([{sport_id:sport, name, sort_order:order}]);
   if(error){ msg.className='error-msg'; msg.textContent=error.message; return; }
   document.getElementById('newPosName').value='';
-  msg.className='ok-msg'; msg.textContent=name+' added to '+sportName(sport)+'.';
+  msg.className='ok-msg'; msg.textContent=name+' added.';
   await loadAll();
 };
 
+function renderAdmin(){ renderAdminOverview(); renderSessionDays(); fillGoalTeams(); }
+
 function renderAdminOverview(){
   const el=document.getElementById('adminOverview');
-  if(!S.sports.length){ el.innerHTML='<div style="color:var(--text-soft)">No sports yet.</div>'; return; }
+  if(!S.sports.length){ el.innerHTML='<div class="muted">No sports yet.</div>'; return; }
   el.innerHTML = S.sports.map(s=>{
-    const tms=S.teams.filter(t=>t.sport_id===s.id).map(t=>t.name);
-    const pss=S.positions.filter(p=>p.sport_id===s.id).map(p=>p.name);
+    const js = x => esc(JSON.stringify(x));
+    const chip = (table, i) => `<span class="ad-chip">${esc(i.name)}<button title="Rename" onclick='renameItem("${table}","${i.id}",${js(i.name)})'>✎</button><button title="Delete" onclick='deleteItem("${table}","${i.id}",${js(i.name)})'>✕</button></span>`;
+    const tms=S.teams.filter(t=>t.sport_id===s.id).map(t=>chip('cmj_teams',t));
+    const pss=S.positions.filter(p=>p.sport_id===s.id).map(p=>chip('cmj_positions',p));
     const n=S.athletes.filter(a=>a.sport_id===s.id).length;
     return `<div style="padding:12px 0;border-bottom:1px solid var(--gray-border)">
-      <div style="font-weight:800;color:var(--navy);margin-bottom:4px">${s.name} — ${n} athletes</div>
-      <div style="font-size:13px;color:var(--text-soft)">Teams: ${tms.length?tms.join(', '):'none yet'}</div>
-      <div style="font-size:13px;color:var(--text-soft)">Positions: ${pss.length?pss.join(', '):'none yet'}</div>
+      <div style="font-weight:800;color:var(--navy);margin-bottom:6px">${chip('cmj_sports',s)} <span class="muted small">${n} athletes</span></div>
+      <div class="muted" style="font-size:13px;margin-bottom:4px">Teams: ${tms.length?tms.join(' '):'none yet'}</div>
+      <div class="muted" style="font-size:13px">Positions: ${pss.length?pss.join(' '):'none yet'}</div>
     </div>`;
   }).join('');
 }
 
-/* ---------- REPORT ---------- */
-window.buildReport = function(){
+function renderSessionDays(){
+  const el = document.getElementById('sessionDaysAdmin');
+  if(!S.sports.length){ el.innerHTML='<div class="muted">Add a sport first.</div>'; return; }
+  const order = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  el.innerHTML = S.sports.map(s=>{
+    const on = sessionDays(s.id);
+    return `<div class="sd-row"><div class="sd-name">${esc(s.name)}</div><div class="sd-days">${
+      order.map(d=>`<label class="sd-day"><input type="checkbox" data-sport="${s.id}" value="${d}" ${on.includes(d)?'checked':''}><span>${d}</span></label>`).join('')
+    }</div><button class="btn btn-green btn-sm" onclick="saveSessionDays('${s.id}')">Save</button><span class="sd-msg" id="sdmsg-${s.id}"></span></div>`;
+  }).join('');
+}
+window.saveSessionDays = async function(sportId){
+  const days = [...document.querySelectorAll(`input[data-sport="${sportId}"]:checked`)].map(i=>i.value);
+  const msg = document.getElementById('sdmsg-'+sportId);
+  if(!days.length){ msg.className='sd-msg error-msg'; msg.textContent='Pick at least one day.'; return; }
+  const { error } = await sb.from('cmj_sports').update({ session_days: days.join(',') }).eq('id', sportId);
+  if(error){ msg.className='sd-msg error-msg'; msg.textContent=error.message+schemaHint(error.message); return; }
+  const s = S.sports.find(x=>x.id===sportId); if(s) s.session_days = days.join(',');
+  msg.className='sd-msg ok-msg'; msg.textContent='Saved';
+  loadDashboard(); loadAttendance();
+};
+
+window.fillGoalTeams = function(){
+  const sportId = document.getElementById('goalSport').value;
+  fillSelect(document.getElementById('goalTeam'), S.teams.filter(t=>t.sport_id===sportId));
+  renderGoals();
+};
+window.goReviewGoals = function(){
+  const sportId = document.getElementById('sportSelect').value;
+  switchTab(document.querySelector('[data-tab="admin"]'), 'admin');
+  document.getElementById('goalSport').value = sportId; fillGoalTeams();
+  // land on the first team that has goals waiting
+  const t = S.teams.find(t=>t.sport_id===sportId && S.athletes.some(a=>a.team_id===t.id && a.weight_goal_set_by==='athlete'));
+  if(t){ document.getElementById('goalTeam').value = t.id; renderGoals(); }
+  document.getElementById('goalTable').scrollIntoView({behavior:'smooth', block:'start'});
+};
+window.renderGoals = function(){
+  const teamId = document.getElementById('goalTeam').value;
+  const el = document.getElementById('goalTable');
+  const ath = S.athletes.filter(a=>a.team_id===teamId).sort((a,b)=>a.last_name.localeCompare(b.last_name));
+  if(!ath.length){ el.innerHTML='<div class="empty">No athletes on this team yet.</div>'; return; }
+  const src = a => a.weight_goal_set_by==='coach' ? '<span class="muted small">coach ✓</span>'
+    : a.weight_goal_set_by==='athlete' ? '<span class="flag flag-amber">athlete-set · review</span>' : '<span class="muted small">not asked yet</span>';
+  const pending = ath.filter(a=>a.weight_goal_set_by==='athlete').length;
+  el.innerHTML = (pending?`<div class="banner">${pending} athlete-set goal${pending===1?'':'s'} on this team to review. Check each one and hit Save to confirm it.</div>`:'') +
+  `<div class="tbl-scroll"><table><thead><tr><th>Athlete</th><th>Goal</th><th>Set by</th><th>Start weight</th><th>Target</th><th>Last 7 days</th><th>Change</th><th></th></tr></thead><tbody>${
+    ath.map(a=>{
+      const r = weightRef(a), w = weightOn(a, todayStr());
+      const auto = r.auto && r.ref!=null ? `auto ${r.ref.toFixed(1)}` : r.auto ? `auto after 3 weigh-ins (${r.n||0}/3)` : '';
+      return `<tr><td>${fullName(a)}</td>
+        <td><select id="g-goal-${a.id}"><option value="maintain" ${(a.weight_goal||'maintain')==='maintain'?'selected':''}>Maintain</option><option value="gain" ${a.weight_goal==='gain'?'selected':''}>Gain</option><option value="lose" ${a.weight_goal==='lose'?'selected':''}>Lose</option></select></td>
+        <td>${src(a)}</td>
+        <td><input id="g-start-${a.id}" type="number" step="0.1" class="in-sm" value="${a.weight_start_lb??''}" placeholder="${auto}"></td>
+        <td><input id="g-target-${a.id}" type="number" step="0.1" class="in-sm" value="${a.weight_target_lb??''}" placeholder="optional"></td>
+        <td>${w.cur!=null?w.cur.toFixed(1)+' lb':'—'}</td><td>${weightCell(w)}</td>
+        <td><button class="btn btn-green btn-sm" onclick="saveGoal('${a.id}')">Save</button> <span id="g-msg-${a.id}" class="small"></span></td></tr>`;
+    }).join('')}</tbody></table></div>`;
+};
+window.saveGoal = async function(id){
+  const num = v => v==='' ? null : Math.round(parseFloat(v)*10)/10;
+  const upd = { weight_goal: document.getElementById('g-goal-'+id).value,
+                weight_start_lb: num(document.getElementById('g-start-'+id).value),
+                weight_target_lb: num(document.getElementById('g-target-'+id).value), weight_goal_set_by:'coach' };
+  const msg = document.getElementById('g-msg-'+id);
+  const { error } = await sb.from('cmj_athletes').update(upd).eq('id', id);
+  if(error){ msg.className='small error-msg'; msg.textContent=error.message+schemaHint(error.message); return; }
+  Object.assign(S.athletes.find(a=>a.id===id), upd);
+  renderGoals();
+  const m2 = document.getElementById('g-msg-'+id); if(m2){ m2.className='small ok-msg'; m2.textContent='Saved'; }
+};
+
+/* ---------- REPORTS ---------- */
+window.setReportMode = function(m){
+  document.getElementById('repDaily').classList.toggle('on', m==='daily');
+  document.getElementById('repWeekly').classList.toggle('on', m==='weekly');
+  document.getElementById('reportDateLabel').textContent = m==='weekly' ? 'Any day in the week' : 'Date';
+  S.reportMode = m;
+};
+window.buildReport = function(){ (S.reportMode==='weekly' ? buildWeekly : buildDaily)(); };
+
+function repHead(title, sub){
+  return `<div class="rep-head"><div><div class="rep-eyebrow">Naperville North Strength &amp; Performance</div>
+    <div class="rep-title">${title}</div><div class="rep-sub">${sub}</div></div>
+    <button class="btn btn-orange no-print" onclick="window.print()">Print / Save as PDF</button></div>`;
+}
+const legendHTML = `<div class="rep-key"><b>Readiness:</b> READY = no flags · MONITOR = CMJ or wellness flagged · CHECK IN = CMJ red, wellness red, or both flagged.
+  <b>CMJ:</b> vs own 7-day avg — Green 0 to −4%, Yellow −5 to −9%, Red −10% or worse (needs 3 jumps in 21 days).
+  <b>Wellness:</b> avg of 5 (5 = good) — Green 4+, Yellow 3–3.9, Orange 2–2.9, Red under 2; any single answer of 1–2 is flagged.
+  <b>Bodyweight:</b> 7-day avg vs start weight — 5+ lb toward the athlete's goal is green, 5+ lb the wrong way is red (maintain/gain: down is wrong; lose: up is wrong); 💧 = 2%+ under last week.</div>`;
+
+function buildDaily(){
   const sportId=document.getElementById('reportSport').value;
   const d=document.getElementById('reportDate').value||todayStr();
-  const roster=S.athletes.filter(a=>a.sport_id===sportId);
-  const js=S.jumps.filter(j=>j.sport_id===sportId && j.jump_date===d);
-  const present=js.filter(j=>!j.is_medical);
-  const medical=js.filter(j=>j.is_medical);
-  const absent=roster.length-(present.length+medical.length);
-
-  const top=present.filter(j=>j.cmj_inches!=null).sort((a,b)=>b.cmj_inches-a.cmj_inches).slice(0,5);
-  const red=roster.map(a=>{
-    const j=present.find(x=>x.athlete_id===a.id);
-    if(!j) return null;
-    const avg=rollingAvg(a.id,7,d);
-    if(!avg) return null;
-    const pct=(j.cmj_inches-avg)/avg*100;
-    return status(pct)==='RED'?{a,j,avg,pct}:null;
-  }).filter(Boolean).sort((x,y)=>x.pct-y.pct);
-
-  let html=`<div class="card"><h2 style="color:var(--navy);margin-bottom:4px">CMJ Readiness Report</h2>
-    <div style="color:var(--text-soft);margin-bottom:16px">${sportName(sportId)} — ${new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
-    <div class="grid4" style="margin-bottom:18px">
-      <div class="stat"><div class="stat-label">Present</div><div class="stat-value">${present.length}</div></div>
-      <div class="stat"><div class="stat-label">Medical</div><div class="stat-value">${medical.length}</div></div>
-      <div class="stat"><div class="stat-label">Absent</div><div class="stat-value">${absent}</div></div>
-      <div class="stat"><div class="stat-label">Attendance</div><div class="stat-value">${roster.length?Math.round((present.length+medical.length)/roster.length*100):0}%</div></div>
-    </div>`;
-
-  html+=`<h3 style="color:var(--navy);margin:16px 0 8px;font-size:15px">Top 5 Jumpers</h3>`;
+  const roster=S.athletes.filter(a=>a.sport_id===sportId && activeFrom(a)<=d);
+  const rows=readinessRows(roster,d);
+  const top=rows.filter(r=>r.c.v!=null).sort((a,b)=>b.c.v-a.c.v).slice(0,5);
+  const session=isSessionDay(sportId,d);
+  const absent=session?roster.filter(a=>!rowOn(a.id,d)):[];
+  let html=`<div class="report">${repHead('Daily Readiness Report', `${sportName(sportId)} — ${longDate(d)}`)}`;
+  html+=readinessTiles(rows, roster, d, sportId);
+  const attention = rows.filter(r=>r.r==='CHECK IN'||r.r==='MONITOR');
+  html+=`<h3 class="rep-h3 red">Check In &amp; Monitor (${attention.length})</h3>${attention.length?readinessTable(attention,{print:true}):'<div class="empty">Nobody flagged today.</div>'}`;
+  html+=`<h3 class="rep-h3">Top 5 Jumpers</h3>`;
   html+= top.length?`<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Position</th><th>CMJ</th></tr></thead><tbody>${
-    top.map((j,i)=>{const a=S.athletes.find(x=>x.id===j.athlete_id);
-    return `<tr><td>${i+1}</td><td>${a?.first_name} ${a?.last_name}</td><td>${teamName(a?.team_id)}</td><td>${posName(a?.position_id)}</td><td>${j.cmj_inches}"</td></tr>`;}).join('')
-  }</tbody></table>`:'<div style="color:var(--text-soft)">No jumps recorded.</div>';
+    top.map((r,i)=>`<tr><td>${i+1}</td><td>${fullName(r.a)}</td><td>${teamName(r.a.team_id)}</td><td>${posName(r.a.position_id)}</td><td>${r.c.v}"</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No jumps recorded.</div>';
+  if(absent.length) html+=`<h3 class="rep-h3">Absent (${absent.length})</h3><div class="rep-list">${absent.sort((a,b)=>a.last_name.localeCompare(b.last_name)).map(a=>`${fullName(a)} <span class="muted">${teamName(a.team_id)}</span>`).join(' · ')}</div>`;
+  html+=`<h3 class="rep-h3">All Check-Ins (${rows.length})</h3>${readinessTable(rows,{print:true})}${legendHTML}</div>`;
+  document.getElementById('reportOut').innerHTML=html;
+}
 
-  S.teams.filter(t=>t.sport_id===sportId).forEach(t=>{
-    const ath=roster.filter(a=>a.team_id===t.id);
-    const tj=present.filter(j=>j.cmj_inches!=null && ath.some(a=>a.id===j.athlete_id));
-    const avg=tj.length?(tj.reduce((s,j)=>s+Number(j.cmj_inches),0)/tj.length).toFixed(1):'—';
-    html+=`<h3 style="color:var(--navy);margin:16px 0 8px;font-size:15px">${t.name}</h3>
-      <div style="font-size:13px">Roster ${ath.length} • Jumped ${tj.length} • Avg CMJ ${avg==='—'?'—':avg+'"'} • Participation ${ath.length?Math.round(tj.length/ath.length*100):0}%</div>`;
+// CMJ trend for a week: this week's average vs the 21 days before the week
+function cmjWeekTrend(athleteId, ws, we){
+  const wk = S.jumps.filter(j=>j.athlete_id===athleteId && !j.is_medical && j.cmj_inches!=null && j.jump_date>=ws && j.jump_date<=we);
+  const base = rollingAvgN(athleteId, 21, ws);
+  if(wk.length<2 || base.n<MIN_BASELINE) return { word:'Building', pct:null };
+  const pct = (avg(wk.map(j=>Number(j.cmj_inches)))-base.avg)/base.avg*100;
+  return { word: pct>=3 ? 'Improving' : pct<=-3 ? 'Slipping' : 'Steady', pct };
+}
+function wellWeek(athleteId, ws, we){
+  return avg(S.jumps.filter(j=>j.athlete_id===athleteId && j.jump_date>=ws && j.jump_date<=we).map(wellAvg).filter(x=>x!=null));
+}
+
+function buildWeekly(){
+  const sportId=document.getElementById('reportSport').value;
+  const pick=document.getElementById('reportDate').value||todayStr();
+  const ws=weekStartOf(pick), we=addDays(ws,6), upto = we<todayStr()?we:todayStr();
+  const pws=addDays(ws,-7), pwe=addDays(ws,-1);
+  const roster=S.athletes.filter(a=>a.sport_id===sportId && activeFrom(a)<=we);
+  const held=sessionsBetween(sportId, ws, upto);
+
+  const data = roster.map(a=>{
+    const att=attendanceFor(a, ws, upto);
+    const cmj=cmjWeekTrend(a.id, ws, we);
+    const w=wellWeek(a.id, ws, we), pw=wellWeek(a.id, pws, pwe);
+    const wkRows=S.jumps.filter(j=>j.athlete_id===a.id && j.jump_date>=ws && j.jump_date<=we);
+    const lowDays=wkRows.filter(j=>lowItems(j).length).length;
+    const wt=weightOn(a, upto);
+    const lastDay=[...wkRows].sort((x,y)=>y.jump_date.localeCompare(x.jump_date))[0];
+    const r=lastDay?readinessOn(a,lastDay.jump_date):'—';
+    const sl=straightLined(a.id, upto);
+    const reasons=[];
+    if(att.held && att.att/att.held<2/3) reasons.push(`attendance ${att.att}/${att.held}`);
+    if(cmj.word==='Slipping') reasons.push(`CMJ slipping ${cmj.pct.toFixed(1)}%`);
+    if(w!=null && w<3) reasons.push(`wellness ${fmt1(w)}`);
+    if(lowDays>=2) reasons.push(`low wellness answers on ${lowDays} days`);
+    if(wt.state==='OK' && wt.offGoal) reasons.push(`${wt.delta<0?'down':'up'} ${Math.abs(wt.delta).toFixed(1)} lb (${wt.goal} goal)`);
+    const tgt = a.weight_target_lb!=null ? Number(a.weight_target_lb) : null;
+    const atTarget = tgt!=null && wt.cur!=null && (wt.goal==='lose' ? wt.cur<=tgt : wt.cur>=tgt);
+    if(wt.state==='OK' && !wt.offGoal && !atTarget && wt.goal==='gain' && wt.delta<2) reasons.push('gain goal, not rising');
+    if(wt.state==='OK' && !wt.offGoal && !atTarget && wt.goal==='lose' && wt.delta>-2) reasons.push('lose goal, not dropping');
+    if(sl) reasons.push('same wellness answers 5×');
+    return { a, att, cmj, w, pw, wt, r, reasons };
   });
 
-  html+=`<h3 style="color:var(--red);margin:18px 0 8px;font-size:15px">Red Zone (${red.length})</h3>`;
-  html+= red.length?`<table><thead><tr><th>Name</th><th>Team</th><th>Today</th><th>7-Day Avg</th><th>Change</th></tr></thead><tbody>${
-    red.map(r=>`<tr><td>${r.a.first_name} ${r.a.last_name}</td><td>${teamName(r.a.team_id)}</td><td>${r.j.cmj_inches}"</td><td>${r.avg.toFixed(1)}"</td><td style="color:var(--red);font-weight:700">${r.pct.toFixed(1)}%</td></tr>`).join('')
-  }</tbody></table>`:'<div style="color:var(--text-soft)">No athletes flagged.</div>';
+  const sumAtt=data.reduce((s,x)=>s+x.att.att,0), sumHeld=data.reduce((s,x)=>s+x.att.held,0);
+  const pulse=avg(data.map(x=>x.w).filter(x=>x!=null));
+  const ppulse=avg(data.map(x=>x.pw).filter(x=>x!=null));
+  const cnt=k=>data.filter(x=>x.cmj.word===k).length;
+  const onTrack=data.filter(x=>x.wt.state==='OK' && x.wt.color==='green').length;
+  const offTrack=data.filter(x=>x.wt.state==='OK' && x.wt.offGoal).length;
+  const pulseDelta = (pulse!=null && ppulse!=null) ? pulse-ppulse : null;
+  const attPct = sumHeld ? Math.round(sumAtt/sumHeld*100) : null;
 
-  html+=`<button class="btn btn-orange" style="margin-top:18px" onclick="window.print()">Print / Save as PDF</button></div>`;
+  let html=`<div class="report">${repHead('Weekly Readiness Report', `${sportName(sportId)} — Week of ${shortDate(ws)} – ${shortDate(we)}, ${ws.slice(0,4)} · ${held.length} session${held.length===1?'':'s'} held`)}`;
+  html+=`<div class="tiles">
+    <div class="tile ${attPct==null?'':attPct>=90?'t-ready':attPct>=75?'t-monitor':'t-checkin'}"><div class="tl">Attendance</div><div class="tv">${attPct==null?'—':attPct+'%'}</div><div class="ts">${sumAtt} of ${sumHeld} athlete-sessions</div></div>
+    <div class="tile t-pulse chipbg-${wellBand(pulse).toLowerCase()}"><div class="tl">Wellness Pulse</div><div class="tv">${fmt1(pulse)}</div><div class="ts">${pulseDelta==null?'no prior week':`${pulseDelta>=0?'▲':'▼'} ${Math.abs(pulseDelta).toFixed(1)} vs last week`}</div></div>
+    <div class="tile"><div class="tl">CMJ Trend</div><div class="tv tv-sm"><span class="g">▲${cnt('Improving')}</span> <span class="n">●${cnt('Steady')}</span> <span class="r">▼${cnt('Slipping')}</span></div><div class="ts">improving · steady · slipping${cnt('Building')?` · ${cnt('Building')} building`:''}</div></div>
+    <div class="tile"><div class="tl">Bodyweight</div><div class="tv tv-sm"><span class="g">✓${onTrack}</span> <span class="r">✕${offTrack}</span></div><div class="ts">5+ lb toward goal · 5+ lb wrong way</div></div>
+  </div>`;
+
+  const attn = data.filter(x=>x.reasons.length).sort((x,y)=>y.reasons.length-x.reasons.length);
+  html+=`<h3 class="rep-h3 red">Needs Attention (${attn.length})</h3>`;
+  html+= attn.length ? `<table><thead><tr><th>Athlete</th><th>Team</th><th>Why</th></tr></thead><tbody>${
+    attn.map(x=>`<tr><td><b>${fullName(x.a)}</b></td><td>${teamName(x.a.team_id)}</td><td>${x.reasons.map(r=>`<span class="flag">${r}</span>`).join(' ')}</td></tr>`).join('')
+  }</tbody></table>` : '<div class="empty">Nobody flagged this week.</div>';
+
+  const trendCell = c => c.word==='Building' ? '<span class="muted">building</span>'
+    : `<span class="tr-${c.word.toLowerCase()}">${c.word==='Improving'?'▲':c.word==='Slipping'?'▼':'●'} ${c.word}</span> <span class="muted small">${c.pct>0?'+':''}${c.pct.toFixed(1)}%</span>`;
+  const wellCell = (w,pw) => `${wellChip(w)}${w!=null&&pw!=null?` <span class="muted small">${w-pw>=0.05?'▲':w-pw<=-0.05?'▼':'●'} vs last wk</span>`:''}`;
+  const attCell = t => !t.held ? '—' : `<span class="${t.att/t.held<2/3?'r':t.att===t.held?'g':''}"><b>${t.att}/${t.held}</b></span>`;
+  const goalNote = x => { if(x.wt.goal==='maintain' || x.a.weight_target_lb==null || x.wt.cur==null) return '';
+    const left = x.wt.goal==='lose' ? x.wt.cur-Number(x.a.weight_target_lb) : Number(x.a.weight_target_lb)-x.wt.cur;
+    return left<=0 ? ' <span class="g small"><b>at goal ✓</b></span>' : ` <span class="muted small">${left.toFixed(1)} to goal</span>`; };
+
+  S.teams.filter(t=>t.sport_id===sportId).forEach(t=>{
+    const td = data.filter(x=>x.a.team_id===t.id).sort((x,y)=>x.a.last_name.localeCompare(y.a.last_name));
+    if(!td.length) return;
+    const tAtt=td.reduce((s,x)=>s+x.att.att,0), tHeld=td.reduce((s,x)=>s+x.att.held,0);
+    html+=`<h3 class="rep-h3">${esc(t.name)} <span class="muted small">· ${td.length} athletes · attendance ${tHeld?Math.round(tAtt/tHeld*100)+'%':'—'} · wellness ${fmt1(avg(td.map(x=>x.w).filter(x=>x!=null)))}</span></h3>
+    <div class="tbl-scroll"><table class="rt"><thead><tr><th>Athlete</th><th>Pos</th><th>Attend</th><th>CMJ Trend</th><th>Wellness</th><th>Bodyweight</th><th>Latest</th></tr></thead><tbody>${
+      td.map(x=>`<tr><td>${fullName(x.a)}</td><td>${posName(x.a.position_id)}</td><td>${attCell(x.att)}</td><td>${trendCell(x.cmj)}</td><td>${wellCell(x.w,x.pw)}</td><td>${weightCell(x.wt)}${goalNote(x)}</td><td>${x.r==='—'?'<span class="muted">—</span>':readyBadge(x.r)}</td></tr>`).join('')
+    }</tbody></table></div>`;
+  });
+  html+=`${legendHTML}<div class="rep-key"><b>Weekly CMJ trend:</b> this week's average vs the 21 days before it — ▲ Improving +3% or more, ● Steady, ▼ Slipping −3% or more (needs 2 jumps this week). <b>Attendance:</b> sessions attended of sessions held; red under 2 of 3. Today's absences count once the day is over; a training day with zero check-ins is treated as cancelled.</div></div>`;
   document.getElementById('reportOut').innerHTML=html;
-};
+}
 
 /* ---------- TABS ---------- */
 window.switchTab = function(btn, tab){
@@ -1006,8 +1771,238 @@ window.switchTab = function(btn, tab){
   if(tab==='dashboard') loadDashboard();
   if(tab==='attendance') loadAttendance();
   if(tab==='trends'){ drawTrendChart(); drawTeamFatigue(); }
-  if(tab==='admin') renderAdminOverview();
+  if(tab==='admin') renderAdmin();
+  if(tab==='edit') renderEditSearch();
 };
+
+/* ---------- EDIT DATA (coach only) ----------
+   Fix anything: athlete profile, any check-in on any date, move a check-in to the
+   right athlete, merge a duplicate registration, delete. Hidden while kiosk-locked. */
+const editMsg = (html, ok) => { const el=document.getElementById('editMsg'); if(el){ el.className = ok?'ed-msg ok':'ed-msg err'; el.innerHTML = html; } };
+const dupHint = msg => /duplicate|unique|conflict/i.test(msg||'') ? ' That athlete already has a check-in on that date. Edit or delete that one instead.' : '';
+
+window.renderEditSearch = function(){
+  const sportId = document.getElementById('editSport').value;
+  const q = document.getElementById('editSearch').value.trim().toLowerCase();
+  const list = S.athletes.filter(a=>a.sport_id===sportId && (!q || `${a.first_name} ${a.last_name}`.toLowerCase().includes(q)))
+    .sort((a,b)=>a.last_name.localeCompare(b.last_name)||a.first_name.localeCompare(b.first_name));
+  // flag likely duplicate registrations (same first + last name in a sport)
+  const key = a => (a.first_name+'|'+a.last_name).toLowerCase().replace(/\s/g,'');
+  const counts = {}; S.athletes.filter(a=>a.sport_id===sportId).forEach(a=>counts[key(a)]=(counts[key(a)]||0)+1);
+  const el = document.getElementById('editResults');
+  if(!list.length){ el.innerHTML='<div class="empty">No athletes match.</div>'; return; }
+  el.innerHTML = list.slice(0,60).map(a=>{
+    const n = S.jumps.filter(j=>j.athlete_id===a.id).length;
+    return `<div class="ed-item${S.editId===a.id?' on':''}" onclick="openEditor('${a.id}')">
+      <div><b>${fullName(a)}</b> ${counts[key(a)]>1?'<span class="flag">possible duplicate</span>':''}</div>
+      <div class="muted small">${teamName(a.team_id)} • ${posName(a.position_id)} • ${n} check-in${n===1?'':'s'}</div></div>`;
+  }).join('') + (list.length>60?`<div class="muted small" style="padding:8px">Showing 60 of ${list.length}. Type more of the name to narrow it.</div>`:'');
+};
+
+window.openEditor = function(id){
+  if(isLocked()) return;
+  const a = S.athletes.find(x=>x.id===id);
+  if(!a) return;
+  S.editId = id;
+  // jump to the tab if called from another screen
+  if(!document.getElementById('panel-edit').classList.contains('active')){
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelector('[data-tab="edit"]').classList.add('active');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-edit').classList.add('active');
+    document.getElementById('editSport').value = a.sport_id;
+    document.getElementById('editSearch').value = '';
+  }
+  renderEditSearch();
+  const opt = (items, sel) => items.map(i=>`<option value="${i.id}" ${i.id===sel?'selected':''}>${esc(i.name)}</option>`).join('');
+  const others = S.athletes.filter(x=>x.sport_id===a.sport_id && x.id!==a.id).sort((x,y)=>x.last_name.localeCompare(y.last_name));
+  const rows = S.jumps.filter(j=>j.athlete_id===id).sort((x,y)=>y.jump_date.localeCompare(x.jump_date));
+  const wsel = (key, v, rid) => `<select class="ed-w" id="${rid}-${key}"><option value="">–</option>${[1,2,3,4,5].map(n=>`<option ${Number(v)===n?'selected':''}>${n}</option>`).join('')}</select>`;
+  const rowHTML = (j, rid, isNew) => `<tr id="${rid}">
+      <td><input type="date" class="in-sm ed-date" id="${rid}-date" value="${j.jump_date||todayStr()}"></td>
+      <td class="c"><input type="checkbox" id="${rid}-med" ${j.is_medical?'checked':''}></td>
+      <td><input type="number" step="0.1" class="in-sm ed-num" id="${rid}-cmj" value="${j.cmj_inches??''}" placeholder="in"></td>
+      <td><input type="number" step="0.1" class="in-sm ed-num" id="${rid}-bw" value="${j.bodyweight_lb??''}" placeholder="lb"></td>
+      ${WELL_Q.map(q=>`<td>${wsel(q.key, j[q.key], rid)}</td>`).join('')}
+      <td>${isNew?'':wellChip(wellAvg(j))}</td>
+      <td class="ed-actions">${isNew
+        ? `<button class="btn btn-green btn-sm" onclick="addCheckin()">Add</button>`
+        : `<button class="btn btn-sm" onclick="saveCheckin('${rid}','${j.jump_date}')">Save</button>
+           <select class="ed-move" id="${rid}-move" onchange="moveCheckin('${rid}','${j.jump_date}')"><option value="">Move to…</option>${others.map(o=>`<option value="${o.id}">${esc(o.last_name+', '+o.first_name)}</option>`).join('')}</select>
+           <button class="btn btn-sm btn-del" onclick="deleteCheckin('${j.jump_date}')">Delete</button>`}</td></tr>`;
+
+  document.getElementById('editAthlete').innerHTML = `
+  <div class="card">
+    <div class="ed-head"><div><div class="card-title" style="margin-bottom:4px">Editing: ${fullName(a)}</div>
+      <div class="muted small">Registered ${a.created_at?shortDate(activeFrom(a)):'—'} · ${rows.length} check-ins</div></div>
+      <button class="btn btn-gray btn-sm" onclick="openTrend('${a.id}')">View trends</button></div>
+    <div id="editMsg" class="ed-msg"></div>
+    <div class="ed-grid">
+      <div class="form-group"><label>First name</label><input id="ef-first" value="${esc(a.first_name)}"></div>
+      <div class="form-group"><label>Last name</label><input id="ef-last" value="${esc(a.last_name)}"></div>
+      <div class="form-group"><label>Grad year</label><input id="ef-grad" type="number" value="${esc(a.grad_year??'')}"></div>
+      <div class="form-group"><label>Sport</label><select id="ef-sport" onchange="editSportChanged()">${opt(S.sports, a.sport_id)}</select></div>
+      <div class="form-group"><label>Team</label><select id="ef-team">${opt(S.teams.filter(t=>t.sport_id===a.sport_id), a.team_id)}</select></div>
+      <div class="form-group"><label>Position</label><select id="ef-pos">${opt(S.positions.filter(p=>p.sport_id===a.sport_id), a.position_id)}</select></div>
+      <div class="form-group"><label>Weight goal <span class="muted small" style="text-transform:none;letter-spacing:0">${a.weight_goal_set_by==='athlete'?'· athlete-set, Save confirms it':a.weight_goal_set_by==='coach'?'· coach ✓':'· not asked yet'}</span></label><select id="ef-goal">${['maintain','gain','lose'].map(g=>`<option value="${g}" ${(a.weight_goal||'maintain')===g?'selected':''}>${g[0].toUpperCase()+g.slice(1)}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Start weight (lb)</label><input id="ef-start" type="number" step="0.1" value="${a.weight_start_lb??''}" placeholder="auto from first 3"></div>
+      <div class="form-group"><label>Target weight (lb)</label><input id="ef-target" type="number" step="0.1" value="${a.weight_target_lb??''}" placeholder="optional"></div>
+    </div>
+    <button class="btn btn-green" onclick="saveAthlete()">Save profile</button>
+
+    <div class="ed-danger">
+      <div><b>Duplicate registration?</b> Move all of this athlete's check-ins into the correct record, then remove this one.</div>
+      <div class="ed-inline"><select id="ef-merge"><option value="">Merge into…</option>${others.map(o=>`<option value="${o.id}">${esc(o.last_name+', '+o.first_name)} (${S.teams.find(t=>t.id===o.team_id)?.name||'—'})</option>`).join('')}</select>
+      <button class="btn btn-amber btn-sm" onclick="mergeAthlete()">Merge</button>
+      <button class="btn btn-sm btn-del" onclick="deleteAthlete()">Delete athlete</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Check-Ins</div>
+    <div class="hint" style="margin:-8px 0 12px">Change any value and hit Save. Leave CMJ blank and tick Medical for an injured-but-present day. Use the top row to add a check-in a kid missed (laptop down, forgot) — that also fixes their attendance.</div>
+    <div class="tbl-scroll"><table class="ed-tbl"><thead><tr><th>Date</th><th>Med</th><th>CMJ</th><th>BW</th>${WELL_Q.map(q=>`<th title="${q.label}">${q.label.split(' ')[0]}</th>`).join('')}<th>Avg</th><th></th></tr></thead>
+    <tbody>${rowHTML({}, 'new', true)}${rows.map((j,i)=>rowHTML(j,'r'+i,false)).join('')}</tbody></table></div>
+    ${rows.length?'':'<div class="empty">No check-ins yet.</div>'}
+  </div>`;
+};
+
+window.editSportChanged = function(){
+  const sid = document.getElementById('ef-sport').value;
+  const opt = items => items.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  document.getElementById('ef-team').innerHTML = opt(S.teams.filter(t=>t.sport_id===sid));
+  document.getElementById('ef-pos').innerHTML = opt(S.positions.filter(p=>p.sport_id===sid));
+};
+
+async function reloadAndReopen(id, msg){
+  await loadAll();
+  if(id && S.athletes.some(a=>a.id===id)) openEditor(id); else { S.editId=null; document.getElementById('editAthlete').innerHTML=''; renderEditSearch(); }
+  if(msg) editMsg(msg, true);
+}
+
+window.saveAthlete = async function(){
+  const id = S.editId, v = k => document.getElementById(k).value.trim();
+  const num = x => x==='' ? null : Math.round(parseFloat(x)*10)/10;
+  const upd = { first_name:v('ef-first'), last_name:v('ef-last'), grad_year: v('ef-grad')===''?null:parseInt(v('ef-grad')),
+    sport_id:v('ef-sport'), team_id:v('ef-team'), position_id:v('ef-pos'),
+    weight_goal:v('ef-goal'), weight_start_lb:num(v('ef-start')), weight_target_lb:num(v('ef-target')), weight_goal_set_by:'coach' };
+  if(!upd.first_name || !upd.last_name){ editMsg('First and last name are required.'); return; }
+  if(!upd.team_id || !upd.position_id){ editMsg('That sport needs a team and a position set up in Admin first.'); return; }
+  const { error } = await sb.from('cmj_athletes').update(upd).eq('id', id);
+  if(error){ editMsg('Could not save: '+esc(error.message)+schemaHint(error.message)); return; }
+  await reloadAndReopen(id, 'Profile saved.');
+};
+
+function readRow(rid){
+  const g = k => document.getElementById(`${rid}-${k}`).value.trim();
+  const med = document.getElementById(`${rid}-med`).checked;
+  const cmj = g('cmj'), bw = g('bw');
+  const row = { jump_date:g('date'), is_medical:med, cmj_inches: med||cmj==='' ? null : Math.round(parseFloat(cmj)*10)/10,
+                bodyweight_lb: bw==='' ? null : Math.round(parseFloat(bw)*10)/10 };
+  WELL_Q.forEach(q=>{ const x=g(q.key); row[q.key] = x==='' ? null : Number(x); });
+  if(!row.jump_date) return { err:'Pick a date.' };
+  if(row.jump_date > todayStr()) return { err:'That date is in the future.' };
+  if(row.cmj_inches!=null && (isNaN(row.cmj_inches) || row.cmj_inches<5 || row.cmj_inches>60)) return { err:'CMJ must be between 5 and 60 inches (or blank).' };
+  if(row.bodyweight_lb!=null && (isNaN(row.bodyweight_lb) || row.bodyweight_lb<60 || row.bodyweight_lb>450)) return { err:'Bodyweight must be between 60 and 450 lb (or blank).' };
+  const answered = WELL_Q.filter(q=>row[q.key]!=null).length;
+  if(answered && answered<5) return { err:'Fill in all 5 wellness answers, or clear all 5.' };
+  return { row };
+}
+
+window.addCheckin = async function(){
+  const a = S.athletes.find(x=>x.id===S.editId);
+  const { row, err } = readRow('new');
+  if(err){ editMsg(err); return; }
+  if(rowOn(a.id, row.jump_date)){ editMsg(`${fullName(a)} already has a check-in on ${shortDate(row.jump_date)}. Edit that row below instead.`); return; }
+  const { error } = await sb.from('cmj_jumps').insert([{ ...row, athlete_id:a.id, sport_id:a.sport_id, created_by:S.user.email }]);
+  if(error){ editMsg('Could not add: '+esc(error.message)+dupHint(error.message)+schemaHint(error.message)); return; }
+  await reloadAndReopen(a.id, `Added check-in for ${shortDate(row.jump_date)}.`);
+};
+
+window.saveCheckin = async function(rid, origDate){
+  const { row, err } = readRow(rid);
+  if(err){ editMsg(err); return; }
+  if(row.jump_date!==origDate && rowOn(S.editId, row.jump_date)){ editMsg(`There's already a check-in on ${shortDate(row.jump_date)}. Delete or edit that one first.`); return; }
+  const { error } = await sb.from('cmj_jumps').update(row).eq('athlete_id', S.editId).eq('jump_date', origDate);
+  if(error){ editMsg('Could not save: '+esc(error.message)+dupHint(error.message)+schemaHint(error.message)); return; }
+  await reloadAndReopen(S.editId, `Saved ${shortDate(row.jump_date)}.`);
+};
+
+window.deleteCheckin = async function(date){
+  const a = S.athletes.find(x=>x.id===S.editId);
+  if(!confirm(`Delete ${a.first_name} ${a.last_name}'s check-in on ${shortDate(date)}?\n\nThey will show as ABSENT that day if it was a training day.`)) return;
+  const { error } = await sb.from('cmj_jumps').delete().eq('athlete_id', a.id).eq('jump_date', date);
+  if(error){ editMsg('Could not delete: '+esc(error.message)); return; }
+  await reloadAndReopen(a.id, `Deleted ${shortDate(date)}.`);
+};
+
+window.moveCheckin = async function(rid, date){
+  const toId = document.getElementById(`${rid}-move`).value;
+  if(!toId) return;
+  const from = S.athletes.find(x=>x.id===S.editId), to = S.athletes.find(x=>x.id===toId);
+  if(rowOn(toId, date)){ editMsg(`${fullName(to)} already has a check-in on ${shortDate(date)}. Delete one of them instead.`); document.getElementById(`${rid}-move`).value=''; return; }
+  if(!confirm(`Move the ${shortDate(date)} check-in from ${from.first_name} ${from.last_name} to ${to.first_name} ${to.last_name}?`)){ document.getElementById(`${rid}-move`).value=''; return; }
+  const { error } = await sb.from('cmj_jumps').update({ athlete_id:toId, sport_id:to.sport_id }).eq('athlete_id', from.id).eq('jump_date', date);
+  if(error){ editMsg('Could not move: '+esc(error.message)+dupHint(error.message)); return; }
+  await reloadAndReopen(from.id, `Moved ${shortDate(date)} to ${fullName(to)}.`);
+};
+
+window.mergeAthlete = async function(){
+  const toId = document.getElementById('ef-merge').value;
+  if(!toId){ editMsg('Pick the athlete to merge into.'); return; }
+  const from = S.athletes.find(x=>x.id===S.editId), to = S.athletes.find(x=>x.id===toId);
+  const rows = S.jumps.filter(j=>j.athlete_id===from.id);
+  const clash = rows.filter(j=>rowOn(toId, j.jump_date));
+  const moving = rows.filter(j=>!rowOn(toId, j.jump_date));
+  if(!confirm(`Merge ${from.first_name} ${from.last_name} INTO ${to.first_name} ${to.last_name}?\n\n• ${moving.length} check-in(s) move over\n• ${clash.length} date(s) where both have a check-in keep ${to.first_name}'s entry\n• then ${from.first_name} ${from.last_name}'s duplicate record is deleted\n\nThis can't be undone.`)) return;
+  for(const j of moving){
+    const { error } = await sb.from('cmj_jumps').update({ athlete_id:toId, sport_id:to.sport_id }).eq('athlete_id', from.id).eq('jump_date', j.jump_date);
+    if(error){ editMsg('Merge stopped: '+esc(error.message)); await loadAll(); return; }
+  }
+  if(clash.length){
+    const { error } = await sb.from('cmj_jumps').delete().eq('athlete_id', from.id);
+    if(error){ editMsg('Merge stopped: '+esc(error.message)); await loadAll(); return; }
+  }
+  const { error } = await sb.from('cmj_athletes').delete().eq('id', from.id);
+  if(error){ editMsg('Check-ins moved, but the duplicate record could not be removed: '+esc(error.message)); await loadAll(); return; }
+  await reloadAndReopen(toId, `Merged. ${moving.length} check-in(s) moved into ${fullName(to)}.`);
+};
+
+window.deleteAthlete = async function(){
+  const a = S.athletes.find(x=>x.id===S.editId);
+  const n = S.jumps.filter(j=>j.athlete_id===a.id).length;
+  const typed = prompt(`Permanently delete ${a.first_name} ${a.last_name} and all ${n} of their check-ins?\n\nIf they just registered twice, use Merge instead.\n\nType DELETE to confirm.`);
+  if(typed===null) return;
+  if(typed.trim().toUpperCase()!=='DELETE'){ editMsg('Not deleted. You have to type DELETE.'); return; }
+  const r1 = await sb.from('cmj_jumps').delete().eq('athlete_id', a.id);
+  if(r1.error){ editMsg('Could not delete check-ins: '+esc(r1.error.message)); return; }
+  const r2 = await sb.from('cmj_athletes').delete().eq('id', a.id);
+  if(r2.error){ editMsg('Could not delete athlete: '+esc(r2.error.message)); await loadAll(); return; }
+  await reloadAndReopen(null);
+  editMsg(`${fullName(a)} deleted.`, true);
+};
+
+/* ---------- ADMIN: rename / delete sports, teams, positions ---------- */
+window.renameItem = async function(table, id, current){
+  const name = prompt('New name:', current);
+  if(name===null || !name.trim() || name.trim()===current) return;
+  const { error } = await sb.from(table).update({ name:name.trim() }).eq('id', id);
+  if(error){ alert('Could not rename: '+error.message); return; }
+  await loadAll();
+};
+window.deleteItem = async function(table, id, name){
+  const col = table==='cmj_sports' ? 'sport_id' : table==='cmj_teams' ? 'team_id' : 'position_id';
+  const used = S.athletes.filter(a=>a[col]===id).length;
+  if(used){ alert(`${name} still has ${used} athlete(s). Move them in Edit Data first.`); return; }
+  if(table==='cmj_sports' && (S.teams.some(t=>t.sport_id===id) || S.positions.some(p=>p.sport_id===id))){ alert(`Delete ${name}'s teams and positions first.`); return; }
+  if(!confirm(`Delete ${name}?`)) return;
+  const { error } = await sb.from(table).delete().eq('id', id);
+  if(error){ alert('Could not delete: '+error.message); return; }
+  await loadAll();
+};
+
+S.reportMode = 'weekly';
+
 </script>
 </body>
 </html>
