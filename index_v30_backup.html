@@ -208,7 +208,7 @@ input:focus,select:focus{outline:2px solid var(--orange);border-color:var(--oran
    FALLBACK_CODE is only used if Supabase isn't configured below.
    --------------------------------------------------------------- */
 const ACCESS = { FALLBACK_CODE: "Huskies2026", HOURS: 12 };
-const BUILD = "v31";   // shown in the header so you can confirm which version loaded
+const BUILD = "v30";   // shown in the header so you can confirm which version loaded
 
 const CONFIG = { SUPABASE_URL: "https://qyhlsoidbyiwlatpoewl.supabase.co", SUPABASE_ANON_KEY: "sb_publishable_cZE5LZny7o9pQKpf48J2cA_Xp1vGbTn" };
 
@@ -226,7 +226,7 @@ const DEFAULT_TERM = "2026-27 S1";
 const DEFAULT_STALE = 30;            /* v27: days before a test date is flagged orange */
 const STALE_OPTIONS = [30,60,90];
 const DEFAULT_EXERCISES = [
-  {id:"bsq",name:"Back Squat",unit:"lb",kpi_type:"ratio",kpi_m:1.75,kpi_f:1.25,reps_ok:true,sort:1},
+  {id:"bsq",name:"Back Squat",unit:"lb",kpi_type:"ratio",kpi_m:1.7,kpi_f:1.25,reps_ok:true,sort:1},
   {id:"fsq",name:"Front Squat",unit:"lb",kpi_type:"ratio",kpi_m:1.25,kpi_f:1.0,reps_ok:true,sort:2},
   {id:"tbd",name:"Trap Bar Deadlift",unit:"lb",kpi_type:"ratio",kpi_m:2.0,kpi_f:1.5,reps_ok:true,sort:3},
   {id:"bp",name:"Bench Press",unit:"lb",kpi_type:"ratio",kpi_m:1.0,kpi_f:0.75,reps_ok:true,sort:4},
@@ -276,8 +276,7 @@ const S = {
 };
 /* Stages where a re-render would wipe what someone is typing. */
 const FORM_STAGES = ["new","edit","test","confirm","pickperiod","created"];
-const inForm = () => (S.view==="kiosk" && FORM_STAGES.includes(S.kiosk.stage)) || S.editingProfile
-  || (S.view==="testreport" && !!document.activeElement && /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName));  /* v31: don't wipe a headline mid-typing */
+const inForm = () => (S.view==="kiosk" && FORM_STAGES.includes(S.kiosk.stage)) || S.editingProfile;
 
 /* ---------------- data layer ---------------- */
 const useSupa = !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
@@ -328,8 +327,6 @@ const DB = {
       /* v27: stale threshold — only written when a coach changes it */
       { let v=DEFAULT_STALE; try{ if(row("stale_days")) v=+JSON.parse(row("stale_days").value); }catch(err){}
         S.staleDays = STALE_OPTIONS.includes(v) ? v : DEFAULT_STALE; }
-      /* v31: saved test events for the Test Report tab */
-      try{ S.testEvents = row("test_events") ? JSON.parse(row("test_events").value) : []; }catch(err){ S.testEvents=[]; }
     } else {
       S.athletes=JSON.parse(localStorage.getItem("nn-athletes")||"[]");
       S.tests=JSON.parse(localStorage.getItem("nn-tests")||"[]");
@@ -339,7 +336,6 @@ const DB = {
       S.gradYears=JSON.parse(localStorage.getItem("nn-gradyears")||"null")||DEFAULT_GRADYEARS.slice();
       S.term=JSON.parse(localStorage.getItem("nn-term")||"null")||DEFAULT_TERM;
       { const v=+JSON.parse(localStorage.getItem("nn-stale")||"null"); S.staleDays=STALE_OPTIONS.includes(v)?v:DEFAULT_STALE; }
-      try{ S.testEvents=JSON.parse(localStorage.getItem("nn-test-events")||"[]"); }catch(err){ S.testEvents=[]; }
     }
     S.lastSync = new Date();
   },
@@ -675,7 +671,6 @@ function render(){
     S.view==="compare"?compareHTML():
     S.view==="roster"?rosterHTML():
     S.view==="report"?reportHTML(false):
-    S.view==="testreport"?testReportHTML():
     setupHTML())+"</main>";
   mountCharts(); updateSyncLabel();
 }
@@ -695,7 +690,7 @@ function headerHTML(){
       </div>
     </div>
     <div class="hrow2">
-      <nav>${tab("board","Board")}${tab("leaderboard","Leaderboard")}${tab("compare","Compare")}${tab("roster","Athletes")}${tab("testreport","Test Report")}${tab("setup","Setup")}</nav>
+      <nav>${tab("board","Board")}${tab("leaderboard","Leaderboard")}${tab("compare","Compare")}${tab("roster","Athletes")}${tab("setup","Setup")}</nav>
       <button class="kioskbtn" onclick="A.launchKiosk()">LAUNCH KIOSK →</button>
     </div>
     ${pillarsHTML(false)}</header>`;
@@ -1210,7 +1205,7 @@ function kioskHTML(){
     body=`<div class="inner"><div class="kioskcard">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
         <div><h2 style="margin-bottom:2px">${esc(me.first_name)} ${esc(me.last_name)}</h2>
-          <div class="mid" style="font-size:12.5px">${me.height?`${fmtHeight(me.height)} · `:""}last weigh-in ${me.weight} lb — enter today's weight below</div></div>
+          <div class="mid" style="font-size:12.5px">${me.weight} lb${me.height?` · ${fmtHeight(me.height)}`:""} — update this if it's changed</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-ghost" style="padding:7px 12px;font-size:12px" onclick="A.kMyReport()">My report</button>
           <button class="btn btn-ghost" style="padding:7px 12px;font-size:12px" onclick="A.kStage('edit')">Profile</button>
@@ -1219,9 +1214,6 @@ function kioskHTML(){
       </div>
       <p class="mid" style="margin:10px 0 0">Enter the weight you lifted and how many reps you got. Leave blank anything you didn't test.</p>
       <label class="f" style="margin-bottom:14px"><span class="lab">Test date</span><input type="date" id="te-date" value="${today()}"></label>
-      <div class="liftrow" style="margin-bottom:14px;border:2px solid var(--orange)"><div class="nm">Body weight today (lb) <span class="mid" style="font-weight:400">— required for any lift · last: ${me.weight?fmtNum(me.weight)+" lb":"none on file"}</span></div>
-        <div class="inrow"><input type="number" inputmode="decimal" min="60" max="450" step="0.5" id="te-bw" placeholder="weigh in, then type it here"></div>
-        <div class="est">Step on the scale with a coach watching. Your strength line is based on this number.</div></div>
       <div class="grid2">${rows}</div>
       <div style="display:flex;gap:10px;margin-top:16px">
         <button class="btn btn-navy" onclick="A.kSubmitTests()">SUBMIT</button>
@@ -1975,25 +1967,12 @@ const A={
     if(S.kiosk.submitting) return;
     const me=S.athletes.find(x=>x.id===S.kiosk.meId);
     const date=document.getElementById("te-date").value||today();
-    /* v31: body weight is entered on test day, not copied from the profile */
-    const bwEl=document.getElementById("te-bw"), bwRaw=bwEl?String(bwEl.value).trim():"";
-    const bwIn=bwRaw===""?null:+bwRaw;
-    const needBW=S.exercises.some(ex=>isRatio(ex)&&(document.getElementById("te-"+ex.id)||{}).value);
-    if(bwIn!=null&&(isNaN(bwIn)||bwIn<60||bwIn>450)){ say("Body weight must be between 60 and 450 lb. Check the number and try again."); return; }
-    if(needBW&&bwIn==null){ say("Enter your body weight today before you submit a lift. Step on the scale with a coach watching, then type the number in the orange box."); if(bwEl) bwEl.focus(); return; }
-    const prevBW=+me.weight||null;
-    if(bwIn!=null&&prevBW&&Math.abs(bwIn-prevBW)>10){
-      const diff=Math.round(Math.abs(bwIn-prevBW)*10)/10;
-      const ok=await ask(`You entered ${fmtNum(bwIn)} lb. That is ${fmtNum(diff)} lb ${bwIn>prevBW?"more":"less"} than your last weight (${fmtNum(prevBW)} lb).\n\nDid a coach weigh you today?`,{title:"Check your body weight",ok:"Yes — a coach weighed me",cancel:"Let me fix it"});
-      if(!ok){ if(bwEl) bwEl.focus(); return; }
-    }
-    const bwUse=bwIn!=null?bwIn:prevBW;
     const rows=[];
     S.exercises.forEach(ex=>{
       const el=document.getElementById("te-"+ex.id); if(!el)return;
       const w=el.value; if(w===""||isNaN(+w))return;
       const reps=usesReps(ex)?(+document.getElementById("tr-"+ex.id).value||1):1;
-      rows.push({id:uid(),athlete_id:me.id,ex_id:ex.id,weight:+w,reps,value:usesReps(ex)?est1RM(+w,reps):+w,date,bw:bwUse||null});  /* v31: body weight entered on test day */
+      rows.push({id:uid(),athlete_id:me.id,ex_id:ex.id,weight:+w,reps,value:usesReps(ex)?est1RM(+w,reps):+w,date,bw:+me.weight||null});  /* v28: body weight at test time */
     });
     const badFt=S.exercises.filter(ex=>isFtIn(ex)&&document.getElementById("tf-"+ex.id)&&(document.getElementById("tf-"+ex.id).value!==""||document.getElementById("ti-"+ex.id).value!=="")&&document.getElementById("te-"+ex.id).value==="");
     if(badFt.length){say(`Check ${badFt.map(e=>e.name).join(", ")} — inches must be 0 to 11.5 (a 6'7" jump is 6 ft, 7 in).`);return;}
@@ -2011,13 +1990,6 @@ const A={
       return;   /* stay on the entry screen so nothing typed is lost */
     }
     S.tests.push(...rows);
-    /* v31: keep the profile weight in step with today's weigh-in so every tab agrees */
-    if(bwIn!=null&&bwIn!==prevBW){
-      const upd={...me,weight:bwIn};
-      S.athletes=S.athletes.map(x=>x.id===me.id?upd:x);
-      try{ await DB.upsertAthlete(upd); }
-      catch(e){ S.athletes=S.athletes.map(x=>x.id===me.id?me:x); console.warn("profile weight update failed (tests were saved with the weight)",e); }
-    }
     S.kiosk.savedCount=rows.length;
     S.kiosk.savedList=rows.map(r=>{
       const ex=S.exercises.find(e=>e.id===r.ex_id)||{};
@@ -2270,604 +2242,6 @@ const A={
   }
 };
 window.A=A;
-
-/* =====================================================================
-   v31: TEST REPORT ("Over the Line")
-   A coach-facing strength test report for any sport, built from the
-   same athletes/tests/exercises as the rest of the board.
-   - Lifts graded = every ratio lift (lb/kg) that has a line set in Setup
-     for the chosen gender AND was tested by this team in the window.
-   - Test events are saved in the settings table (key "test_events") so
-     the growth tracker knows what "Test 2" means.
-   - Compare to: previous saved test, each athlete's first test on
-     record (career baseline), or any earlier saved test.
-   ===================================================================== */
-const TR_FONTS = "https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap";
-const TR_COLORS = ["#002F55","#FF4800","#5B7A99","#1B7F4E","#9A3412","#6B21A8"];
-const TR_CSS = `
-.tr-doc{--navy:#002F55;--orange:#FF4800;--ink:#0B1E30;--ink2:#44566A;--muted:#728196;--line:#D6DDE6;--line2:#E7EBF0;--grey:#B9C2CD;--climb:#1B7F4E;--red:#B42318;--red-soft:#FDE4E1;
-  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-  font-family:var(--body);color:var(--ink);font-size:15px;line-height:1.5;background:#F2F4F7;page:trpage}
-.tr-doc *{box-sizing:border-box}
-.tr-doc h1,.tr-doc h2,.tr-doc h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.01em;line-height:.95;margin:0}
-.tr-doc p{margin:0;max-width:72ch}
-.tr-mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.tr-eye{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.tr-wrap{padding:0 18px 40px}
-.tr-sec{padding-top:40px}
-.tr-head{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
-.tr-head h2{font-size:44px;font-weight:900}
-.tr-head h2 span{color:var(--orange)}
-.tr-head p{color:var(--ink2)}
-.tr-mast{background:var(--navy);color:#fff;padding:26px 18px 0;border-bottom:6px solid var(--orange)}
-.tr-mast-in{display:flex;flex-direction:column;gap:16px}
-.tr-mast-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.tr-brand{display:flex;align-items:center;gap:14px}
-.tr-brand img{height:88px;width:auto;display:block}
-.tr-wm{font-family:var(--display);font-weight:900;font-size:29px;letter-spacing:.05em;line-height:1;text-transform:uppercase}
-.tr-pil{display:flex;flex-wrap:wrap;margin-top:8px;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#D3DEE9}
-.tr-pil span+span::before{content:"";display:inline-block;width:5px;height:5px;background:var(--orange);border-radius:1px;margin:0 10px;vertical-align:2px}
-.tr-mast .tr-eye{color:#9FB6CC}
-.tr-mast h1{font-size:96px;font-weight:900;line-height:.85}
-.tr-mast h1 span{color:var(--orange)}
-.tr-lede{font-size:17px;color:#D3DEE9;max-width:66ch;padding-bottom:24px}
-.tr-truth{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
-.tr-verdict{font-family:var(--display);font-weight:800;font-size:60px;line-height:.92;text-transform:uppercase}
-.tr-verdict em{font-style:normal;color:var(--orange)}
-.tr-copy{display:flex;flex-direction:column;gap:14px}
-.tr-lc{background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px}
-.tr-lc+.tr-lc{margin-top:12px}
-.tr-lc h3{font-size:28px;font-weight:900}
-.tr-lc h3 small{font-family:var(--body);font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--muted);margin-left:8px}
-.tr-split{display:flex;height:38px;border-radius:4px;overflow:hidden;gap:2px}
-.tr-split div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:13px;color:#fff;min-width:34px}
-.tr-legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--ink2)}
-.tr-legend b{font-family:var(--mono);color:var(--ink)}
-.tr-dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
-.tr-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.tr-kpis div{border-top:1px solid var(--line2);padding-top:8px;display:flex;flex-direction:column}
-.tr-kpis .lb{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.tr-kpis b{font-family:var(--mono);font-size:22px;font-weight:600}
-.tr-kpis .s{font-size:12px;color:var(--ink2)}
-.tr-chart{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 14px 8px}
-.tr-chart h3{font-family:var(--body);text-transform:none;font-size:14px;font-weight:700;letter-spacing:0;line-height:1.3}
-.tr-sub{font-size:12px;color:var(--muted);margin-bottom:6px}
-.tr-chart svg{width:100%;height:auto;display:block}
-.tr-ax{fill:#728196;font-family:"IBM Plex Mono",monospace;font-size:10px}
-.tr-vl{fill:#0B1E30;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600}
-.tr-ref{fill:#0B1E30;font-family:"Public Sans",sans-serif;font-size:11px;font-weight:700}
-.tr-two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-.tr-panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 16px}
-.tr-panel h3{font-size:22px;font-weight:900;margin-bottom:4px}
-.tr-panel.hot{border:2px solid var(--navy);border-left:8px solid var(--orange)}
-.tr-names{display:flex;flex-wrap:wrap;gap:5px}
-.tr-names span{font-size:12.5px;font-weight:600;border:1px solid var(--line);border-radius:3px;padding:2px 7px;background:#fff}
-.tr-names span i{font-style:normal;font-family:var(--mono);font-weight:500;color:var(--muted);margin-left:5px;font-size:11.5px}
-.tr-empty{font-size:13px;color:var(--muted)}
-.tr-mini{width:100%;border-collapse:collapse;font-size:13px}
-.tr-mini th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:600;padding:5px 6px;border-bottom:1px solid var(--line)}
-.tr-mini td{padding:5px 6px;border-bottom:1px solid var(--line2);border-top:0}
-.tr-mini td.n{font-weight:700}
-.tr-mini td.m{font-family:var(--mono);white-space:nowrap}
-.tr-mini td.t{font-family:var(--mono);font-weight:600;color:var(--navy);white-space:nowrap}
-.tr-mini th:first-child,.tr-mini td:first-child{padding-left:6px}
-.tr-growth{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
-.tr-base{border:2px dashed var(--line);border-radius:6px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:8px}
-.tr-base b.big{font-family:var(--display);font-weight:900;font-size:30px;text-transform:uppercase;line-height:1}
-.tr-base ul{margin:0;padding-left:18px;color:var(--ink2);font-size:14px;display:flex;flex-direction:column;gap:4px}
-.tr-movers{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:10px}
-.tr-mv{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;font-size:14px}
-.tr-mv b{font-weight:700}.tr-mv span{font-family:var(--mono);font-weight:600;color:var(--climb)}
-.tr-h3{font-family:var(--display);font-size:22px;font-weight:900;text-transform:uppercase;margin:18px 0 0}
-.tr-tbl{background:#fff;border:1px solid var(--line);border-radius:6px;overflow-x:auto}
-table.tr-ros{border-collapse:collapse;width:100%;min-width:820px;font-size:13px}
-.tr-ros th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-.tr-ros th.grp{text-align:center;color:var(--navy);border-bottom:2px solid var(--navy);font-size:11px}
-.tr-ros th:first-child,.tr-ros td:first-child{padding-left:10px}
-.tr-ros td{padding:7px 10px;border-top:0;border-bottom:1px solid var(--line2);white-space:nowrap}
-.tr-ros td.nm{font-weight:700}
-.tr-ros td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.tr-ros td.l{border-left:1px solid var(--line)}
-.tr-ros td small{color:var(--muted);font-family:var(--mono);font-size:11px;margin-left:4px}
-.tr-chip{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:3px;white-space:nowrap}
-.tr-chip.over{background:var(--navy);color:#fff}
-.tr-chip.reach{background:#FFE6DA;color:#A33000}
-.tr-chip.below{background:#F0F2F5;color:var(--ink2)}
-.tr-chip.flag{background:var(--red-soft);color:var(--red)}
-.tr-chip.both{background:var(--orange);color:#fff}
-.tr-up{color:var(--climb)}.tr-dn{color:var(--red)}.tr-na{color:var(--muted)}
-.tr-det{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 16px}
-.tr-det+.tr-det{margin-top:10px}
-.tr-det h4{margin:0;font-weight:700;font-size:15px}
-.tr-det ul{margin:10px 0 0;padding-left:18px;color:var(--ink2);font-size:14px;display:flex;flex-direction:column;gap:6px}
-.tr-foot{margin-top:40px;padding-top:14px;border-top:6px solid var(--orange);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--muted)}
-.tr-foot b{font-family:var(--display);font-size:18px;letter-spacing:.06em;color:var(--ink)}
-.tr-ctl{padding:18px 20px}
-.tr-ctl .row{display:flex;gap:14px;flex-wrap:wrap;align-items:end}
-.tr-ctl .row+.row{margin-top:14px}
-.tr-ctl label.f{min-width:150px}
-.tr-ctl .grow{flex:1 1 220px}
-.tr-ctl .hint{font-size:12.5px;color:var(--mid);margin-top:10px;line-height:1.5}
-.tr-ctl .warn{font-size:12.5px;color:var(--red);font-weight:700;margin-top:10px}
-@media (max-width:820px){.tr-truth,.tr-two,.tr-growth{grid-template-columns:1fr}.tr-mast h1{font-size:60px}.tr-verdict{font-size:42px}}
-@page trpage{size:letter portrait;margin:.4in}
-@media print{
-  .tr-doc{background:#fff;font-size:11px}
-  .tr-doc *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .tr-wrap{padding:0}
-  .tr-mast{padding:16px 20px 0}
-  .tr-mast h1{font-size:68px}
-  .tr-brand img{height:76px}
-  .tr-lede{font-size:13px;padding-bottom:14px}
-  .tr-sec{padding-top:18px}
-  .tr-head{margin-bottom:10px;gap:4px}
-  .tr-head h2{font-size:32px}
-  .tr-head p{font-size:12px}
-  .tr-verdict{font-size:44px}
-  .tr-truth{grid-template-columns:1fr 1.1fr;gap:18px}
-  .tr-copy p{font-size:12px}
-  .tr-lc{padding:10px 12px;gap:7px}
-  .tr-lc h3{font-size:22px}
-  .tr-kpis b{font-size:18px}
-  .tr-split{height:28px}
-  .tr-pb{break-before:page}
-  .tr-two{grid-template-columns:1fr 1fr;gap:10px}
-  .tr-growth{grid-template-columns:1.3fr 1fr}
-  .tr-panel{padding:10px 12px}
-  .tr-mini{font-size:10.5px}.tr-mini td{padding:3px 5px}.tr-mini th{padding:3px 5px;font-size:8.5px}
-  .tr-names span{font-size:10px;padding:1px 5px}
-  .tr-mv{font-size:11px;padding:6px 9px}
-  .tr-tbl{overflow:visible;border:0}
-  table.tr-ros{min-width:0;font-size:9px}
-  .tr-ros th{font-size:7.5px;padding:4px 5px}
-  .tr-ros td{padding:2.5px 5px}
-  .tr-chip{font-size:7.5px;padding:1px 4px}
-  .tr-ros tr{break-inside:avoid}
-  .tr-ros thead{display:table-header-group}
-  .tr-chart,.tr-panel,.tr-lc,.tr-det,.tr-base{break-inside:avoid}
-  .tr-det ul{font-size:11px}
-  .tr-foot{margin-top:20px}
-}`;
-(function(){ try{
-  const l=document.createElement("link"); l.rel="stylesheet"; l.href=TR_FONTS; document.head.appendChild(l);
-  const s=document.createElement("style"); s.id="tr-css"; s.textContent=TR_CSS; document.head.appendChild(s);
-}catch(e){} })();
-
-/* ---------- saved test events ---------- */
-/* {id,name,sport,gender,from,to,v1,v2,note} — stored as JSON in settings.test_events */
-S.testEvents = S.testEvents || [];
-S.tr = null;
-async function trLoadEvents(){
-  if(useSupa){
-    const { data } = await supa.from("settings").select("value").eq("key","test_events").maybeSingle();
-    try{ S.testEvents = data && data.value ? JSON.parse(data.value) : []; }catch(e){ S.testEvents=[]; }
-  } else {
-    try{ S.testEvents = JSON.parse(localStorage.getItem("nn-test-events")||"[]"); }catch(e){ S.testEvents=[]; }
-  }
-}
-async function trSaveEvents(list){
-  if(useSupa) await DB.saveList("test_events", list);
-  else localStorage.setItem("nn-test-events", JSON.stringify(list));
-  S.testEvents = list;
-}
-const trEvSort = (a,b)=>String(a.to).localeCompare(String(b.to))||String(a.from).localeCompare(String(b.from));
-const trEventsFor = (sport,gender)=>S.testEvents.filter(e=>e.sport===sport&&e.gender===gender).slice().sort(trEvSort);
-
-/* ---------- team + lifts ---------- */
-const trTeam = (sport,gender)=>S.athletes.filter(a=>listOf(a.sports).includes(sport)&&a.gender===gender);
-const trLine = (ex,gender)=>{ const k=gender==="Female"?ex.kpi_f:ex.kpi_m; return k==null||k===""?null:+k; };
-const trName = a=>`${(a.last_name||"").trim()}, ${(a.first_name||"").trim()}`;
-const tr2 = v=>(Math.round(v*100)/100).toFixed(2);
-const trLineTxt = v=>{ const s=String(+v); return s.includes(".")?s:s+".0"; };
-const trShort = ex=>({"Bench Press":"Bench","Back Squat":"Squat","Front Squat":"Front Squat","Trap Bar Deadlift":"Trap Bar"})[ex.name]||ex.name;
-const trDate = iso=>{ const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${+m[2]}/${+m[3]}/${m[1].slice(2)}`:String(iso||""); };
-const trRange = (f,t)=>f===t?trDate(f):`${trDate(f)}–${trDate(t)}`;
-const trMedian = a=>{ if(!a.length) return 0; const s=[...a].sort((x,y)=>x-y), m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; };
-const trPct = (a,b)=>b?Math.round(a/b*100):0;
-const trLb = v=>fmtNum(v);
-
-/* Best entry per athlete per lift inside [from,to]; graded against the line using test-day body weight. */
-function trBuild(sport,gender,from,to,liftIds){
-  const team=trTeam(sport,gender), ids=new Set(team.map(a=>a.id));
-  const inR=t=>{ const d=String(t.date); return d>=from&&d<=to; };
-  const tt=S.tests.filter(t=>ids.has(t.athlete_id)&&inR(t));
-  let lifts=S.exercises.filter(e=>isRatio(e)&&trLine(e,gender)!=null).sort((a,b)=>(+a.sort||0)-(+b.sort||0));
-  lifts = liftIds ? lifts.filter(e=>liftIds.includes(e.id)) : lifts.filter(e=>tt.some(t=>t.ex_id===e.id));
-  const out={sport,gender,from,to,team,lifts,rows:{},stats:{}};
-  for(const ex of lifts){
-    const line=trLine(ex,gender), rows=[];
-    for(const a of team){
-      const r=tt.filter(t=>t.athlete_id===a.id&&t.ex_id===ex.id);
-      if(!r.length) continue;
-      const t=r.reduce((x,y)=>(+y.value>+x.value)||(+y.value===+x.value&&tOrder(y,x)>0)?y:x);
-      const bwT=+t.bw>0?+t.bw:null, bw=bwT||(+a.weight>0?+a.weight:null);
-      const row={id:a.id,a,name:trName(a),bw,bwProfile:!bwT,best:+t.value,w:+t.weight,reps:+t.reps||1,date:String(t.date),
-        how:(+t.reps>1)?`${fmtNum(t.weight)}×${t.reps}`:"1RM",ratio:null,status:"below",reason:""};
-      if(!bw){ row.status="flag"; row.reason="no body weight on file"; rows.push(row); continue; }
-      row.ratio=row.best/bw;
-      if(row.ratio < line*0.4){ row.status="flag"; row.reason=`${trLb(row.best)} lb at ${trLb(bw)} lb BW (${tr2(row.ratio)}×) is too low to be real`; }
-      else if(row.best >= line*bw - 1e-9) row.status="over";
-      else if(Math.round(row.ratio*100)/100 >= Math.round(line*0.9*100)/100) row.status="reach";
-      rows.push(row);
-    }
-    rows.sort((x,y)=>byName(x.a,y.a));
-    out.rows[ex.id]=rows;
-    const v=rows.filter(r=>r.status!=="flag"), over=v.filter(r=>r.status==="over").length, reach=v.filter(r=>r.status==="reach").length;
-    out.stats[ex.id]={line,n:v.length,over,reach,below:v.length-over-reach,pct:trPct(over,v.length),
-      med:trMedian(v.map(r=>r.ratio)),avg:v.length?v.reduce((s,r)=>s+r.best,0)/v.length:0};
-  }
-  return out;
-}
-/* Each athlete's first test day on record for a lift (best entry that day), before `before`. */
-function trFirstOnRecord(aid,exid,before){
-  const r=S.tests.filter(t=>t.athlete_id===aid&&t.ex_id===exid&&String(t.date)<before);
-  if(!r.length) return null;
-  const d=r.map(t=>String(t.date)).reduce((x,y)=>y<x?y:x);
-  const t=r.filter(x=>String(x.date)===d).reduce((x,y)=>(+y.value>+x.value)?y:x);
-  const a=S.athletes.find(x=>x.id===aid);
-  const bw=+t.bw>0?+t.bw:(a&&+a.weight>0?+a.weight:null);
-  return {best:+t.value,bw,date:d,ratio:bw?(+t.value)/bw:null};
-}
-
-/* ---------- state + defaults ---------- */
-function trLatestDate(sport,gender){
-  const ids=new Set(trTeam(sport,gender).map(a=>a.id));
-  const ok=new Set(S.exercises.filter(e=>isRatio(e)&&trLine(e,gender)!=null).map(e=>e.id));
-  let d=null; for(const t of S.tests){ if(ids.has(t.athlete_id)&&ok.has(t.ex_id)){ const x=String(t.date); if(!d||x>d) d=x; } }
-  return d;
-}
-function trGenderFor(sport){
-  let m=0,f=0; for(const a of S.athletes){ if(listOf(a.sports).includes(sport)){ if(a.gender==="Female") f++; else m++; } }
-  if(/^G /.test(sport)) return "Female"; if(/^B /.test(sport)) return "Male";
-  return f>m?"Female":"Male";
-}
-function trPickSport(sport){
-  const gender=trGenderFor(sport);
-  const ev=trEventsFor(sport,gender);
-  if(ev.length){ const e=ev[ev.length-1]; return {sport,gender,eventId:e.id,from:e.from,to:e.to,cmp:"prev"}; }
-  const d=trLatestDate(sport,gender)||today();
-  return {sport,gender,eventId:"",from:d,to:d,cmp:"prev"};
-}
-function trInit(){
-  if(S.tr) return;
-  const sp=S.sports.includes("Football")?"Football":(S.sports[0]||"");
-  S.tr=trPickSport(sp);
-}
-const trCurEvent = ()=>S.tr.eventId?S.testEvents.find(e=>e.id===S.tr.eventId)||null:null;
-
-/* ---------- comparison ---------- */
-/* Returns {label, short, mode, prevBuild|null}. mode: none | event | career */
-function trCompare(cur){
-  const evs=trEventsFor(cur.sport,cur.gender).filter(e=>e.id!==S.tr.eventId && String(e.to)<cur.from);
-  const c=S.tr.cmp;
-  if(c==="career") return {mode:"career",label:"each athlete's first test on record",short:"first test on record"};
-  let e=null;
-  if(c==="prev") e=evs.length?evs[evs.length-1]:null;
-  else e=evs.find(x=>x.id===c)||null;
-  if(!e) return {mode:"none",label:"",short:""};
-  return {mode:"event",ev:e,label:`${e.name} (${trRange(e.from,e.to)})`,short:e.name,
-    build:trBuild(cur.sport,cur.gender,e.from,e.to,cur.lifts.map(x=>x.id))};
-}
-/* Comparison record for one athlete+lift, or null */
-function trPrevRow(cmp,exid,row,cur){
-  if(cmp.mode==="event"){ const r=(cmp.build.rows[exid]||[]).find(x=>x.id===row.id); return r&&r.status!=="flag"?{best:r.best,ratio:r.ratio,status:r.status}:null; }
-  if(cmp.mode==="career"){
-    const f=trFirstOnRecord(row.id,exid,cur.from); if(!f||!f.bw) return null;
-    const line=cur.stats[exid].line;
-    return {best:f.best,ratio:f.ratio,status:f.best>=line*f.bw-1e-9?"over":"below",date:f.date};
-  }
-  return null;
-}
-
-/* ---------- auto flags ---------- */
-function trFlags(cur){
-  const F=[];
-  for(const ex of cur.lifts){
-    for(const r of cur.rows[ex.id].filter(x=>x.status==="flag"))
-      F.push(`<b>${esc(r.name)}, ${esc(ex.name.toLowerCase())}:</b> ${esc(r.reason)}. Left out of the team numbers and marked Verify in the roster. Fix or delete the entry in the dashboard.`);
-  }
-  const bp=cur.rows.bp, sq=cur.rows.bsq;
-  if(bp&&sq){
-    const m=new Map(bp.filter(r=>r.status!=="flag").map(r=>[r.id,r]));
-    const low=sq.filter(r=>r.status!=="flag"&&m.has(r.id)&&r.best<1.22*m.get(r.id).best).sort((x,y)=>byName(x.a,y.a));
-    if(low.length) F.push(`<b>Squat barely above bench</b> (squat less than 1.22× bench): ${low.map(r=>`${esc(r.a.last_name)} (${trLb(r.best)} vs ${trLb(m.get(r.id).best)})`).join(", ")}. Retest with a depth standard. These athletes are probably closer to the line than this test shows.`);
-  }
-  if(cur.lifts.length>1){
-    const parts=[];
-    for(const ex of cur.lifts){
-      const others=cur.lifts.filter(o=>o.id!==ex.id);
-      const only=cur.rows[ex.id].filter(r=>others.every(o=>!cur.rows[o.id].some(x=>x.id===r.id)));
-      if(only.length) parts.push(`${esc(trShort(ex))} only: ${only.map(r=>esc(r.a.last_name)).join(", ")}`);
-    }
-    if(parts.length) F.push(`<b>Tested on one lift only.</b> ${parts.join(". ")}. They show as Not tested for the lift they missed.`);
-  }
-  const tested=new Set(); cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>tested.add(r.id)));
-  const dnt=cur.team.filter(a=>!tested.has(a.id)).sort(byName);
-  if(dnt.length) F.push(`<b>${dnt.length} on the ${esc(cur.sport)} roster did not test</b> in this window: ${dnt.map(a=>esc(trName(a))).join("; ")}.`);
-  const prof=[]; cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ if(r.bwProfile&&r.bw&&!prof.includes(r.name)) prof.push(r.name); }));
-  if(prof.length) F.push(`<b>No test-day body weight for ${prof.length} athlete${prof.length>1?"s":""}</b>; the profile weight was used instead: ${prof.sort().map(esc).join("; ")}.`);
-  const jumps=[]; const seen=new Set();
-  cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ if(seen.has(r.id)||r.bwProfile||!r.bw) return; seen.add(r.id);
-    const prior=S.tests.filter(t=>t.athlete_id===r.id&&+t.bw>0&&String(t.date)<cur.from).sort(tOrder);
-    if(prior.length){ const pb=+prior[prior.length-1].bw, d=Math.round((r.bw-pb)*10)/10; if(Math.abs(d)>=10) jumps.push(`${esc(r.name)} (${trLb(pb)} → ${trLb(r.bw)}, ${d>0?"+":""}${trLb(d)})`); } }));
-  if(jumps.length) F.push(`<b>Body weight changed 10+ lb since the last weigh-in:</b> ${jumps.join("; ")}. Real growth or a typo — confirm on the scale.`);
-  const bws=[]; cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ if(r.bw) bws.push(r.bw); }));
-  const round=bws.filter(b=>b%5===0).length;
-  if(bws.length>=10 && round/bws.length>0.5) F.push(`<b>Body weights look rounded:</b> ${round} of ${bws.length} graded entries end in 0 or 5. Athletes near the line can flip status on a few pounds, so weigh everyone on test day.`);
-  const names=new Set(); cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ const a=r.a; if(/^[a-z]/.test(a.first_name||"")||/^[a-z]/.test(a.last_name||"")) names.add(trName(a)); }));
-  if(names.size) F.push(`<b>Names to clean up</b> (lower-case): ${[...names].sort().map(esc).join("; ")}. Fix them on the Athletes tab.`);
-  const ids=new Set(S.athletes.filter(a=>!listOf(a.sports).length&&a.gender===cur.gender).map(a=>a.id));
-  const liftSet=new Set(cur.lifts.map(e=>e.id));
-  const untagged=new Set(S.tests.filter(t=>ids.has(t.athlete_id)&&liftSet.has(t.ex_id)&&String(t.date)>=cur.from&&String(t.date)<=cur.to).map(t=>t.athlete_id));
-  if(untagged.size) F.push(`<b>${untagged.size} ${cur.gender==="Female"?"female":"male"} athlete${untagged.size>1?"s":""} tested in this window with no sport tagged</b>, so they are not in any team report: ${S.athletes.filter(a=>untagged.has(a.id)).sort(byName).map(a=>esc(trName(a))).join("; ")}.`);
-  return F;
-}
-
-/* ---------- SVG charts ---------- */
-function trHist(ex,st,rows){
-  const v=rows.filter(r=>r.status!=="flag"); if(!v.length) return "";
-  const line=st.line, rs=v.map(r=>r.ratio), span=Math.max(...rs)-Math.min(...rs);
-  const step=span>1.2?0.10:0.05;
-  const idx=r=>Math.floor((r-line)/step+1e-9);
-  const lo=Math.min(...v.map(r=>idx(r.ratio))), hi=Math.max(...v.map(r=>idx(r.ratio)),0);
-  const bins=[]; for(let i=lo;i<=hi;i++) bins.push({i,b:line+i*step,n:v.filter(r=>idx(r.ratio)===i).length});
-  const W=1000,H=300,x0=40,x1=W-10,y0=36,yb=H-34,bw=(x1-x0)/bins.length,mx=Math.max(1,...bins.map(d=>d.n));
-  const y=n=>yb-n/mx*(yb-y0); const every=bins.length>16?2:1; let s="";
-  bins.forEach((d,k)=>{ const x=x0+k*bw, over=d.i>=0;
-    if(d.n) s+=`<rect x="${x+2}" y="${y(d.n)}" width="${Math.max(1,bw-4)}" height="${yb-y(d.n)}" fill="${over?"#002F55":"#B9C2CD"}"><title>${d.b.toFixed(2)}×: ${d.n}</title></rect><text class="tr-vl" x="${x+bw/2}" y="${y(d.n)-5}" text-anchor="middle">${d.n}</text>`;
-    if((d.i%every)===0) s+=`<text class="tr-ax" x="${x}" y="${yb+16}" text-anchor="middle">${d.b.toFixed(2)}×</text>`; });
-  const li=bins.findIndex(d=>d.i===0), xl=x0+li*bw;
-  s+=`<line x1="${x0}" x2="${x1}" y1="${yb}" y2="${yb}" stroke="#D6DDE6"/><line x1="${xl}" x2="${xl}" y1="${y0-14}" y2="${yb}" stroke="#FF4800" stroke-width="3" stroke-dasharray="7 5"/><text class="tr-ref" x="${xl+8}" y="${y0-2}">THE LINE · ${trLineTxt(line)}× BW</text>`;
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(ex.name)} ratio distribution">${s}</svg>`;
-}
-function trGrowthSVG(pts,lifts){
-  const W=560,H=250,x0=44,x1=W-90,y0=24,yb=H-34,n=Math.max(pts.length,4);
-  const x=i=>x0+(x1-x0)*(n===1?0:i/(n-1)), y=v=>yb-v/100*(yb-y0); let s="";
-  [0,25,50,75,100].forEach(v=>{ s+=`<line x1="${x0}" x2="${x1}" y1="${y(v)}" y2="${y(v)}" stroke="#E7EBF0"/><text class="tr-ax" x="${x0-6}" y="${y(v)+3}" text-anchor="end">${v}%</text>`; });
-  for(let i=0;i<n;i++){ const p=pts[i]; s+=`<text class="tr-ax" x="${x(i)}" y="${yb+16}" text-anchor="middle">${p?esc(trDate(p.d)):"Test "+(i+1)}</text>`; }
-  const labY=[];
-  lifts.forEach((ex,k)=>{ const c=TR_COLORS[k%TR_COLORS.length], q=pts.map((p,i)=>({i,v:p.v[ex.id]})).filter(o=>o.v!=null);
-    if(q.length>1) s+=`<polyline fill="none" stroke="${c}" stroke-width="3" points="${q.map(o=>`${x(o.i)},${y(o.v)}`).join(" ")}"/>`;
-    q.forEach(o=>{ s+=`<circle cx="${x(o.i)}" cy="${y(o.v)}" r="6" fill="${c}"><title>${esc(trShort(ex))} ${esc(trDate(pts[o.i].d))}: ${o.v}%</title></circle>`; });
-    if(q.length){ const l=q[q.length-1]; let ly=y(l.v)+4; while(labY.some(z=>Math.abs(z-ly)<12)) ly+=12; labY.push(ly);
-      s+=`<text class="tr-vl" x="${x(l.i)+10}" y="${ly}" style="fill:${c}">${esc(trShort(ex))} ${l.v}%</text>`; } });
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Percent over the line by test date">${s}</svg>`;
-}
-
-/* ---------- the report itself (pure HTML string, also used for the download) ---------- */
-function trReportHTML(){
-  const T=S.tr, ev=trCurEvent();
-  const cur=trBuild(T.sport,T.gender,T.from,T.to);
-  if(!cur.lifts.length) return null;
-  const evName=ev?ev.name:"Unsaved test";
-  const cmp=trCompare(cur);
-  const L=cur.lifts, ST=cur.stats, R=cur.rows;
-  const sexWord=T.gender==="Female"?"female":"male";
-  const lineList=L.map(ex=>`${trLineTxt(ST[ex.id].line)}× bodyweight for ${ex.name.toLowerCase()}`);
-  const joinAnd=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+(a.length>2?",":"")+" and "+a[a.length-1];
-  const liftNames=joinAnd(L.map(ex=>ex.name.toLowerCase()));
-  const lede=`${evName}: ${liftNames}, graded against the program's ${sexWord} strength line${L.length>1?"s":""} of ${joinAnd(lineList)}. Each saved test adds a point to the growth tracker.`;
-
-  /* honest read */
-  const byId=k=>new Map(R[k].filter(r=>r.status!=="flag").map(r=>[r.id,r]));
-  const maps=Object.fromEntries(L.map(ex=>[ex.id,byId(ex.id)]));
-  const allOver=L.length>1?[...maps[L[0].id].values()].filter(r=>r.status==="over"&&L.every(ex=>maps[ex.id].get(r.id)&&maps[ex.id].get(r.id).status==="over")).length:null;
-  const t1=`<b>${L.map(ex=>`<span class="tr-mono">${ST[ex.id].over}</span> of <span class="tr-mono">${ST[ex.id].n}</span> ${ex.id==="bp"?"bench their bodyweight":`are over the ${esc(trShort(ex).toLowerCase())} line (${trLineTxt(ST[ex.id].line)}×)`}`).join(". ")}.</b>${allOver!=null?` <span class="tr-mono">${allOver}</span> ${allOver===1?"is":"are"} over the line on ${L.length===2?"both lifts":"every lift"}.`:""}`;
-  const t2=`<b>The fastest wins are close.</b> ${joinAnd(L.map(ex=>`<span class="tr-mono">${ST[ex.id].reach}</span> on ${esc(trShort(ex).toLowerCase())}`))} ${L.reduce((s,ex)=>s+ST[ex.id].reach,0)===1?"is":"are"} within 10% of the line. Each one has a next-test target on the pages that follow.`;
-  /* heaviest quarter */
-  const bwOf=new Map(); L.forEach(ex=>R[ex.id].forEach(r=>{ if(r.bw&&r.status!=="flag") bwOf.set(r.id,r.bw); }));
-  const bwSorted=[...bwOf.values()].sort((a,b)=>b-a);
-  let t3="";
-  if(bwSorted.length>=12){
-    const cut=bwSorted[Math.floor(bwSorted.length/4)-1];
-    const heavy=new Set([...bwOf.entries()].filter(([,b])=>b>=cut).map(([id])=>id));
-    const parts=L.map(ex=>{ const h=R[ex.id].filter(r=>r.status!=="flag"&&heavy.has(r.id)); return {ex,n:h.length,o:h.filter(r=>r.status==="over").length,p:trPct(h.filter(r=>r.status==="over").length,h.length)}; });
-    const teamP=L.map(ex=>ST[ex.id].pct);
-    const lagging=parts.some((p,i)=>p.n&&p.p<teamP[i]);
-    t3=`<b>${lagging?"The heaviest athletes have the furthest to go.":"Size is not holding this group back."}</b> Of the ${heavy.size} athletes at ${trLb(cut)} lb or more, ${joinAnd(parts.filter(p=>p.n).map(p=>`<span class="tr-mono">${p.o}</span> of <span class="tr-mono">${p.n}</span> are over the ${esc(trShort(p.ex).toLowerCase())} line`))}.${lagging?" For this group, track pounds gained as well as the ratio.":""}`;
-  }
-  const worst=Math.min(...L.map(ex=>ST[ex.id].pct)), best=Math.max(...L.map(ex=>ST[ex.id].pct));
-  const reachTot=L.reduce((s,ex)=>s+ST[ex.id].reach,0), nTot=L.reduce((s,ex)=>s+ST[ex.id].n,0);
-  const auto = worst>=60?["Strong team.","Keep climbing."] : (best>=25&&reachTot>=nTot*0.15)?["Strong top.","Fill the middle."] : ["Build the base.","Every rep counts."];
-  const v1=(ev&&ev.v1)||T.v1||auto[0], v2=(ev&&ev.v2)||T.v2||auto[1];
-
-  const seg=(n,c,t)=>n?`<div style="flex:${n};background:${c}" title="${t}">${n}</div>`:"";
-  const cards=L.map(ex=>{ const s=ST[ex.id]; return `<div class="tr-lc"><h3>${esc(ex.name)}<small>LINE ${trLineTxt(s.line)}× BW</small></h3>
-    <div class="tr-split">${seg(s.over,"#002F55","Over")}${seg(s.reach,"#FF4800","Within reach")}${seg(s.below,"#B9C2CD","Below")}</div>
-    <div class="tr-legend"><span><i class="tr-dot" style="background:#002F55"></i>Over <b>${s.over}</b></span><span><i class="tr-dot" style="background:#FF4800"></i>Within 10% <b>${s.reach}</b></span><span><i class="tr-dot" style="background:#B9C2CD"></i>Below <b>${s.below}</b></span></div>
-    <div class="tr-kpis"><div><span class="lb">Over the line</span><b>${s.pct}%</b><span class="s">${s.over} of ${s.n}</span></div><div><span class="lb">Median ratio</span><b>${tr2(s.med)}×</b><span class="s">line ${trLineTxt(s.line)}×</span></div><div><span class="lb">Average best</span><b>${Math.round(s.avg)}</b><span class="s">${esc(ex.unit)}</span></div></div></div>`; }).join("");
-
-  /* lift pages */
-  const target=(r,line)=>{ const need=line*r.bw; if(r.reps<=1) return `${Math.ceil(need/5)*5}×1`; return `${Math.ceil(need*34/36/5)*5}×3`; };
-  const liftSecs=L.map(ex=>{ const s=ST[ex.id], rows=R[ex.id];
-    const reach=rows.filter(r=>r.status==="reach"), over=rows.filter(r=>r.status==="over"), fl=rows.filter(r=>r.status==="flag");
-    const est=rows.filter(r=>r.status!=="flag"&&r.reps>1).length, sing=rows.filter(r=>r.status!=="flag"&&r.reps<=1).length;
-    const note=`The line is ${trLineTxt(s.line)}× bodyweight. ${est} of ${s.n} maxes are estimated from a multi-rep set; ${sing===1?"the other 1 is a tested single":`the other ${sing} are tested singles`}.${fl.length?` ${fl.length} entr${fl.length>1?"ies are":"y is"} left out until verified (see Coach Notes).`:""}`;
-    return `<section class="tr-sec tr-pb"><div class="tr-head"><span class="tr-eye">${esc(ex.name)} · line ${trLineTxt(s.line)}× bodyweight</span><h2>${esc(trShort(ex))} <span>${s.pct}% over</span></h2><p>${note}</p></div>
-    <div class="tr-chart"><h3>${s.over} of ${s.n} over the line · ${s.reach} within 10%</h3><div class="tr-sub">Athletes per band of best ${esc(trShort(ex).toLowerCase())} ÷ bodyweight. Bands start at the line. Navy = over the line.</div>${trHist(ex,s,rows)}</div>
-    <div class="tr-two"><div class="tr-panel hot"><h3>Within reach</h3><div class="tr-sub">Within 10% of the line, A–Z. Target = the 3-rep load that estimates at the line (tested-single athletes get a single).</div>
-    ${reach.length?`<table class="tr-mini"><thead><tr><th>Athlete</th><th>BW</th><th>Best</th><th>Gap</th><th>Next target</th></tr></thead><tbody>${reach.map(r=>`<tr><td class="n">${esc(r.name)}</td><td class="m">${trLb(r.bw)}</td><td class="m">${trLb(r.best)}</td><td class="m">${trLb(Math.round((s.line*r.bw-r.best)*10)/10)}</td><td class="t">${target(r,s.line)}</td></tr>`).join("")}</tbody></table>`:`<p class="tr-empty">No one within 10% this test.</p>`}</div>
-    <div class="tr-panel"><h3>Over the line</h3><div class="tr-sub">A–Z, with ratio.</div><div class="tr-names">${over.length?over.map(r=>`<span>${esc(r.name)}<i>${tr2(r.ratio)}×</i></span>`).join(""):`<p class="tr-empty">No one over the line this test.</p>`}</div></div></div></section>`; }).join("");
-
-  /* growth */
-  const evs=trEventsFor(T.sport,T.gender).filter(e=>e.id!==T.eventId&&String(e.to)<T.from).slice(-9);
-  const pts=evs.map(e=>{ const b=trBuild(T.sport,T.gender,e.from,e.to,L.map(x=>x.id)); return {d:e.to,name:e.name,v:Object.fromEntries(L.map(ex=>[ex.id,b.stats[ex.id]&&b.stats[ex.id].n?b.stats[ex.id].pct:null]))}; });
-  pts.push({d:T.to,name:evName,v:Object.fromEntries(L.map(ex=>[ex.id,ST[ex.id].pct]))});
-  let gTitle, gSub, side="", movers="", compared="";
-  if(cmp.mode==="none"){
-    gTitle=`Baseline set ${trDate(T.to)}: ${L.map(ex=>`${trShort(ex).toLowerCase()} ${ST[ex.id].pct}%`).join(", ")}`;
-    gSub=pts.length>1?"No earlier saved test to compare against with this setting.":"This is the first saved test for this team, so it sets the baseline. Every test after this adds a point and fills the change columns in the roster.";
-    side=`<div class="tr-base"><span class="tr-eye">${esc(evName)}</span><b class="big">Baseline locked</b><p>From the next saved test on, this page shows:</p><ul><li>Team % over the line for each test date</li><li>Who crossed the line since the comparison test</li><li>Biggest gains in pounds, by lift</li><li>A change column for every athlete in the roster</li></ul></div>`;
-  } else {
-    if(cmp.mode==="event"){
-      const P=cmp.build;
-      gTitle=L.map(ex=>`${trShort(ex)} ${P.stats[ex.id]&&P.stats[ex.id].n?P.stats[ex.id].pct+"% → ":""}${ST[ex.id].pct}%`).join(" · ");
-      gSub=`Change from ${cmp.label} to ${evName} (${trRange(T.from,T.to)}). Each saved test adds a point.`;
-    } else {
-      gTitle=`${evName}: ${L.map(ex=>`${trShort(ex).toLowerCase()} ${ST[ex.id].pct}%`).join(", ")}`;
-      gSub=`Change for each athlete from their first test on record to ${evName}. This is the long view: every rep since they walked in.`;
-    }
-    let cnt=[];
-    L.forEach((ex,k)=>{
-      const both=R[ex.id].filter(r=>r.status!=="flag").map(r=>({r,p:trPrevRow(cmp,ex.id,r,cur)})).filter(o=>o.p);
-      cnt.push(`${trShort(ex).toLowerCase()} ${both.length} of ${ST[ex.id].n}`);
-      const crossed=both.filter(o=>o.r.status==="over"&&o.p.status!=="over").map(o=>o.r.name);
-      side+=`<div class="tr-panel${k===0?" hot":""}" style="margin-bottom:10px"><h3>Crossed the line · ${esc(trShort(ex))}</h3><div class="tr-names">${crossed.length?crossed.map(n=>`<span>${esc(n)}</span>`).join(""):`<p class="tr-empty">None since ${esc(cmp.short)}.</p>`}</div></div>`;
-      const gains=both.map(o=>({n:o.r.name,g:Math.round((o.r.best-o.p.best)*10)/10})).filter(g=>g.g>0).sort((a,b)=>b.g-a.g).slice(0,8);
-      movers+=`<h3 class="tr-h3">Biggest gains · ${esc(trShort(ex))}</h3><div class="tr-movers">${gains.length?gains.map(g=>`<div class="tr-mv"><b>${esc(g.n)}</b><span>+${trLb(g.g)} ${esc(ex.unit)}</span></div>`).join(""):`<div class="tr-mv">No gains recorded</div>`}</div>`;
-    });
-    compared=`Compared: ${cnt.join(", ")} tested both times.`;
-    gSub+=` ${compared}`;
-  }
-  const growth=`<section class="tr-sec tr-pb"><div class="tr-head"><span class="tr-eye">Every test, same athletes</span><h2>Growth <span>Tracker</span></h2><p>${esc(gSub)}</p></div>
-    <div class="tr-growth"><div class="tr-chart"><h3>${esc(gTitle)}</h3><div class="tr-sub">% of tested athletes over the line, by saved test</div>${trGrowthSVG(pts,L)}</div><div>${side}</div></div>${movers}</section>`;
-
-  /* roster */
-  const names=new Map(); L.forEach(ex=>R[ex.id].forEach(r=>names.set(r.id,r)));
-  const lbl={over:"Over",reach:"Within 10%",below:"Below",flag:"Verify"};
-  const cell=(ex,id)=>{ const r=R[ex.id].find(x=>x.id===id);
-    if(!r) return `<td class="num l tr-na">—</td><td class="num tr-na">—</td><td><span class="tr-chip below">Not tested</span></td><td class="num tr-na">—</td>`;
-    let ch;
-    if(cmp.mode==="none") ch='<span class="tr-na">baseline</span>';
-    else { const p=r.status==="flag"?null:trPrevRow(cmp,ex.id,r,cur);
-      if(!p) ch=`<span class="tr-na">${cmp.mode==="career"?"first test":"—"}</span>`;
-      else { const d=Math.round((r.best-p.best)*10)/10; ch=`<span class="${d>0?"tr-up":d<0?"tr-dn":"tr-na"}">${d>0?"+":""}${trLb(d)} ${esc(ex.unit)}</span>`; } }
-    return `<td class="num l">${trLb(r.best)}<small>${esc(r.how)}</small></td><td class="num">${r.ratio!=null?tr2(r.ratio)+"×":"—"}</td><td><span class="tr-chip ${r.status}">${lbl[r.status]}</span></td><td class="num">${ch}</td>`; };
-  const rosterRows=[...names.values()].sort((x,y)=>byName(x.a,y.a)).map(r0=>{
-    const bwset=[...new Set(L.map(ex=>{ const r=R[ex.id].find(x=>x.id===r0.id); return r&&r.bw?trLb(r.bw):null; }).filter(Boolean))];
-    const allO=L.length>1&&L.every(ex=>{ const r=R[ex.id].find(x=>x.id===r0.id); return r&&r.status==="over"; });
-    return `<tr><td class="nm">${esc(r0.name)}</td><td class="num">${bwset.join("/")||"—"}${r0.bwProfile?"<small>~</small>":""}</td>${L.map(ex=>cell(ex,r0.id)).join("")}${L.length>1?`<td>${allO?`<span class="tr-chip both">${L.length===2?"Both":"All"}</span>`:""}</td>`:""}</tr>`; }).join("");
-  const chgHead=cmp.mode==="none"?"Change":cmp.mode==="career"?"Since first":`Vs ${esc(cmp.short)}`;
-  const roster=`<section class="tr-sec tr-pb"><div class="tr-head"><span class="tr-eye">Every athlete · A–Z</span><h2>Full <span>Roster</span></h2><p>${names.size} athletes tested ${T.from===T.to?"on":"from"} ${esc(trRange(T.from,T.to))}. Best = estimated 1RM from the rep set shown (or a tested 1RM). Change = ${cmp.mode==="none"?"pounds gained since the last test (starts with the next saved test)":`pounds gained vs ${esc(cmp.label)}`}.${[...names.values()].some(r=>r.bwProfile)?" ~ = profile body weight used (no test-day weight).":""}</p></div>
-    <div class="tr-tbl"><table class="tr-ros"><thead><tr><th></th><th></th>${L.map(ex=>`<th class="grp" colspan="4">${esc(trShort(ex))} · line ${trLineTxt(ST[ex.id].line)}× BW</th>`).join("")}${L.length>1?"<th></th>":""}</tr>
-    <tr><th>Athlete</th><th>BW</th>${L.map(()=>`<th>Best (lb)</th><th>Ratio</th><th>Status</th><th>${chgHead}</th>`).join("")}${L.length>1?`<th>${L.length===2?"Both lines":"All lines"}</th>`:""}</tr></thead><tbody>${rosterRows}</tbody></table></div></section>`;
-
-  /* notes */
-  const flags=trFlags(cur);
-  const method=[
-    "Best = the best entry in the test window. Multi-rep sets are converted to an estimated 1RM with the Brzycki formula (weight × 36 ÷ (37 − reps)); tested singles are used as entered.",
-    "Ratio = best ÷ body weight on test day (the profile weight is used only when no test-day weight was entered). Over = best at or above the line × body weight.",
-    `Within 10% = ratio at or above ${L.map(ex=>`${tr2(ST[ex.id].line*0.9)}× for ${esc(trShort(ex).toLowerCase())}`).join(", ")}. Next target = the 3-rep load (or single) that estimates at the line, rounded up to the next 5 lb.`,
-    `Lines come from the dashboard's Setup tab (${sexWord}): ${L.map(ex=>`${esc(ex.name)} ${trLineTxt(ST[ex.id].line)}× BW`).join(", ")}.`,
-    cmp.mode==="career"?"Change = this test's best minus the athlete's first test on record for the same lift. Athletes testing for the first time show \"first test\".":
-      cmp.mode==="event"?`Change = this test's best minus the best in ${esc(cmp.label)}, for the same athlete and lift. Athletes who missed that test show —.`:
-      "Change starts with the next saved test.",
-    "Entries flagged Verify are left out of team numbers and change. All athlete lists are sorted A–Z by last name."
-  ];
-  const notes=`<section class="tr-sec tr-pb"><div class="tr-head"><span class="tr-eye">For coaches</span><h2>Coach <span>Notes</span></h2><p>How the numbers were built, and what to fix before the next test.</p></div>
-    <div class="tr-det"><h4>Data flags this test (${flags.length})</h4>${flags.length?`<ul>${flags.map(f=>`<li>${f}</li>`).join("")}</ul>`:`<ul><li>No data problems found.</li></ul>`}</div>
-    ${ev&&ev.note?`<div class="tr-det"><h4>Coach's note</h4><ul><li>${esc(ev.note)}</li></ul></div>`:""}
-    <div class="tr-det"><h4>How this report is scored</h4><ul>${method.map(m=>`<li>${m}</li>`).join("")}</ul></div></section>`;
-
-  const html=`<div class="tr-doc">
-  <header class="tr-mast"><div class="tr-mast-in">
-    <div class="tr-mast-top"><div class="tr-brand"><img alt="Naperville North Huskies" src="${LOGO}"><div class="tr-wm">Huskies Strength &amp; Performance<div class="tr-pil"><span>Train Smart.</span><span>Compete with Purpose.</span><span>Lead Strong.</span></div></div></div>
-    <span class="tr-eye">NNHS ${esc(T.sport)} · ${esc(evName)} · ${esc(trRange(T.from,T.to))}</span></div>
-    <h1>Over the <span>Line</span></h1><p class="tr-lede">${esc(lede)}</p></div></header>
-  <div class="tr-wrap">
-    <section class="tr-sec"><div class="tr-truth"><div class="tr-copy"><span class="tr-eye">The honest read</span>
-      <div class="tr-verdict">${esc(v1)}<br><em>${esc(v2)}</em></div><p>${t1}</p><p>${t2}</p>${t3?`<p>${t3}</p>`:""}</div><div>${cards}</div></div></section>
-    ${liftSecs}${growth}${roster}${notes}
-    <footer class="tr-foot"><b>BUILT IN THE VILLE</b><span>Train Smart. Compete with Purpose. Lead Strong.</span></footer>
-  </div></div>`;
-  return {html,cur,ev,evName,auto,v1,v2};
-}
-
-/* ---------- the tab (controls + report) ---------- */
-function testReportHTML(){
-  trInit();
-  const T=S.tr, ev=trCurEvent();
-  const opt=(v,l,sel)=>`<option value="${esc(v)}" ${sel?"selected":""}>${esc(l)}</option>`;
-  const evs=trEventsFor(T.sport,T.gender);
-  const team=trTeam(T.sport,T.gender);
-  const rep=team.length?trReportHTML():null;
-  const prevEvs=evs.filter(e=>e.id!==T.eventId&&String(e.to)<T.from);
-  const lastPrev=prevEvs.length?prevEvs[prevEvs.length-1]:null;
-  const bad=T.from>T.to;
-  const ctl=`<div class="card print-hide" style="margin-bottom:22px"><div class="cardhead">TEST REPORT <span class="sub">Over the Line report for a team's coaching staff</span></div>
-  <div class="tr-ctl">
-    <div class="row">
-      <label class="f"><span class="lab">Sport</span><select onchange="A.trSport(this.value)">${S.sports.map(s=>opt(s,s,s===T.sport)).join("")}</select></label>
-      <label class="f" style="min-width:120px"><span class="lab">Gender</span><select onchange="A.trSet('gender',this.value)">${opt("Male","Male",T.gender==="Male")}${opt("Female","Female",T.gender==="Female")}</select></label>
-      <label class="f grow"><span class="lab">Test</span><select onchange="A.trEvent(this.value)">${opt("","New / unsaved test (pick dates)",!T.eventId)}${evs.slice().reverse().map(e=>opt(e.id,`${e.name} · ${trRange(e.from,e.to)}`,e.id===T.eventId)).join("")}</select></label>
-      <label class="f grow"><span class="lab">Compare to</span><select onchange="A.trSet('cmp',this.value)">
-        ${opt("prev",`Previous test${lastPrev?` (${lastPrev.name})`:" (none saved yet)"}`,T.cmp==="prev")}
-        ${opt("career","Career baseline (each athlete's first test)",T.cmp==="career")}
-        ${prevEvs.slice().reverse().map(e=>opt(e.id,`${e.name} · ${trRange(e.from,e.to)}`,e.id===T.cmp)).join("")}</select></label>
-    </div>
-    <div class="row">
-      <label class="f"><span class="lab">From</span><input type="date" value="${esc(T.from)}" onchange="A.trDates('from',this.value)"></label>
-      <label class="f"><span class="lab">To</span><input type="date" value="${esc(T.to)}" onchange="A.trDates('to',this.value)"></label>
-      <label class="f grow"><span class="lab">Test name</span><input id="tr-name" value="${esc(ev?ev.name:"Test "+(evs.length+1))}" placeholder="Test 2"></label>
-      ${ev?`<button class="btn btn-navy" onclick="A.trSaveEvent()">SAVE CHANGES</button><button class="btn btn-ghost" onclick="A.trDelEvent()">DELETE TEST</button>`
-          :`<button class="btn btn-navy" onclick="A.trSaveEvent()">SAVE AS TEST</button>`}
-    </div>
-    <div class="row">
-      <label class="f grow"><span class="lab">Headline line 1</span><input id="tr-v1" value="${esc(ev?ev.v1||"":T.v1||"")}" placeholder="${esc(rep?rep.auto[0]:"Strong top.")}" onchange="A.trHeadline()"></label>
-      <label class="f grow"><span class="lab">Headline line 2 (orange)</span><input id="tr-v2" value="${esc(ev?ev.v2||"":T.v2||"")}" placeholder="${esc(rep?rep.auto[1]:"Fill the middle.")}" onchange="A.trHeadline()"></label>
-      <label class="f grow"><span class="lab">Coach's note (optional, prints in Coach Notes)</span><input id="tr-note" value="${esc(ev?ev.note||"":T.note||"")}" onchange="A.trHeadline()"></label>
-    </div>
-    <div class="row">
-      <button class="btn btn-orange" onclick="A.trPrint()">PRINT / SAVE PDF</button>
-      <button class="btn btn-ghost" onclick="A.trDownload()">DOWNLOAD REPORT FILE</button>
-    </div>
-    ${bad?`<div class="warn">"From" is after "To" — swap the dates.</div>`:""}
-    <div class="hint">Lines come from Setup (${esc(T.gender.toLowerCase())}). Save each test once so the growth tracker can plot it. Blank headline = the suggested text shown in grey. ${ev?"":"<b>This test is not saved yet</b> — it will not show up in later growth trackers until you save it."}${window.self!==window.top?" <b>Inside the website, PRINT downloads the report file</b> — open it and print from there.":""}</div>
-  </div></div>`;
-  let body;
-  if(!team.length) body=`<div class="alert">No ${esc(T.gender.toLowerCase())} athletes are tagged with ${esc(T.sport)}. Tag athletes on the Athletes tab, or pick another sport or gender.</div>`;
-  else if(!rep) body=`<div class="alert">No ${esc(T.sport)} (${esc(T.gender.toLowerCase())}) athlete has a graded lift between ${esc(trDate(T.from))} and ${esc(trDate(T.to))}. A lift is graded when it is a ×BW lift with a ${esc(T.gender.toLowerCase())} line set in Setup.${trLatestDate(T.sport,T.gender)?` Most recent test date for this team: <b>${esc(trDate(trLatestDate(T.sport,T.gender)))}</b>.`:""}</div>`;
-  else body=rep.html;
-  return ctl+body;
-}
-
-/* ---------- actions ---------- */
-Object.assign(A,{
-  trSport(v){ S.tr=trPickSport(v); render(); },
-  trSet(k,v){ S.tr[k]=v; if(k==="gender"){ const ev=trEventsFor(S.tr.sport,v);
-      if(ev.length){ const e=ev[ev.length-1]; Object.assign(S.tr,{eventId:e.id,from:e.from,to:e.to}); }
-      else { const d=trLatestDate(S.tr.sport,v)||today(); Object.assign(S.tr,{eventId:"",from:d,to:d}); } S.tr.cmp="prev"; }
-    render(); },
-  trEvent(id){ const e=S.testEvents.find(x=>x.id===id);
-    if(e) Object.assign(S.tr,{eventId:e.id,from:e.from,to:e.to}); else S.tr.eventId="";
-    if(S.tr.cmp!=="prev"&&S.tr.cmp!=="career") S.tr.cmp="prev"; render(); },
-  trDates(k,v){ if(!v) return; S.tr[k]=v; if(k==="from"&&S.tr.to<v) S.tr.to=v; render(); },
-  trHeadline(){ const g=id=>(document.getElementById(id)||{}).value||""; const ev=trCurEvent();
-    const v1=g("tr-v1").trim(), v2=g("tr-v2").trim(), note=g("tr-note").trim();
-    if(ev){ const list=S.testEvents.map(e=>e.id===ev.id?{...e,v1,v2,note}:e);
-      trSaveEvents(list).then(()=>render()).catch(e=>say("Couldn't save the headline.\n\n"+(e.message||e))); }
-    else { Object.assign(S.tr,{v1,v2,note}); render(); } },
-  async trSaveEvent(){
-    const T=S.tr, name=((document.getElementById("tr-name")||{}).value||"").trim();
-    if(!name){ say("Give the test a name, like \"Test 2\" or \"Winter Max\"."); return; }
-    if(T.from>T.to){ say("\"From\" is after \"To\" — swap the dates first."); return; }
-    const g=id=>((document.getElementById(id)||{}).value||"").trim();
-    const ev=trCurEvent();
-    const clash=trEventsFor(T.sport,T.gender).find(e=>e.id!==(ev&&ev.id)&&!(e.to<T.from||e.from>T.to));
-    if(clash && !(await ask(`These dates overlap "${clash.name}" (${trRange(clash.from,clash.to)}). Overlapping tests count the same entries twice in the growth tracker.\n\nSave anyway?`,{title:"Dates overlap",ok:"Save anyway"}))) return;
-    let list;
-    if(ev) list=S.testEvents.map(e=>e.id===ev.id?{...e,name,from:T.from,to:T.to,v1:g("tr-v1"),v2:g("tr-v2"),note:g("tr-note")}:e);
-    else { const ne={id:uid(),name,sport:T.sport,gender:T.gender,from:T.from,to:T.to,v1:g("tr-v1"),v2:g("tr-v2"),note:g("tr-note")};
-      list=S.testEvents.concat([ne]); T.eventId=ne.id; }
-    try{ await trSaveEvents(list); render(); }
-    catch(e){ if(!ev) T.eventId=""; say("Couldn't save the test.\n\n"+(e.message||e)); }
-  },
-  async trDelEvent(){ const ev=trCurEvent(); if(!ev) return;
-    if(!(await ask(`Delete the saved test "${ev.name}" (${trRange(ev.from,ev.to)})?\n\nNo athlete numbers are deleted — only the saved test, so it drops off the growth tracker.`,{title:"Delete saved test",ok:"Delete",danger:true}))) return;
-    try{ await trSaveEvents(S.testEvents.filter(e=>e.id!==ev.id)); S.tr.eventId=""; if(S.tr.cmp===ev.id) S.tr.cmp="prev"; render(); }
-    catch(e){ say("Couldn't delete it.\n\n"+(e.message||e)); } },
-  trFileHTML(){
-    const r=trReportHTML(); if(!r) return null;
-    const title=`${S.tr.sport} ${r.evName} ${S.tr.to} Over the Line`;
-    return {name:`NNHS_${safeName(S.tr.sport)}_${safeName(r.evName)}_${S.tr.to}.html`,
-      text:`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(title)}</title><link rel="stylesheet" href="${TR_FONTS}"><style>body{margin:0;background:#F2F4F7}.tr-doc{max-width:1040px;margin:0 auto}.tr-printbar{position:sticky;top:0;z-index:5;background:#0B1E30;color:#fff;padding:10px 16px;font:600 14px system-ui;display:flex;gap:12px;align-items:center;justify-content:center}.tr-printbar button{font:800 13px system-ui;background:#FF4800;color:#fff;border:0;border-radius:6px;padding:9px 16px;cursor:pointer}@media print{.tr-printbar{display:none}.tr-doc{max-width:none}}${TR_CSS}</style></head><body><div class="tr-printbar">Huskies Strength &amp; Performance · ${esc(title)} <button onclick="window.print()">PRINT / SAVE PDF</button></div>${r.html}</body></html>`};
-  },
-  trDownload(){ const f=A.trFileHTML(); if(!f){ say("Nothing to download — no graded lifts in this window."); return; } downloadBlob(f.name,f.text,"text/html;charset=utf-8"); },
-  trPrint(){ if(!trReportHTML()){ say("Nothing to print — no graded lifts in this window."); return; }
-    if(window.self!==window.top){ A.trDownload(); say("The report file is downloading. Open it and press PRINT / SAVE PDF at the top — printing from inside the website prints the whole page around the dashboard."); return; }
-    window.print(); }
-});
-
 
 /* ---------------- boot + live sync ---------------- */
 async function boot(){
