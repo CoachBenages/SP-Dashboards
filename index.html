@@ -1219,6 +1219,9 @@ function kioskHTML(){
       </div>
       <p class="mid" style="margin:10px 0 0">Enter the weight you lifted and how many reps you got. Leave blank anything you didn't test.</p>
       <label class="f" style="margin-bottom:14px"><span class="lab">Test date</span><input type="date" id="te-date" value="${today()}"></label>
+      <div class="liftrow" style="margin-bottom:14px;border:2px solid var(--orange)"><div class="nm">Body weight today (lb) <span class="mid" style="font-weight:400">— required for any lift · last: ${me.weight?fmtNum(me.weight)+" lb":"none on file"}</span></div>
+        <div class="inrow"><input type="number" inputmode="decimal" min="60" max="450" step="0.5" id="te-bw" placeholder="weigh in, then type it here"></div>
+        <div class="est">Step on the scale with a coach watching. Your strength line is based on this number.</div></div>
       <div class="grid2">${rows}</div>
       <div style="display:flex;gap:10px;margin-top:16px">
         <button class="btn btn-navy" onclick="A.kSubmitTests()">SUBMIT</button>
@@ -1972,12 +1975,25 @@ const A={
     if(S.kiosk.submitting) return;
     const me=S.athletes.find(x=>x.id===S.kiosk.meId);
     const date=document.getElementById("te-date").value||today();
+    /* v31: body weight is entered on test day, not copied from the profile */
+    const bwEl=document.getElementById("te-bw"), bwRaw=bwEl?String(bwEl.value).trim():"";
+    const bwIn=bwRaw===""?null:+bwRaw;
+    const needBW=S.exercises.some(ex=>isRatio(ex)&&(document.getElementById("te-"+ex.id)||{}).value);
+    if(bwIn!=null&&(isNaN(bwIn)||bwIn<60||bwIn>450)){ say("Body weight must be between 60 and 450 lb. Check the number and try again."); return; }
+    if(needBW&&bwIn==null){ say("Enter your body weight today before you submit a lift. Step on the scale with a coach watching, then type the number in the orange box."); if(bwEl) bwEl.focus(); return; }
+    const prevBW=+me.weight||null;
+    if(bwIn!=null&&prevBW&&Math.abs(bwIn-prevBW)>10){
+      const diff=Math.round(Math.abs(bwIn-prevBW)*10)/10;
+      const ok=await ask(`You entered ${fmtNum(bwIn)} lb. That is ${fmtNum(diff)} lb ${bwIn>prevBW?"more":"less"} than your last weight (${fmtNum(prevBW)} lb).\n\nDid a coach weigh you today?`,{title:"Check your body weight",ok:"Yes — a coach weighed me",cancel:"Let me fix it"});
+      if(!ok){ if(bwEl) bwEl.focus(); return; }
+    }
+    const bwUse=bwIn!=null?bwIn:prevBW;
     const rows=[];
     S.exercises.forEach(ex=>{
       const el=document.getElementById("te-"+ex.id); if(!el)return;
       const w=el.value; if(w===""||isNaN(+w))return;
       const reps=usesReps(ex)?(+document.getElementById("tr-"+ex.id).value||1):1;
-      rows.push({id:uid(),athlete_id:me.id,ex_id:ex.id,weight:+w,reps,value:usesReps(ex)?est1RM(+w,reps):+w,date,bw:+me.weight||null});  /* v28: body weight at test time */
+      rows.push({id:uid(),athlete_id:me.id,ex_id:ex.id,weight:+w,reps,value:usesReps(ex)?est1RM(+w,reps):+w,date,bw:bwUse||null});  /* v31: body weight entered on test day */
     });
     const badFt=S.exercises.filter(ex=>isFtIn(ex)&&document.getElementById("tf-"+ex.id)&&(document.getElementById("tf-"+ex.id).value!==""||document.getElementById("ti-"+ex.id).value!=="")&&document.getElementById("te-"+ex.id).value==="");
     if(badFt.length){say(`Check ${badFt.map(e=>e.name).join(", ")} — inches must be 0 to 11.5 (a 6'7" jump is 6 ft, 7 in).`);return;}
@@ -1995,6 +2011,13 @@ const A={
       return;   /* stay on the entry screen so nothing typed is lost */
     }
     S.tests.push(...rows);
+    /* v31: keep the profile weight in step with today's weigh-in so every tab agrees */
+    if(bwIn!=null&&bwIn!==prevBW){
+      const upd={...me,weight:bwIn};
+      S.athletes=S.athletes.map(x=>x.id===me.id?upd:x);
+      try{ await DB.upsertAthlete(upd); }
+      catch(e){ S.athletes=S.athletes.map(x=>x.id===me.id?me:x); console.warn("profile weight update failed (tests were saved with the weight)",e); }
+    }
     S.kiosk.savedCount=rows.length;
     S.kiosk.savedList=rows.map(r=>{
       const ex=S.exercises.find(e=>e.id===r.ex_id)||{};
@@ -2563,6 +2586,11 @@ function trFlags(cur){
   if(dnt.length) F.push(`<b>${dnt.length} on the ${esc(cur.sport)} roster did not test</b> in this window: ${dnt.map(a=>esc(trName(a))).join("; ")}.`);
   const prof=[]; cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ if(r.bwProfile&&r.bw&&!prof.includes(r.name)) prof.push(r.name); }));
   if(prof.length) F.push(`<b>No test-day body weight for ${prof.length} athlete${prof.length>1?"s":""}</b>; the profile weight was used instead: ${prof.sort().map(esc).join("; ")}.`);
+  const jumps=[]; const seen=new Set();
+  cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ if(seen.has(r.id)||r.bwProfile||!r.bw) return; seen.add(r.id);
+    const prior=S.tests.filter(t=>t.athlete_id===r.id&&+t.bw>0&&String(t.date)<cur.from).sort(tOrder);
+    if(prior.length){ const pb=+prior[prior.length-1].bw, d=Math.round((r.bw-pb)*10)/10; if(Math.abs(d)>=10) jumps.push(`${esc(r.name)} (${trLb(pb)} → ${trLb(r.bw)}, ${d>0?"+":""}${trLb(d)})`); } }));
+  if(jumps.length) F.push(`<b>Body weight changed 10+ lb since the last weigh-in:</b> ${jumps.join("; ")}. Real growth or a typo — confirm on the scale.`);
   const bws=[]; cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ if(r.bw) bws.push(r.bw); }));
   const round=bws.filter(b=>b%5===0).length;
   if(bws.length>=10 && round/bws.length>0.5) F.push(`<b>Body weights look rounded:</b> ${round} of ${bws.length} graded entries end in 0 or 5. Athletes near the line can flip status on a few pounds, so weigh everyone on test day.`);
