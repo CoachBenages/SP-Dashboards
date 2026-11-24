@@ -1210,7 +1210,7 @@ function kioskHTML(){
     body=`<div class="inner"><div class="kioskcard">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
         <div><h2 style="margin-bottom:2px">${esc(me.first_name)} ${esc(me.last_name)}</h2>
-          <div class="mid" style="font-size:12.5px">${me.weight} lb${me.height?` · ${fmtHeight(me.height)}`:""} — update this if it's changed</div></div>
+          <div class="mid" style="font-size:12.5px">${me.height?`${fmtHeight(me.height)} · `:""}last weigh-in ${me.weight} lb — enter today's weight below</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-ghost" style="padding:7px 12px;font-size:12px" onclick="A.kMyReport()">My report</button>
           <button class="btn btn-ghost" style="padding:7px 12px;font-size:12px" onclick="A.kStage('edit')">Profile</button>
