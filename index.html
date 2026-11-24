@@ -208,7 +208,7 @@ input:focus,select:focus{outline:2px solid var(--orange);border-color:var(--oran
    FALLBACK_CODE is only used if Supabase isn't configured below.
    --------------------------------------------------------------- */
 const ACCESS = { FALLBACK_CODE: "Huskies2026", HOURS: 12 };
-const BUILD = "v31";   // shown in the header so you can confirm which version loaded
+const BUILD = "v32";   // shown in the header so you can confirm which version loaded
 
 const CONFIG = { SUPABASE_URL: "https://qyhlsoidbyiwlatpoewl.supabase.co", SUPABASE_ANON_KEY: "sb_publishable_cZE5LZny7o9pQKpf48J2cA_Xp1vGbTn" };
 
@@ -2451,11 +2451,14 @@ async function trSaveEvents(list){
   S.testEvents = list;
 }
 const trEvSort = (a,b)=>String(a.to).localeCompare(String(b.to))||String(a.from).localeCompare(String(b.from));
-const trEventsFor = (sport,gender)=>S.testEvents.filter(e=>e.sport===sport&&e.gender===gender).slice().sort(trEvSort);
+const trByNow = ()=> (S.tr&&S.tr.by)||"sport";
+const trEventsFor = (sport,gender)=>S.testEvents.filter(e=>(e.by||"sport")===trByNow()&&e.sport===sport&&e.gender===gender).slice().sort(trEvSort);
 
 /* ---------- team + lifts ---------- */
-const trTeam = (sport,gender)=>S.athletes.filter(a=>listOf(a.sports).includes(sport)&&a.gender===gender);
+const trTeam = (sport,gender)=>S.athletes.filter(a=>listOf(trByNow()==="period"?a.periods:a.sports).includes(sport)&&(gender==="All"||a.gender===gender));
+const trGroupWord = ()=> trByNow()==="period"?"class":"roster";
 const trLine = (ex,gender)=>{ const k=gender==="Female"?ex.kpi_f:ex.kpi_m; return k==null||k===""?null:+k; };
+const trHasLine = (ex,gender)=> gender==="All" ? (trLine(ex,"Male")!=null||trLine(ex,"Female")!=null) : trLine(ex,gender)!=null;
 const trName = a=>`${(a.last_name||"").trim()}, ${(a.first_name||"").trim()}`;
 const tr2 = v=>(Math.round(v*100)/100).toFixed(2);
 const trLineTxt = v=>{ const s=String(+v); return s.includes(".")?s:s+".0"; };
@@ -2471,18 +2474,19 @@ function trBuild(sport,gender,from,to,liftIds){
   const team=trTeam(sport,gender), ids=new Set(team.map(a=>a.id));
   const inR=t=>{ const d=String(t.date); return d>=from&&d<=to; };
   const tt=S.tests.filter(t=>ids.has(t.athlete_id)&&inR(t));
-  let lifts=S.exercises.filter(e=>isRatio(e)&&trLine(e,gender)!=null).sort((a,b)=>(+a.sort||0)-(+b.sort||0));
+  let lifts=S.exercises.filter(e=>isRatio(e)&&trHasLine(e,gender)).sort((a,b)=>(+a.sort||0)-(+b.sort||0));
   lifts = liftIds ? lifts.filter(e=>liftIds.includes(e.id)) : lifts.filter(e=>tt.some(t=>t.ex_id===e.id));
   const out={sport,gender,from,to,team,lifts,rows:{},stats:{}};
   for(const ex of lifts){
-    const line=trLine(ex,gender), rows=[];
+    const rows=[];
     for(const a of team){
+      const line=trLine(ex,a.gender==="Female"?"Female":"Male"); if(line==null) continue;
       const r=tt.filter(t=>t.athlete_id===a.id&&t.ex_id===ex.id);
       if(!r.length) continue;
       const t=r.reduce((x,y)=>(+y.value>+x.value)||(+y.value===+x.value&&tOrder(y,x)>0)?y:x);
       const bwT=+t.bw>0?+t.bw:null, bw=bwT||(+a.weight>0?+a.weight:null);
       const row={id:a.id,a,name:trName(a),bw,bwProfile:!bwT,best:+t.value,w:+t.weight,reps:+t.reps||1,date:String(t.date),
-        how:(+t.reps>1)?`${fmtNum(t.weight)}×${t.reps}`:"1RM",ratio:null,status:"below",reason:""};
+        how:(+t.reps>1)?`${fmtNum(t.weight)}×${t.reps}`:"1RM",ratio:null,status:"below",reason:"",line};
       if(!bw){ row.status="flag"; row.reason="no body weight on file"; rows.push(row); continue; }
       row.ratio=row.best/bw;
       if(row.ratio < line*0.4){ row.status="flag"; row.reason=`${trLb(row.best)} lb at ${trLb(bw)} lb BW (${tr2(row.ratio)}×) is too low to be real`; }
@@ -2493,8 +2497,13 @@ function trBuild(sport,gender,from,to,liftIds){
     rows.sort((x,y)=>byName(x.a,y.a));
     out.rows[ex.id]=rows;
     const v=rows.filter(r=>r.status!=="flag"), over=v.filter(r=>r.status==="over").length, reach=v.filter(r=>r.status==="reach").length;
-    out.stats[ex.id]={line,n:v.length,over,reach,below:v.length-over-reach,pct:trPct(over,v.length),
-      med:trMedian(v.map(r=>r.ratio)),avg:v.length?v.reduce((s,r)=>s+r.best,0)/v.length:0};
+    const lines=[...new Set(rows.map(r=>r.line))];
+    const lm=trLine(ex,"Male"), lf=trLine(ex,"Female");
+    const mixed=gender==="All"&&lines.length>1;
+    const line=mixed?null:(lines[0]!=null?lines[0]:trLine(ex,gender==="All"?"Male":gender));
+    const lineTxt=mixed?`${trLineTxt(lm)}× boys / ${trLineTxt(lf)}× girls`:`${trLineTxt(line)}×`;
+    out.stats[ex.id]={line,mixed,lineTxt,lm,lf,n:v.length,over,reach,below:v.length-over-reach,pct:trPct(over,v.length),
+      med:trMedian(v.map(r=>mixed?r.ratio/r.line:r.ratio)),avg:v.length?v.reduce((s,r)=>s+r.best,0)/v.length:0};
   }
   return out;
 }
@@ -2512,11 +2521,12 @@ function trFirstOnRecord(aid,exid,before){
 /* ---------- state + defaults ---------- */
 function trLatestDate(sport,gender){
   const ids=new Set(trTeam(sport,gender).map(a=>a.id));
-  const ok=new Set(S.exercises.filter(e=>isRatio(e)&&trLine(e,gender)!=null).map(e=>e.id));
+  const ok=new Set(S.exercises.filter(e=>isRatio(e)&&trHasLine(e,gender)).map(e=>e.id));
   let d=null; for(const t of S.tests){ if(ids.has(t.athlete_id)&&ok.has(t.ex_id)){ const x=String(t.date); if(!d||x>d) d=x; } }
   return d;
 }
 function trGenderFor(sport){
+  if(trByNow()==="period") return "All";
   let m=0,f=0; for(const a of S.athletes){ if(listOf(a.sports).includes(sport)){ if(a.gender==="Female") f++; else m++; } }
   if(/^G /.test(sport)) return "Female"; if(/^B /.test(sport)) return "Male";
   return f>m?"Female":"Male";
@@ -2524,9 +2534,10 @@ function trGenderFor(sport){
 function trPickSport(sport){
   const gender=trGenderFor(sport);
   const ev=trEventsFor(sport,gender);
-  if(ev.length){ const e=ev[ev.length-1]; return {sport,gender,eventId:e.id,from:e.from,to:e.to,cmp:"prev"}; }
+  const by=trByNow();
+  if(ev.length){ const e=ev[ev.length-1]; return {by,sport,gender,eventId:e.id,from:e.from,to:e.to,cmp:"prev"}; }
   const d=trLatestDate(sport,gender)||today();
-  return {sport,gender,eventId:"",from:d,to:d,cmp:"prev"};
+  return {by,sport,gender,eventId:"",from:d,to:d,cmp:"prev"};
 }
 function trInit(){
   if(S.tr) return;
@@ -2553,7 +2564,7 @@ function trPrevRow(cmp,exid,row,cur){
   if(cmp.mode==="event"){ const r=(cmp.build.rows[exid]||[]).find(x=>x.id===row.id); return r&&r.status!=="flag"?{best:r.best,ratio:r.ratio,status:r.status}:null; }
   if(cmp.mode==="career"){
     const f=trFirstOnRecord(row.id,exid,cur.from); if(!f||!f.bw) return null;
-    const line=cur.stats[exid].line;
+    const line=row.line;
     return {best:f.best,ratio:f.ratio,status:f.best>=line*f.bw-1e-9?"over":"below",date:f.date};
   }
   return null;
@@ -2583,7 +2594,7 @@ function trFlags(cur){
   }
   const tested=new Set(); cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>tested.add(r.id)));
   const dnt=cur.team.filter(a=>!tested.has(a.id)).sort(byName);
-  if(dnt.length) F.push(`<b>${dnt.length} on the ${esc(cur.sport)} roster did not test</b> in this window: ${dnt.map(a=>esc(trName(a))).join("; ")}.`);
+  if(dnt.length) F.push(`<b>${dnt.length} on the ${esc(cur.sport)} ${trGroupWord()} did not test</b> in this window: ${dnt.map(a=>esc(trName(a))).join("; ")}.`);
   const prof=[]; cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ if(r.bwProfile&&r.bw&&!prof.includes(r.name)) prof.push(r.name); }));
   if(prof.length) F.push(`<b>No test-day body weight for ${prof.length} athlete${prof.length>1?"s":""}</b>; the profile weight was used instead: ${prof.sort().map(esc).join("; ")}.`);
   const jumps=[]; const seen=new Set();
@@ -2596,17 +2607,18 @@ function trFlags(cur){
   if(bws.length>=10 && round/bws.length>0.5) F.push(`<b>Body weights look rounded:</b> ${round} of ${bws.length} graded entries end in 0 or 5. Athletes near the line can flip status on a few pounds, so weigh everyone on test day.`);
   const names=new Set(); cur.lifts.forEach(ex=>cur.rows[ex.id].forEach(r=>{ const a=r.a; if(/^[a-z]/.test(a.first_name||"")||/^[a-z]/.test(a.last_name||"")) names.add(trName(a)); }));
   if(names.size) F.push(`<b>Names to clean up</b> (lower-case): ${[...names].sort().map(esc).join("; ")}. Fix them on the Athletes tab.`);
-  const ids=new Set(S.athletes.filter(a=>!listOf(a.sports).length&&a.gender===cur.gender).map(a=>a.id));
+  const ids=new Set(S.athletes.filter(a=>!listOf(trByNow()==="period"?a.periods:a.sports).length&&(cur.gender==="All"||a.gender===cur.gender)).map(a=>a.id));
   const liftSet=new Set(cur.lifts.map(e=>e.id));
   const untagged=new Set(S.tests.filter(t=>ids.has(t.athlete_id)&&liftSet.has(t.ex_id)&&String(t.date)>=cur.from&&String(t.date)<=cur.to).map(t=>t.athlete_id));
-  if(untagged.size) F.push(`<b>${untagged.size} ${cur.gender==="Female"?"female":"male"} athlete${untagged.size>1?"s":""} tested in this window with no sport tagged</b>, so they are not in any team report: ${S.athletes.filter(a=>untagged.has(a.id)).sort(byName).map(a=>esc(trName(a))).join("; ")}.`);
+  if(untagged.size) F.push(`<b>${untagged.size} ${cur.gender==="All"?"":cur.gender==="Female"?"female ":"male "}athlete${untagged.size>1?"s":""} tested in this window with no ${trByNow()==="period"?"class period":"sport"} tagged</b>, so they are not in any ${trByNow()==="period"?"class":"team"} report: ${S.athletes.filter(a=>untagged.has(a.id)).sort(byName).map(a=>esc(trName(a))).join("; ")}.`);
   return F;
 }
 
 /* ---------- SVG charts ---------- */
 function trHist(ex,st,rows){
-  const v=rows.filter(r=>r.status!=="flag"); if(!v.length) return "";
-  const line=st.line, rs=v.map(r=>r.ratio), span=Math.max(...rs)-Math.min(...rs);
+  const v0=rows.filter(r=>r.status!=="flag"); if(!v0.length) return "";
+  const v=st.mixed?v0.map(r=>({...r,ratio:r.ratio/r.line})):v0;
+  const line=st.mixed?1:st.line, rs=v.map(r=>r.ratio), span=Math.max(...rs)-Math.min(...rs);
   const step=span>1.2?0.10:0.05;
   const idx=r=>Math.floor((r-line)/step+1e-9);
   const lo=Math.min(...v.map(r=>idx(r.ratio))), hi=Math.max(...v.map(r=>idx(r.ratio)),0);
@@ -2614,10 +2626,10 @@ function trHist(ex,st,rows){
   const W=1000,H=300,x0=40,x1=W-10,y0=36,yb=H-34,bw=(x1-x0)/bins.length,mx=Math.max(1,...bins.map(d=>d.n));
   const y=n=>yb-n/mx*(yb-y0); const every=bins.length>16?2:1; let s="";
   bins.forEach((d,k)=>{ const x=x0+k*bw, over=d.i>=0;
-    if(d.n) s+=`<rect x="${x+2}" y="${y(d.n)}" width="${Math.max(1,bw-4)}" height="${yb-y(d.n)}" fill="${over?"#002F55":"#B9C2CD"}"><title>${d.b.toFixed(2)}×: ${d.n}</title></rect><text class="tr-vl" x="${x+bw/2}" y="${y(d.n)-5}" text-anchor="middle">${d.n}</text>`;
-    if((d.i%every)===0) s+=`<text class="tr-ax" x="${x}" y="${yb+16}" text-anchor="middle">${d.b.toFixed(2)}×</text>`; });
+    if(d.n) s+=`<rect x="${x+2}" y="${y(d.n)}" width="${Math.max(1,bw-4)}" height="${yb-y(d.n)}" fill="${over?"#002F55":"#B9C2CD"}"><title>${st.mixed?Math.round(d.b*100)+"% of line":d.b.toFixed(2)+"×"}: ${d.n}</title></rect><text class="tr-vl" x="${x+bw/2}" y="${y(d.n)-5}" text-anchor="middle">${d.n}</text>`;
+    if((d.i%every)===0) s+=`<text class="tr-ax" x="${x}" y="${yb+16}" text-anchor="middle">${st.mixed?Math.round(d.b*100)+"%":d.b.toFixed(2)+"×"}</text>`; });
   const li=bins.findIndex(d=>d.i===0), xl=x0+li*bw;
-  s+=`<line x1="${x0}" x2="${x1}" y1="${yb}" y2="${yb}" stroke="#D6DDE6"/><line x1="${xl}" x2="${xl}" y1="${y0-14}" y2="${yb}" stroke="#FF4800" stroke-width="3" stroke-dasharray="7 5"/><text class="tr-ref" x="${xl+8}" y="${y0-2}">THE LINE · ${trLineTxt(line)}× BW</text>`;
+  s+=`<line x1="${x0}" x2="${x1}" y1="${yb}" y2="${yb}" stroke="#D6DDE6"/><line x1="${xl}" x2="${xl}" y1="${y0-14}" y2="${yb}" stroke="#FF4800" stroke-width="3" stroke-dasharray="7 5"/><text class="tr-ref" x="${xl+8}" y="${y0-2}">THE LINE · ${st.mixed?"100% OF EACH ATHLETE'S LINE":trLineTxt(line)+"× BW"}</text>`;
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(ex.name)} ratio distribution">${s}</svg>`;
 }
 function trGrowthSVG(pts,lifts){
@@ -2642,17 +2654,17 @@ function trReportHTML(){
   const evName=ev?ev.name:"Unsaved test";
   const cmp=trCompare(cur);
   const L=cur.lifts, ST=cur.stats, R=cur.rows;
-  const sexWord=T.gender==="Female"?"female":"male";
-  const lineList=L.map(ex=>`${trLineTxt(ST[ex.id].line)}× bodyweight for ${ex.name.toLowerCase()}`);
+  const sexWord=T.gender==="All"?"":T.gender==="Female"?"female":"male";
+  const lineList=L.map(ex=>`${ST[ex.id].lineTxt} bodyweight for ${ex.name.toLowerCase()}`);
   const joinAnd=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+(a.length>2?",":"")+" and "+a[a.length-1];
   const liftNames=joinAnd(L.map(ex=>ex.name.toLowerCase()));
-  const lede=`${evName}: ${liftNames}, graded against the program's ${sexWord} strength line${L.length>1?"s":""} of ${joinAnd(lineList)}. Each saved test adds a point to the growth tracker.`;
+  const lede=`${evName}: ${liftNames}, graded against the program's ${sexWord?sexWord+" ":""}strength line${L.length>1?"s":""} of ${joinAnd(lineList)}${T.gender==="All"?" (each athlete is graded against the line for their own gender)":""}. Each saved test adds a point to the growth tracker.`;
 
   /* honest read */
   const byId=k=>new Map(R[k].filter(r=>r.status!=="flag").map(r=>[r.id,r]));
   const maps=Object.fromEntries(L.map(ex=>[ex.id,byId(ex.id)]));
   const allOver=L.length>1?[...maps[L[0].id].values()].filter(r=>r.status==="over"&&L.every(ex=>maps[ex.id].get(r.id)&&maps[ex.id].get(r.id).status==="over")).length:null;
-  const t1=`<b>${L.map(ex=>`<span class="tr-mono">${ST[ex.id].over}</span> of <span class="tr-mono">${ST[ex.id].n}</span> ${ex.id==="bp"?"bench their bodyweight":`are over the ${esc(trShort(ex).toLowerCase())} line (${trLineTxt(ST[ex.id].line)}×)`}`).join(". ")}.</b>${allOver!=null?` <span class="tr-mono">${allOver}</span> ${allOver===1?"is":"are"} over the line on ${L.length===2?"both lifts":"every lift"}.`:""}`;
+  const t1=`<b>${L.map(ex=>`<span class="tr-mono">${ST[ex.id].over}</span> of <span class="tr-mono">${ST[ex.id].n}</span> ${ex.id==="bp"&&ST[ex.id].line===1?"bench their bodyweight":`are over the ${esc(trShort(ex).toLowerCase())} line (${ST[ex.id].lineTxt})`}`).join(". ")}.</b>${allOver!=null?` <span class="tr-mono">${allOver}</span> ${allOver===1?"is":"are"} over the line on ${L.length===2?"both lifts":"every lift"}.`:""}`;
   const t2=`<b>The fastest wins are close.</b> ${joinAnd(L.map(ex=>`<span class="tr-mono">${ST[ex.id].reach}</span> on ${esc(trShort(ex).toLowerCase())}`))} ${L.reduce((s,ex)=>s+ST[ex.id].reach,0)===1?"is":"are"} within 10% of the line. Each one has a next-test target on the pages that follow.`;
   /* heaviest quarter */
   const bwOf=new Map(); L.forEach(ex=>R[ex.id].forEach(r=>{ if(r.bw&&r.status!=="flag") bwOf.set(r.id,r.bw); }));
@@ -2672,21 +2684,21 @@ function trReportHTML(){
   const v1=(ev&&ev.v1)||T.v1||auto[0], v2=(ev&&ev.v2)||T.v2||auto[1];
 
   const seg=(n,c,t)=>n?`<div style="flex:${n};background:${c}" title="${t}">${n}</div>`:"";
-  const cards=L.map(ex=>{ const s=ST[ex.id]; return `<div class="tr-lc"><h3>${esc(ex.name)}<small>LINE ${trLineTxt(s.line)}× BW</small></h3>
+  const cards=L.map(ex=>{ const s=ST[ex.id]; return `<div class="tr-lc"><h3>${esc(ex.name)}<small>LINE ${esc(s.lineTxt.toUpperCase())} BW</small></h3>
     <div class="tr-split">${seg(s.over,"#002F55","Over")}${seg(s.reach,"#FF4800","Within reach")}${seg(s.below,"#B9C2CD","Below")}</div>
     <div class="tr-legend"><span><i class="tr-dot" style="background:#002F55"></i>Over <b>${s.over}</b></span><span><i class="tr-dot" style="background:#FF4800"></i>Within 10% <b>${s.reach}</b></span><span><i class="tr-dot" style="background:#B9C2CD"></i>Below <b>${s.below}</b></span></div>
-    <div class="tr-kpis"><div><span class="lb">Over the line</span><b>${s.pct}%</b><span class="s">${s.over} of ${s.n}</span></div><div><span class="lb">Median ratio</span><b>${tr2(s.med)}×</b><span class="s">line ${trLineTxt(s.line)}×</span></div><div><span class="lb">Average best</span><b>${Math.round(s.avg)}</b><span class="s">${esc(ex.unit)}</span></div></div></div>`; }).join("");
+    <div class="tr-kpis"><div><span class="lb">Over the line</span><b>${s.pct}%</b><span class="s">${s.over} of ${s.n}</span></div><div><span class="lb">${s.mixed?"Median % of line":"Median ratio"}</span><b>${s.mixed?Math.round(s.med*100)+"%":tr2(s.med)+"×"}</b><span class="s">${s.mixed?"line = 100%":"line "+esc(s.lineTxt)}</span></div><div><span class="lb">Average best</span><b>${Math.round(s.avg)}</b><span class="s">${esc(ex.unit)}</span></div></div></div>`; }).join("");
 
   /* lift pages */
   const target=(r,line)=>{ const need=line*r.bw; if(r.reps<=1) return `${Math.ceil(need/5)*5}×1`; return `${Math.ceil(need*34/36/5)*5}×3`; };
   const liftSecs=L.map(ex=>{ const s=ST[ex.id], rows=R[ex.id];
     const reach=rows.filter(r=>r.status==="reach"), over=rows.filter(r=>r.status==="over"), fl=rows.filter(r=>r.status==="flag");
     const est=rows.filter(r=>r.status!=="flag"&&r.reps>1).length, sing=rows.filter(r=>r.status!=="flag"&&r.reps<=1).length;
-    const note=`The line is ${trLineTxt(s.line)}× bodyweight. ${est} of ${s.n} maxes are estimated from a multi-rep set; ${sing===1?"the other 1 is a tested single":`the other ${sing} are tested singles`}.${fl.length?` ${fl.length} entr${fl.length>1?"ies are":"y is"} left out until verified (see Coach Notes).`:""}`;
-    return `<section class="tr-sec tr-pb"><div class="tr-head"><span class="tr-eye">${esc(ex.name)} · line ${trLineTxt(s.line)}× bodyweight</span><h2>${esc(trShort(ex))} <span>${s.pct}% over</span></h2><p>${note}</p></div>
-    <div class="tr-chart"><h3>${s.over} of ${s.n} over the line · ${s.reach} within 10%</h3><div class="tr-sub">Athletes per band of best ${esc(trShort(ex).toLowerCase())} ÷ bodyweight. Bands start at the line. Navy = over the line.</div>${trHist(ex,s,rows)}</div>
+    const note=`The line is ${esc(s.lineTxt)} bodyweight. ${est} of ${s.n} maxes are estimated from a multi-rep set; ${sing===1?"the other 1 is a tested single":`the other ${sing} are tested singles`}.${fl.length?` ${fl.length} entr${fl.length>1?"ies are":"y is"} left out until verified (see Coach Notes).`:""}`;
+    return `<section class="tr-sec tr-pb"><div class="tr-head"><span class="tr-eye">${esc(ex.name)} · line ${esc(s.lineTxt)} bodyweight</span><h2>${esc(trShort(ex))} <span>${s.pct}% over</span></h2><p>${note}</p></div>
+    <div class="tr-chart"><h3>${s.over} of ${s.n} over the line · ${s.reach} within 10%</h3><div class="tr-sub">${s.mixed?`Athletes per band of best ${esc(trShort(ex).toLowerCase())} as a % of their own line (boys ${trLineTxt(s.lm)}×, girls ${trLineTxt(s.lf)}× BW)`:`Athletes per band of best ${esc(trShort(ex).toLowerCase())} ÷ bodyweight`}. Bands start at the line. Navy = over the line.</div>${trHist(ex,s,rows)}</div>
     <div class="tr-two"><div class="tr-panel hot"><h3>Within reach</h3><div class="tr-sub">Within 10% of the line, A–Z. Target = the 3-rep load that estimates at the line (tested-single athletes get a single).</div>
-    ${reach.length?`<table class="tr-mini"><thead><tr><th>Athlete</th><th>BW</th><th>Best</th><th>Gap</th><th>Next target</th></tr></thead><tbody>${reach.map(r=>`<tr><td class="n">${esc(r.name)}</td><td class="m">${trLb(r.bw)}</td><td class="m">${trLb(r.best)}</td><td class="m">${trLb(Math.round((s.line*r.bw-r.best)*10)/10)}</td><td class="t">${target(r,s.line)}</td></tr>`).join("")}</tbody></table>`:`<p class="tr-empty">No one within 10% this test.</p>`}</div>
+    ${reach.length?`<table class="tr-mini"><thead><tr><th>Athlete</th><th>BW</th><th>Best</th><th>Gap</th><th>Next target</th></tr></thead><tbody>${reach.map(r=>`<tr><td class="n">${esc(r.name)}</td><td class="m">${trLb(r.bw)}</td><td class="m">${trLb(r.best)}</td><td class="m">${trLb(Math.round((r.line*r.bw-r.best)*10)/10)}</td><td class="t">${target(r,r.line)}</td></tr>`).join("")}</tbody></table>`:`<p class="tr-empty">No one within 10% this test.</p>`}</div>
     <div class="tr-panel"><h3>Over the line</h3><div class="tr-sub">A–Z, with ratio.</div><div class="tr-names">${over.length?over.map(r=>`<span>${esc(r.name)}<i>${tr2(r.ratio)}×</i></span>`).join(""):`<p class="tr-empty">No one over the line this test.</p>`}</div></div></div></section>`; }).join("");
 
   /* growth */
@@ -2696,7 +2708,7 @@ function trReportHTML(){
   let gTitle, gSub, side="", movers="", compared="";
   if(cmp.mode==="none"){
     gTitle=`Baseline set ${trDate(T.to)}: ${L.map(ex=>`${trShort(ex).toLowerCase()} ${ST[ex.id].pct}%`).join(", ")}`;
-    gSub=pts.length>1?"No earlier saved test to compare against with this setting.":"This is the first saved test for this team, so it sets the baseline. Every test after this adds a point and fills the change columns in the roster.";
+    gSub=pts.length>1?"No earlier saved test to compare against with this setting.":`This is the first saved test for this ${T.by==="period"?"class":"team"}, so it sets the baseline. Every test after this adds a point and fills the change columns in the roster.`;
     side=`<div class="tr-base"><span class="tr-eye">${esc(evName)}</span><b class="big">Baseline locked</b><p>From the next saved test on, this page shows:</p><ul><li>Team % over the line for each test date</li><li>Who crossed the line since the comparison test</li><li>Biggest gains in pounds, by lift</li><li>A change column for every athlete in the roster</li></ul></div>`;
   } else {
     if(cmp.mode==="event"){
@@ -2739,7 +2751,7 @@ function trReportHTML(){
     return `<tr><td class="nm">${esc(r0.name)}</td><td class="num">${bwset.join("/")||"—"}${r0.bwProfile?"<small>~</small>":""}</td>${L.map(ex=>cell(ex,r0.id)).join("")}${L.length>1?`<td>${allO?`<span class="tr-chip both">${L.length===2?"Both":"All"}</span>`:""}</td>`:""}</tr>`; }).join("");
   const chgHead=cmp.mode==="none"?"Change":cmp.mode==="career"?"Since first":`Vs ${esc(cmp.short)}`;
   const roster=`<section class="tr-sec tr-pb"><div class="tr-head"><span class="tr-eye">Every athlete · A–Z</span><h2>Full <span>Roster</span></h2><p>${names.size} athletes tested ${T.from===T.to?"on":"from"} ${esc(trRange(T.from,T.to))}. Best = estimated 1RM from the rep set shown (or a tested 1RM). Change = ${cmp.mode==="none"?"pounds gained since the last test (starts with the next saved test)":`pounds gained vs ${esc(cmp.label)}`}.${[...names.values()].some(r=>r.bwProfile)?" ~ = profile body weight used (no test-day weight).":""}</p></div>
-    <div class="tr-tbl"><table class="tr-ros"><thead><tr><th></th><th></th>${L.map(ex=>`<th class="grp" colspan="4">${esc(trShort(ex))} · line ${trLineTxt(ST[ex.id].line)}× BW</th>`).join("")}${L.length>1?"<th></th>":""}</tr>
+    <div class="tr-tbl"><table class="tr-ros"><thead><tr><th></th><th></th>${L.map(ex=>`<th class="grp" colspan="4">${esc(trShort(ex))} · line ${esc(ST[ex.id].lineTxt)} BW</th>`).join("")}${L.length>1?"<th></th>":""}</tr>
     <tr><th>Athlete</th><th>BW</th>${L.map(()=>`<th>Best (lb)</th><th>Ratio</th><th>Status</th><th>${chgHead}</th>`).join("")}${L.length>1?`<th>${L.length===2?"Both lines":"All lines"}</th>`:""}</tr></thead><tbody>${rosterRows}</tbody></table></div></section>`;
 
   /* notes */
@@ -2747,8 +2759,8 @@ function trReportHTML(){
   const method=[
     "Best = the best entry in the test window. Multi-rep sets are converted to an estimated 1RM with the Brzycki formula (weight × 36 ÷ (37 − reps)); tested singles are used as entered.",
     "Ratio = best ÷ body weight on test day (the profile weight is used only when no test-day weight was entered). Over = best at or above the line × body weight.",
-    `Within 10% = ratio at or above ${L.map(ex=>`${tr2(ST[ex.id].line*0.9)}× for ${esc(trShort(ex).toLowerCase())}`).join(", ")}. Next target = the 3-rep load (or single) that estimates at the line, rounded up to the next 5 lb.`,
-    `Lines come from the dashboard's Setup tab (${sexWord}): ${L.map(ex=>`${esc(ex.name)} ${trLineTxt(ST[ex.id].line)}× BW`).join(", ")}.`,
+    `Within 10% = ratio at or above ${L.map(ex=>{const st=ST[ex.id]; return st.mixed?`${tr2(st.lm*0.9)}× (boys) / ${tr2(st.lf*0.9)}× (girls) for ${esc(trShort(ex).toLowerCase())}`:`${tr2(st.line*0.9)}× for ${esc(trShort(ex).toLowerCase())}`;}).join(", ")}. Next target = the 3-rep load (or single) that estimates at the line, rounded up to the next 5 lb.`,
+    `Lines come from the dashboard's Setup tab${sexWord?` (${sexWord})`:""}: ${L.map(ex=>`${esc(ex.name)} ${esc(ST[ex.id].lineTxt)} BW`).join(", ")}.${T.gender==="All"?" Each athlete is graded against the line for their own gender.":""}`,
     cmp.mode==="career"?"Change = this test's best minus the athlete's first test on record for the same lift. Athletes testing for the first time show \"first test\".":
       cmp.mode==="event"?`Change = this test's best minus the best in ${esc(cmp.label)}, for the same athlete and lift. Athletes who missed that test show —.`:
       "Change starts with the next saved test.",
@@ -2762,7 +2774,7 @@ function trReportHTML(){
   const html=`<div class="tr-doc">
   <header class="tr-mast"><div class="tr-mast-in">
     <div class="tr-mast-top"><div class="tr-brand"><img alt="Naperville North Huskies" src="${LOGO}"><div class="tr-wm">Huskies Strength &amp; Performance<div class="tr-pil"><span>Train Smart.</span><span>Compete with Purpose.</span><span>Lead Strong.</span></div></div></div>
-    <span class="tr-eye">NNHS ${esc(T.sport)} · ${esc(evName)} · ${esc(trRange(T.from,T.to))}</span></div>
+    <span class="tr-eye">NNHS ${T.by==="period"?"Class · ":""}${esc(T.sport)} · ${esc(evName)} · ${esc(trRange(T.from,T.to))}</span></div>
     <h1>Over the <span>Line</span></h1><p class="tr-lede">${esc(lede)}</p></div></header>
   <div class="tr-wrap">
     <section class="tr-sec"><div class="tr-truth"><div class="tr-copy"><span class="tr-eye">The honest read</span>
@@ -2787,8 +2799,9 @@ function testReportHTML(){
   const ctl=`<div class="card print-hide" style="margin-bottom:22px"><div class="cardhead">TEST REPORT <span class="sub">Over the Line report for a team's coaching staff</span></div>
   <div class="tr-ctl">
     <div class="row">
-      <label class="f"><span class="lab">Sport</span><select onchange="A.trSport(this.value)">${S.sports.map(s=>opt(s,s,s===T.sport)).join("")}</select></label>
-      <label class="f" style="min-width:120px"><span class="lab">Gender</span><select onchange="A.trSet('gender',this.value)">${opt("Male","Male",T.gender==="Male")}${opt("Female","Female",T.gender==="Female")}</select></label>
+      <label class="f" style="min-width:140px"><span class="lab">Report for</span><select onchange="A.trBy(this.value)">${opt("sport","A sport",T.by!=="period")}${opt("period","A class period",T.by==="period")}</select></label>
+      <label class="f"><span class="lab">${T.by==="period"?"Class period":"Sport"}</span><select onchange="A.trSport(this.value)">${(T.by==="period"?S.periods:S.sports).map(s=>opt(s,s,s===T.sport)).join("")}</select></label>
+      <label class="f" style="min-width:120px"><span class="lab">Gender</span><select onchange="A.trSet('gender',this.value)">${opt("All","All (mixed)",T.gender==="All")}${opt("Male","Male",T.gender==="Male")}${opt("Female","Female",T.gender==="Female")}</select></label>
       <label class="f grow"><span class="lab">Test</span><select onchange="A.trEvent(this.value)">${opt("","New / unsaved test (pick dates)",!T.eventId)}${evs.slice().reverse().map(e=>opt(e.id,`${e.name} · ${trRange(e.from,e.to)}`,e.id===T.eventId)).join("")}</select></label>
       <label class="f grow"><span class="lab">Compare to</span><select onchange="A.trSet('cmp',this.value)">
         ${opt("prev",`Previous test${lastPrev?` (${lastPrev.name})`:" (none saved yet)"}`,T.cmp==="prev")}
@@ -2812,11 +2825,11 @@ function testReportHTML(){
       <button class="btn btn-ghost" onclick="A.trDownload()">DOWNLOAD REPORT FILE</button>
     </div>
     ${bad?`<div class="warn">"From" is after "To" — swap the dates.</div>`:""}
-    <div class="hint">Lines come from Setup (${esc(T.gender.toLowerCase())}). Save each test once so the growth tracker can plot it. Blank headline = the suggested text shown in grey. ${ev?"":"<b>This test is not saved yet</b> — it will not show up in later growth trackers until you save it."}${window.self!==window.top?" <b>Inside the website, PRINT downloads the report file</b> — open it and print from there.":""}</div>
+    <div class="hint">Lines come from Setup${T.gender==="All"?" — each athlete is graded against the line for their own gender":` (${esc(T.gender.toLowerCase())})`}. Save each test once so the growth tracker can plot it. Blank headline = the suggested text shown in grey. ${ev?"":"<b>This test is not saved yet</b> — it will not show up in later growth trackers until you save it."}${window.self!==window.top?" <b>Inside the website, PRINT downloads the report file</b> — open it and print from there.":""}</div>
   </div></div>`;
   let body;
-  if(!team.length) body=`<div class="alert">No ${esc(T.gender.toLowerCase())} athletes are tagged with ${esc(T.sport)}. Tag athletes on the Athletes tab, or pick another sport or gender.</div>`;
-  else if(!rep) body=`<div class="alert">No ${esc(T.sport)} (${esc(T.gender.toLowerCase())}) athlete has a graded lift between ${esc(trDate(T.from))} and ${esc(trDate(T.to))}. A lift is graded when it is a ×BW lift with a ${esc(T.gender.toLowerCase())} line set in Setup.${trLatestDate(T.sport,T.gender)?` Most recent test date for this team: <b>${esc(trDate(trLatestDate(T.sport,T.gender)))}</b>.`:""}</div>`;
+  if(!team.length) body=`<div class="alert">No ${T.gender==="All"?"":esc(T.gender.toLowerCase())+" "}athletes are tagged with ${esc(T.sport)}. Tag athletes on the Athletes tab, or pick another ${T.by==="period"?"class period":"sport"} or gender.</div>`;
+  else if(!rep) body=`<div class="alert">No ${esc(T.sport)}${T.gender==="All"?"":` (${esc(T.gender.toLowerCase())})`} athlete has a graded lift between ${esc(trDate(T.from))} and ${esc(trDate(T.to))}. A lift is graded when it is a ×BW lift with a line set in Setup.${trLatestDate(T.sport,T.gender)?` Most recent test date for this ${T.by==="period"?"class":"team"}: <b>${esc(trDate(trLatestDate(T.sport,T.gender)))}</b>.`:""}</div>`;
   else body=rep.html;
   return ctl+body;
 }
@@ -2824,6 +2837,10 @@ function testReportHTML(){
 /* ---------- actions ---------- */
 Object.assign(A,{
   trSport(v){ S.tr=trPickSport(v); render(); },
+  trBy(v){ const prev=S.tr; S.tr={...prev,by:v};
+    const list=v==="period"?S.periods:S.sports;
+    const pick=v==="sport"?(list.includes("Football")?"Football":list[0]):(list.find(p=>trLatestDate(p,"All"))||list[0]);
+    S.tr=trPickSport(pick||""); render(); },
   trSet(k,v){ S.tr[k]=v; if(k==="gender"){ const ev=trEventsFor(S.tr.sport,v);
       if(ev.length){ const e=ev[ev.length-1]; Object.assign(S.tr,{eventId:e.id,from:e.from,to:e.to}); }
       else { const d=trLatestDate(S.tr.sport,v)||today(); Object.assign(S.tr,{eventId:"",from:d,to:d}); } S.tr.cmp="prev"; }
@@ -2847,7 +2864,7 @@ Object.assign(A,{
     if(clash && !(await ask(`These dates overlap "${clash.name}" (${trRange(clash.from,clash.to)}). Overlapping tests count the same entries twice in the growth tracker.\n\nSave anyway?`,{title:"Dates overlap",ok:"Save anyway"}))) return;
     let list;
     if(ev) list=S.testEvents.map(e=>e.id===ev.id?{...e,name,from:T.from,to:T.to,v1:g("tr-v1"),v2:g("tr-v2"),note:g("tr-note")}:e);
-    else { const ne={id:uid(),name,sport:T.sport,gender:T.gender,from:T.from,to:T.to,v1:g("tr-v1"),v2:g("tr-v2"),note:g("tr-note")};
+    else { const ne={id:uid(),name,by:T.by||"sport",sport:T.sport,gender:T.gender,from:T.from,to:T.to,v1:g("tr-v1"),v2:g("tr-v2"),note:g("tr-note")};
       list=S.testEvents.concat([ne]); T.eventId=ne.id; }
     try{ await trSaveEvents(list); render(); }
     catch(e){ if(!ev) T.eventId=""; say("Couldn't save the test.\n\n"+(e.message||e)); }
@@ -2859,7 +2876,7 @@ Object.assign(A,{
   trFileHTML(){
     const r=trReportHTML(); if(!r) return null;
     const title=`${S.tr.sport} ${r.evName} ${S.tr.to} Over the Line`;
-    return {name:`NNHS_${safeName(S.tr.sport)}_${safeName(r.evName)}_${S.tr.to}.html`,
+    return {name:`NNHS_${S.tr.by==="period"?"Class_":""}${safeName(S.tr.sport)}_${safeName(r.evName)}_${S.tr.to}.html`,
       text:`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(title)}</title><link rel="stylesheet" href="${TR_FONTS}"><style>body{margin:0;background:#F2F4F7}.tr-doc{max-width:1040px;margin:0 auto}.tr-printbar{position:sticky;top:0;z-index:5;background:#0B1E30;color:#fff;padding:10px 16px;font:600 14px system-ui;display:flex;gap:12px;align-items:center;justify-content:center}.tr-printbar button{font:800 13px system-ui;background:#FF4800;color:#fff;border:0;border-radius:6px;padding:9px 16px;cursor:pointer}@media print{.tr-printbar{display:none}.tr-doc{max-width:none}}${TR_CSS}</style></head><body><div class="tr-printbar">Huskies Strength &amp; Performance · ${esc(title)} <button onclick="window.print()">PRINT / SAVE PDF</button></div>${r.html}</body></html>`};
   },
   trDownload(){ const f=A.trFileHTML(); if(!f){ say("Nothing to download — no graded lifts in this window."); return; } downloadBlob(f.name,f.text,"text/html;charset=utf-8"); },
